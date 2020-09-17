@@ -34,6 +34,15 @@ from .general import (
     validate_int,
     validate_output_path,
     validate_type,
+    ArgumentConflictError,
+    DirectoryExistsError,
+    DirectoryNotFoundError,
+    ExecutableNotFoundError,
+    GetterError,
+    IsAFileError,
+    NotAFileError,
+    NotAFileOrDirectoryError,
+    SetterError,
 )
 
 ######################################### ALL ##########################################
@@ -52,4 +61,13 @@ __all__: List[str] = [
     "validate_int",
     "validate_output_path",
     "validate_type",
+    "ArgumentConflictError",
+    "DirectoryExistsError",
+    "DirectoryNotFoundError",
+    "ExecutableNotFoundError",
+    "GetterError",
+    "IsAFileError",
+    "NotAFileError",
+    "NotAFileOrDirectoryError",
+    "SetterError",
 ]

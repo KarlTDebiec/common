@@ -124,14 +124,10 @@ class CLTool(ABC):
         """
 
         def func(value: Any) -> float:
-            # Try cast here, to raise ArgumentTypeError instead of ValueError
             try:
-                value = float(value)
-            except ValueError:
-                raise ArgumentTypeError(
-                    f"'{value}' is of type '{type(value)}', not float"
-                )
-            return validate_float(value, min_value, max_value)
+                return validate_float(value, min_value, max_value)
+            except TypeError as e:
+                raise ArgumentTypeError(e)
 
         return func
 
@@ -155,14 +151,12 @@ class CLTool(ABC):
         """
 
         def func(value: Any) -> str:
-            # Try cast here, to raise ArgumentTypeError instead of ValueError
             try:
-                value = str(value)
-            except ValueError:
-                raise ArgumentTypeError(
-                    f"'{value}' is of type '{type(value)}', not str"
+                return validate_input_path(
+                    value, file_ok, directory_ok, default_directory
                 )
-            return validate_input_path(value, file_ok, directory_ok, default_directory)
+            except TypeError as e:
+                raise ArgumentTypeError(e)
 
         return func
 
@@ -182,14 +176,10 @@ class CLTool(ABC):
         """
 
         def func(value: Any) -> int:
-            # Try cast here, to raise ArgumentTypeError instead of ValueError
             try:
-                value = int(value)
-            except ValueError:
-                raise ArgumentTypeError(
-                    f"'{value}' is of type '{type(value)}', not float"
-                )
-            return validate_int(value, min_value, max_value)
+                return validate_int(value, min_value, max_value)
+            except TypeError as e:
+                raise ArgumentTypeError(e)
 
         return func
 
@@ -213,14 +203,12 @@ class CLTool(ABC):
         """
 
         def func(value: Any) -> str:
-            # Try cast here, to raise ArgumentTypeError instead of ValueError
             try:
-                value = str(value)
-            except ValueError:
-                raise ArgumentTypeError(
-                    f"'{value}' is of type '{type(value)}', not str"
+                return validate_output_path(
+                    value, file_ok, directory_ok, default_directory
                 )
-            return validate_output_path(value, file_ok, directory_ok, default_directory)
+            except TypeError as e:
+                raise ArgumentTypeError(e)
 
         return func
 

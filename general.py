@@ -159,10 +159,10 @@ def validate_executable(value: Any) -> str:
     try:
         value = str(value)
     except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
 
     if which(value) is None:
-        raise ValueError(f"'{value}' executable not found in '{defpath}'")
+        raise ExecutableNotFoundError(f"'{value}' executable not found in '{defpath}'")
     value = which(value)
 
     return value
@@ -172,17 +172,18 @@ def validate_float(
     value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
 ) -> float:
     if min_value is not None and max_value is not None and (min_value >= max_value):
-        raise ValueError("min_value must be greater than max_value")
+        raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
         value = float(value)
     except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not float")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not float")
 
     if min_value is not None and value < min_value:
         raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
     if max_value is not None and value > max_value:
         raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+
     return value
 
 
@@ -209,29 +210,31 @@ def validate_input_path(
         ValueError: If input path is not valid
     """
     if not file_ok and not directory_ok:
-        raise ValueError("both file and directory paths may not be prohibited")
+        raise ArgumentConflictError(
+            "both file and directory paths may not be prohibited"
+        )
     if default_directory is None:
         default_directory = getcwd()
 
     try:
         value = str(value)
     except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
 
     value = expandvars(value)
     if not isabs(value):
         value = join(default_directory, value)
 
     if not exists(value):
-        raise ValueError(f"'{value}' does not exist")
+        raise FileNotFoundError(f"'{value}' does not exist")
     if file_ok and not directory_ok and not isfile(value):
-        raise ValueError(f"'{value}' is not a file")
+        raise NotAFileError(f"'{value}' is not a file")
     if not file_ok and directory_ok and not isdir(value):
-        raise ValueError(f"'{value}' is not a directory")
+        raise NotADirectoryError(f"'{value}' is not a directory")
     if not isfile(value) and not isdir(value):
-        raise ValueError(f"'{value}' is not a file or directory")
+        raise NotAFileOrDirectoryError(f"'{value}' is not a file or directory")
     if not access(value, R_OK):
-        raise ValueError(f"'{value}' cannot be read")
+        raise PermissionError(f"'{value}' cannot be read")
 
     return value
 
@@ -240,17 +243,18 @@ def validate_int(
     value: Any, min_value: Optional[int] = None, max_value: Optional[int] = None
 ) -> int:
     if min_value is not None and max_value is not None and (min_value >= max_value):
-        raise ValueError("min_value must be greater than max_value")
+        raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
         value = int(value)
     except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not int")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not int")
 
     if min_value is not None and value < min_value:
         raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
     if max_value is not None and value > max_value:
         raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+
     return value
 
 
@@ -277,14 +281,16 @@ def validate_output_path(
         ValueError: If output path is not valid
     """
     if not file_ok and not directory_ok:
-        raise ValueError("both file and directory paths may not be prohibited")
+        raise ArgumentConflictError(
+            "both file and directory paths may not be prohibited"
+        )
     if default_directory is None:
         default_directory = getcwd()
 
     try:
         value = str(value)
     except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
 
     value = expandvars(value)
     if not isabs(value):
@@ -292,26 +298,77 @@ def validate_output_path(
 
     if exists(value):
         if file_ok and not directory_ok and not isfile(value):
-            raise ValueError(f"'{value}' is not a file")
+            raise NotAFileError(f"'{value}' is not a file")
         if not file_ok and directory_ok and not isdir(value):
-            raise ValueError(f"'{value}' is not a directory")
+            raise NotADirectoryError(f"'{value}' is not a directory")
         if not isfile(value) and not isdir(value):
-            raise ValueError(f"'{value}' is not a file or directory")
+            raise NotAFileOrDirectoryError(f"'{value}' is not a file or directory")
         if not access(value, W_OK):
-            raise ValueError(f"'{value}' cannot be written")
+            raise PermissionError(f"'{value}' cannot be written")
     else:
         directory = dirname(value)
         if not exists(directory):
-            raise ValueError(f"'{directory}' does not exist")
+            raise DirectoryNotFoundError(f"'{directory}' does not exist")
         if not isdir(directory):
-            raise ValueError(f"'{directory}' is not a directory")
+            raise NotADirectoryError(f"'{directory}' is not a directory")
         if not access(directory, W_OK):
-            raise ValueError(f"'{directory}' cannot be written")
+            raise PermissionError(f"'{directory}' cannot be written")
 
     return value
 
 
 def validate_type(value: Any, cls: Any) -> Any:
     if not isinstance(value, cls):
-        raise ValueError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
     return value
+
+
+####################################### CLASSES ########################################
+class ArgumentConflictError(Exception):
+    pass
+
+
+class DirectoryExistsError(OSError):
+    pass
+
+
+class DirectoryNotFoundError(OSError):
+    pass
+
+
+class ExecutableNotFoundError(OSError):
+    pass
+
+
+class GetterError(TypeError):
+    pass
+
+
+class IsAFileError(OSError):
+    pass
+
+
+class NotAFileError(OSError):
+    pass
+
+
+class NotAFileOrDirectoryError(OSError):
+    pass
+
+
+class SetterError(TypeError):
+    def __init__(self, cls: object, value: object):
+        cls_type_name = type(cls).__name__
+        # noinspection Mypy
+        prop_name = getframeinfo(currentframe().f_back).function
+        value_type_name = type(value).__name__
+        prop_docstring = getattr(type(cls), prop_name).__doc__
+        prop_docstring = prop_docstring.split(":")[0]
+
+        self.message = (
+            f"Property '{cls_type_name}.{prop_name}' was passed invalid value "
+            f"'{value}' of type '{value_type_name}'. Expects '{prop_docstring}'."
+        )
+
+    def __str__(self) -> str:
+        return self.message
