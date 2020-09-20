@@ -16,6 +16,8 @@ from pathlib import Path
 
 ###################################### VARIABLES #######################################
 package_root: str = str(Path(__file__).parent.parent.absolute())
+"""str: absolute path of package containing this common submodule (e.g. if common is a
+submodule of the 'test' package, value is '/path/to/test"""
 
 ####################################### MODULES ########################################
 from typing import List
