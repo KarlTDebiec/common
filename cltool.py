@@ -9,7 +9,7 @@
 """
 General-purpose command-line tool base class not tied to a particular project.
 
-Last updated 2020-09-16.
+Last updated 2020-10-10.
 """
 ####################################### MODULES ########################################
 from abc import ABC, abstractmethod
@@ -21,7 +21,7 @@ from argparse import (
 )
 from typing import Any, Callable, Optional, Union
 
-from .general import (
+from .validation import (
     validate_float,
     validate_input_path,
     validate_int,

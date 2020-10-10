@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#   common/general.py
+#   common/validation.py
 #
 #   Copyright (C) 2017-2020 Karl T Debiec
 #   All rights reserved.
@@ -9,14 +9,11 @@
 """
 General-purpose functions not tied to a particular project.
 
-Last updated 2020-09-16.
+Last updated 2020-10-10.
 """
 ####################################### MODULES ########################################
-from contextlib import contextmanager
-from inspect import currentframe, getframeinfo
-from os import R_OK, W_OK, access, getcwd, remove
+from os import R_OK, W_OK, access, getcwd
 from os.path import (
-    basename,
     defpath,
     dirname,
     exists,
@@ -25,136 +22,20 @@ from os.path import (
     isdir,
     isfile,
     join,
-    splitext,
 )
-from readline import insert_text, redisplay, set_pre_input_hook
 from shutil import which
-from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Optional
 
-from . import package_root
+from .exceptions import (
+    ArgumentConflictError,
+    DirectoryNotFoundError,
+    ExecutableNotFoundError,
+    NotAFileError,
+    NotAFileOrDirectoryError,
+)
 
 
 ###################################### FUNCTIONS #######################################
-def embed_kw(verbosity: int = 2) -> Dict[str, str]:
-    """
-    Prepares header for IPython prompt showing current location in code.
-
-    Use ``IPython.embed(**embed_kw())``.
-
-    Args:
-        verbosity (int): Level of verbose output
-
-    Returns:
-        Dict[str, str]: Keyword arguments to be passed to IPython.embed
-    """
-    frame = currentframe()
-    if frame is None:
-        raise ValueError()
-    # noinspection Mypy
-    frameinfo = getframeinfo(frame.f_back)
-    file = frameinfo.filename.replace(package_root, "")
-    func = frameinfo.function
-    number = frameinfo.lineno - 1
-    header = ""
-    if verbosity >= 1:
-        header = f"IPython prompt in file {file}, function {func}," f" line {number}\n"
-    if verbosity >= 2:
-        header += "\n"
-        with open(frameinfo.filename, "r") as infile:
-            lines = [
-                (i, line)
-                for i, line in enumerate(infile)
-                if i in range(number - 5, number + 6)
-            ]
-        for i, line in lines:
-            header += f"{i:5d} {'>' if i == number else ' '} " f"{line.rstrip()}\n"
-
-    return {"header": header}
-
-
-def get_ext(infile: str) -> str:
-    return splitext(basename(infile))[1].strip(".")
-
-
-def get_name(infile: str) -> str:
-    return splitext(basename(infile))[0]
-
-
-def get_shell_type() -> Optional[str]:
-    """
-    Determines if inside IPython prompt.
-
-    Returns:
-        Optional[str]: Type of shell in use, or None if not in a shell
-    """
-    try:
-        # noinspection Mypy
-        shell = str(get_ipython().__class__.__name__)
-        if shell == "ZMQInteractiveShell":
-            # IPython in Jupyter Notebook
-            return shell
-        if shell == "InteractiveShellEmbed":
-            # IPython in Jupyter Notebook using IPython.embed
-            return shell
-        if shell == "TerminalInteractiveShell":
-            # IPython in terminal
-            return shell
-        # Other
-        return shell
-    except NameError:
-        # Not in IPython
-        return None
-
-
-def input_prefill(prompt: str, prefill: str) -> str:
-    """
-    Prompts user for input with pre-filled text.
-
-    Does not handle colored prompt correctly.
-
-    TODO: Does this block CTRL-D?
-
-    Args:
-        prompt (str): Prompt to present to user
-        prefill (str): Text to prefill for user
-
-    Returns:
-        str: Text inputted by user
-    """
-
-    def pre_input_hook() -> None:
-        insert_text(prefill)
-        redisplay()
-
-    set_pre_input_hook(pre_input_hook)
-    result = input(prompt)
-    set_pre_input_hook()
-
-    return result
-
-
-@contextmanager
-def temporary_filename(suffix: Optional[str] = None) -> Iterator[str]:
-    """
-    Provides a temporary filename; use with 'with'.
-
-    Args:
-        suffix (Optional[str]): Suffix (extension) for temporary filename
-
-    Yields:
-        str: Temporary filename
-    """
-    f = None
-    try:
-        f = NamedTemporaryFile(delete=False, suffix=suffix)
-        f.close()
-        yield f.name
-    finally:
-        if f is not None:
-            remove(f.name)
-
-
 def validate_executable(value: Any) -> str:
     try:
         value = str(value)
@@ -321,54 +202,3 @@ def validate_type(value: Any, cls: Any) -> Any:
     if not isinstance(value, cls):
         raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
     return value
-
-
-####################################### CLASSES ########################################
-class ArgumentConflictError(Exception):
-    pass
-
-
-class DirectoryExistsError(OSError):
-    pass
-
-
-class DirectoryNotFoundError(OSError):
-    pass
-
-
-class ExecutableNotFoundError(OSError):
-    pass
-
-
-class GetterError(TypeError):
-    pass
-
-
-class IsAFileError(OSError):
-    pass
-
-
-class NotAFileError(OSError):
-    pass
-
-
-class NotAFileOrDirectoryError(OSError):
-    pass
-
-
-class SetterError(TypeError):
-    def __init__(self, cls: object, value: object):
-        cls_type_name = type(cls).__name__
-        # noinspection Mypy
-        prop_name = getframeinfo(currentframe().f_back).function
-        value_type_name = type(value).__name__
-        prop_docstring = getattr(type(cls), prop_name).__doc__
-        prop_docstring = prop_docstring.split(":")[0]
-
-        self.message = (
-            f"Property '{cls_type_name}.{prop_name}' was passed invalid value "
-            f"'{value}' of type '{value_type_name}'. Expects '{prop_docstring}'."
-        )
-
-    def __str__(self) -> str:
-        return self.message
