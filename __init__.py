@@ -51,6 +51,16 @@ package_root: str = str(Path(__file__).parent.parent.absolute())
 
 ######################################### ALL ##########################################
 __all__: List[str] = [
+    "ArgumentConflictError",
+    "CLTool",
+    "DirectoryExistsError",
+    "DirectoryNotFoundError",
+    "ExecutableNotFoundError",
+    "GetterError",
+    "IsAFileError",
+    "NotAFileError",
+    "NotAFileOrDirectoryError",
+    "SetterError",
     "embed_kw",
     "get_ext",
     "get_name",
@@ -64,14 +74,4 @@ __all__: List[str] = [
     "validate_int",
     "validate_output_path",
     "validate_type",
-    "ArgumentConflictError",
-    "CLTool",
-    "DirectoryExistsError",
-    "DirectoryNotFoundError",
-    "ExecutableNotFoundError",
-    "GetterError",
-    "IsAFileError",
-    "NotAFileError",
-    "NotAFileOrDirectoryError",
-    "SetterError",
 ]

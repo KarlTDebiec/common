@@ -112,7 +112,7 @@ def input_prefill(prompt: str, prefill: str) -> str:
     """
 
     def pre_input_hook() -> None:
-        insert_text(prefill)
+        insert_text(str(prefill))
         redisplay()
 
     set_pre_input_hook(pre_input_hook)

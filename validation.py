@@ -7,7 +7,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-General-purpose functions not tied to a particular project.
+General-purpose validation functions not tied to a particular project.
 
 Last updated 2020-10-10.
 """
@@ -24,7 +24,7 @@ from os.path import (
     join,
 )
 from shutil import which
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 from .exceptions import (
     ArgumentConflictError,
@@ -121,7 +121,10 @@ def validate_input_path(
 
 
 def validate_int(
-    value: Any, min_value: Optional[int] = None, max_value: Optional[int] = None
+    value: Any,
+    min_value: Optional[int] = None,
+    max_value: Optional[int] = None,
+    choices: Optional[Tuple[int]] = None,
 ) -> int:
     if min_value is not None and max_value is not None and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
@@ -135,6 +138,8 @@ def validate_int(
         raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
     if max_value is not None and value > max_value:
         raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+    if choices is not None and value not in choices:
+        raise ValueError(f"'{value}' is not one of {choices}")
 
     return value
 
