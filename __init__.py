@@ -9,31 +9,14 @@
 """
 General-purpose code not tied to a particular project.
 
-Last updated 2020-09-16.
+Last updated 2020-10-10.
 """
 ####################################### MODULES ########################################
 from pathlib import Path
-
-###################################### VARIABLES #######################################
-package_root: str = str(Path(__file__).parent.parent.absolute())
-
-####################################### MODULES ########################################
 from typing import List
 
 from .cltool import CLTool
-from .general import (
-    embed_kw,
-    get_ext,
-    get_name,
-    get_shell_type,
-    input_prefill,
-    temporary_filename,
-    validate_executable,
-    validate_float,
-    validate_input_path,
-    validate_int,
-    validate_output_path,
-    validate_type,
+from .exceptions import (
     ArgumentConflictError,
     DirectoryExistsError,
     DirectoryNotFoundError,
@@ -44,10 +27,40 @@ from .general import (
     NotAFileOrDirectoryError,
     SetterError,
 )
+from .misc import (
+    embed_kw,
+    get_ext,
+    get_name,
+    get_shell_type,
+    input_prefill,
+    temporary_filename,
+)
+from .validation import (
+    validate_executable,
+    validate_float,
+    validate_input_path,
+    validate_int,
+    validate_output_path,
+    validate_type,
+)
+
+###################################### VARIABLES #######################################
+package_root: str = str(Path(__file__).parent.parent.absolute())
+"""str: absolute path of package containing this common submodule (e.g. if this file is
+'/path/to/test/common/__init__.py', value is '/path/to/test"""
 
 ######################################### ALL ##########################################
 __all__: List[str] = [
+    "ArgumentConflictError",
     "CLTool",
+    "DirectoryExistsError",
+    "DirectoryNotFoundError",
+    "ExecutableNotFoundError",
+    "GetterError",
+    "IsAFileError",
+    "NotAFileError",
+    "NotAFileOrDirectoryError",
+    "SetterError",
     "embed_kw",
     "get_ext",
     "get_name",
@@ -61,13 +74,4 @@ __all__: List[str] = [
     "validate_int",
     "validate_output_path",
     "validate_type",
-    "ArgumentConflictError",
-    "DirectoryExistsError",
-    "DirectoryNotFoundError",
-    "ExecutableNotFoundError",
-    "GetterError",
-    "IsAFileError",
-    "NotAFileError",
-    "NotAFileOrDirectoryError",
-    "SetterError",
 ]
