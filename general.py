@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #   common/general.py
 #
-#   Copyright (C) 2017-2020 Karl T Debiec
+#   Copyright (C) 2017-2021 Karl T Debiec
 #   All rights reserved.
 #
 #   This software may be modified and distributed under the terms of the
@@ -266,6 +266,8 @@ def validate_output_path(
 ) -> str:
     """
     Validates an output path and makes it absolute.
+
+    TODO: option to try to create directory if it does not exist
 
     Args:
         value (Any): Provided output path
