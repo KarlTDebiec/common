@@ -16,7 +16,7 @@ from contextlib import contextmanager
 from inspect import currentframe, getframeinfo
 from os import remove
 from os.path import basename, splitext
-from readline import insert_text, redisplay, set_pre_input_hook
+from readline import insert_text, set_pre_input_hook
 from tempfile import NamedTemporaryFile
 from typing import Dict, Iterator, Optional
 
@@ -110,6 +110,7 @@ def input_prefill(prompt: str, prefill: str) -> str:
     Returns:
         str: Text inputted by user
     """
+    from readline import redisplay
 
     def pre_input_hook() -> None:
         insert_text(str(prefill))
