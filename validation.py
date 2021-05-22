@@ -9,7 +9,7 @@
 """
 General-purpose validation functions not tied to a particular project.
 
-Last updated 2020-10-10.
+Last updated 2021-05-22.
 """
 ####################################### MODULES ########################################
 from os import R_OK, W_OK, access, getcwd
