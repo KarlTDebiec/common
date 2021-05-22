@@ -22,6 +22,7 @@ from os.path import (
     isdir,
     isfile,
     join,
+    normpath,
 )
 from shutil import which
 from typing import Any, Optional, Tuple
@@ -105,6 +106,7 @@ def validate_input_path(
     value = expandvars(value)
     if not isabs(value):
         value = join(default_directory, value)
+    value = normpath(value)
 
     if not exists(value):
         raise FileNotFoundError(f"'{value}' does not exist")
@@ -183,6 +185,7 @@ def validate_output_path(
     value = expandvars(value)
     if not isabs(value):
         value = join(default_directory, value)
+    value = normpath(value)
 
     if exists(value):
         if file_ok and not directory_ok and not isfile(value):
