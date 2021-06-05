@@ -25,7 +25,7 @@ from os.path import (
     normpath,
 )
 from shutil import which
-from typing import Any, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from .exceptions import (
     ArgumentConflictError,
@@ -204,6 +204,29 @@ def validate_output_path(
             raise NotADirectoryError(f"'{directory}' is not a directory")
         if not access(directory, W_OK):
             raise PermissionError(f"'{directory}' cannot be written")
+
+    return value
+
+
+def validate_str(value: Any, options: Iterable[str]) -> str:
+    options = list(options)
+    for i, option in enumerate(options):
+        try:
+            option = str(option)
+        except ValueError:
+            raise ArgumentConflictError(
+                f"Option '{option}' is of type '{type(option)}', not str"
+            )
+        options[i] = option.lower()
+
+    try:
+        value = str(value)
+    except ValueError:
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    value = value.lower()
+
+    if value not in options:
+        raise ValueError(f"'{value}' is not one of options '{options}'")
 
     return value
 

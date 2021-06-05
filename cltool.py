@@ -19,13 +19,14 @@ from argparse import (
     RawDescriptionHelpFormatter,
     _SubParsersAction,
 )
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Iterable, List, Optional, Union
 
 from .validation import (
     validate_float,
     validate_input_path,
     validate_int,
     validate_output_path,
+    validate_str,
 )
 
 
@@ -40,7 +41,7 @@ class CLTool(ABC):
         self.verbosity = validate_int(verbosity, min_value=0)
 
     @abstractmethod
-    def __call__(self) -> Any:
+    def __call__(self, **kwargs) -> Any:
         """Perform operations."""
         raise NotImplementedError()
 
@@ -110,7 +111,7 @@ class CLTool(ABC):
 
     @staticmethod
     def float_arg(
-            min_value: Optional[float] = None, max_value: Optional[float] = None
+        min_value: Optional[float] = None, max_value: Optional[float] = None
     ) -> Callable[[Any], float]:
         """
         Validates a float argument.
@@ -133,9 +134,9 @@ class CLTool(ABC):
 
     @staticmethod
     def input_path_arg(
-            file_ok: bool = True,
-            directory_ok: bool = False,
-            default_directory: Optional[str] = None,
+        file_ok: bool = True,
+        directory_ok: bool = False,
+        default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
         """
         Validates an input path argument.
@@ -162,7 +163,7 @@ class CLTool(ABC):
 
     @staticmethod
     def int_arg(
-            min_value: Optional[int] = None, max_value: Optional[int] = None
+        min_value: Optional[int] = None, max_value: Optional[int] = None
     ) -> Callable[[Any], int]:
         """
         Validates an int argument.
@@ -185,9 +186,9 @@ class CLTool(ABC):
 
     @staticmethod
     def output_path_arg(
-            file_ok: bool = True,
-            directory_ok: bool = False,
-            default_directory: Optional[str] = None,
+        file_ok: bool = True,
+        directory_ok: bool = False,
+        default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
         """
         Validates an output path argument.
@@ -207,6 +208,26 @@ class CLTool(ABC):
                 return validate_output_path(
                     value, file_ok, directory_ok, default_directory
                 )
+            except TypeError as e:
+                raise ArgumentTypeError(e)
+
+        return func
+
+    @staticmethod
+    def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
+        """
+        Validates a float argument.
+
+        Args:
+            options (List[str]): Permissible values
+
+        Returns:
+            Callable[[Any], float]: Value validator function
+        """
+
+        def func(value: Any) -> str:
+            try:
+                return validate_str(value, options)
             except TypeError as e:
                 raise ArgumentTypeError(e)
 
