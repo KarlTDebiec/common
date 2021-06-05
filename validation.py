@@ -12,7 +12,7 @@ General-purpose validation functions not tied to a particular project.
 Last updated 2021-05-22.
 """
 ####################################### MODULES ########################################
-from os import R_OK, W_OK, access, getcwd
+from os import R_OK, W_OK, access, getcwd, makedirs
 from os.path import (
     defpath,
     dirname,
@@ -154,8 +154,6 @@ def validate_output_path(
 ) -> str:
     """
     Validates an output path and makes it absolute.
-
-    TODO: option to try to create directory if it does not exist
 
     Args:
         value (Any): Provided output path
