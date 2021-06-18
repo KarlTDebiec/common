@@ -110,7 +110,7 @@ class CLTool(ABC):
 
     @staticmethod
     def float_arg(
-            min_value: Optional[float] = None, max_value: Optional[float] = None
+        min_value: Optional[float] = None, max_value: Optional[float] = None
     ) -> Callable[[Any], float]:
         """
         Validates a float argument.
@@ -133,9 +133,9 @@ class CLTool(ABC):
 
     @staticmethod
     def input_path_arg(
-            file_ok: bool = True,
-            directory_ok: bool = False,
-            default_directory: Optional[str] = None,
+        file_ok: bool = True,
+        directory_ok: bool = False,
+        default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
         """
         Validates an input path argument.
@@ -162,7 +162,7 @@ class CLTool(ABC):
 
     @staticmethod
     def int_arg(
-            min_value: Optional[int] = None, max_value: Optional[int] = None
+        min_value: Optional[int] = None, max_value: Optional[int] = None
     ) -> Callable[[Any], int]:
         """
         Validates an int argument.
@@ -185,9 +185,9 @@ class CLTool(ABC):
 
     @staticmethod
     def output_path_arg(
-            file_ok: bool = True,
-            directory_ok: bool = False,
-            default_directory: Optional[str] = None,
+        file_ok: bool = True,
+        directory_ok: bool = False,
+        default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
         """
         Validates an output path argument.
