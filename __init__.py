@@ -6,11 +6,7 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""
-General-purpose code not tied to a particular project.
-
-Last updated 2020-10-10.
-"""
+"""General-purpose code not tied to a particular project."""
 ####################################### MODULES ########################################
 from pathlib import Path
 from typing import List
@@ -27,13 +23,11 @@ from .exceptions import (
     NotAFileOrDirectoryError,
     SetterError,
 )
+from .files import get_ext, get_name, temporary_filename, rename_preexisting_outfile
 from .misc import (
     embed_kw,
-    get_ext,
-    get_name,
     get_shell_type,
     input_prefill,
-    temporary_filename,
 )
 from .validation import (
     validate_executable,
@@ -67,6 +61,7 @@ __all__: List[str] = [
     "get_shell_type",
     "input_prefill",
     "package_root",
+    "rename_preexisting_outfile",
     "temporary_filename",
     "validate_executable",
     "validate_float",

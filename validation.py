@@ -126,7 +126,7 @@ def validate_int(
     value: Any,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[Tuple[int]] = None,
+    choices: Optional[Tuple[int, ...]] = None,
 ) -> int:
     if min_value is not None and max_value is not None and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
