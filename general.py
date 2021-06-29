@@ -8,6 +8,7 @@
 #   BSD license. See the LICENSE file for details.
 """
 General-purpose functions not tied to a particular project.
+
 Last updated 2020-08-15
 """
 ################################### MODULES ###################################
@@ -23,10 +24,10 @@ from typing import Dict, Optional
 from . import package_root
 
 
-################################## FUNCTIONS ##################################
+###################################### FUNCTIONS ######################################
 def embed_kw(verbosity: int = 2) -> Dict[str, str]:
     """
-    Prepares header for IPython prompt showing current location in code
+    Prepares header for IPython prompt showing current location in code.
 
     Use ``IPython.embed(**embed_kw())``.
 
@@ -45,23 +46,24 @@ def embed_kw(verbosity: int = 2) -> Dict[str, str]:
     number = frameinfo.lineno - 1
     header = ""
     if verbosity >= 1:
-        header = f"IPython prompt in file {file}, function {func}," \
-                 f" line {number}\n"
+        header = f"IPython prompt in file {file}, function {func}," f" line {number}\n"
     if verbosity >= 2:
         header += "\n"
         with open(frameinfo.filename, "r") as infile:
-            lines = [(i, line) for i, line in enumerate(infile)
-                     if i in range(number - 5, number + 6)]
+            lines = [
+                (i, line)
+                for i, line in enumerate(infile)
+                if i in range(number - 5, number + 6)
+            ]
         for i, line in lines:
-            header += f"{i:5d} {'>' if i == number else ' '} " \
-                      f"{line.rstrip()}\n"
+            header += f"{i:5d} {'>' if i == number else ' '} " f"{line.rstrip()}\n"
 
     return {"header": header}
 
 
 def get_shell_type() -> Optional[str]:
     """
-    Determines if inside IPython prompt
+    Determines if inside IPython prompt.
 
     Returns:
         Optional[str]: Type of shell in use, or None if not in a shell
@@ -88,7 +90,7 @@ def get_shell_type() -> Optional[str]:
 
 def input_prefill(prompt: str, prefill: str) -> str:
     """
-    Prompts user for input with pre-filled text
+    Prompts user for input with pre-filled text.
 
     Does not handle colored prompt correctly
 
@@ -123,9 +125,12 @@ def temporary_filename(suffix=None):
         remove(f.name)
 
 
-def validate_input_path(value: str, file_ok: bool = True,
-                        directory_ok: bool = False,
-                        default_directory: Optional[str] = None) -> str:
+def validate_input_path(
+    value: str,
+    file_ok: bool = True,
+    directory_ok: bool = False,
+    default_directory: Optional[str] = None,
+) -> str:
     if not file_ok and not directory_ok:
         raise ValueError("both file and directory paths may not be prohibited")
     if default_directory is None:
@@ -154,9 +159,12 @@ def validate_input_path(value: str, file_ok: bool = True,
     return value
 
 
-def validate_output_path(value: str, file_ok: bool = True,
-                         directory_ok: bool = False,
-                         default_directory: Optional[str] = None) -> str:
+def validate_output_path(
+    value: str,
+    file_ok: bool = True,
+    directory_ok: bool = False,
+    default_directory: Optional[str] = None,
+) -> str:
     if not file_ok and not directory_ok:
         raise ValueError("both file and directory paths may not be prohibited")
     if default_directory is None:
