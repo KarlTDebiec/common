@@ -216,7 +216,7 @@ class CLTool(ABC):
     @staticmethod
     def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
         """
-        Validates a float argument.
+        Validates a string argument.
 
         Args:
             options (List[str]): Permissible values
