@@ -89,7 +89,16 @@ def validate_input_path(
         str: Absolute path to input file or directory
 
     Raises:
-        ValueError: If input path is not valid
+        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
+        FileNotFoundError: If *value* does not exist
+        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
+          is not a directory
+        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
+          not a file
+        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
+          is not a file or directory
+        PermissionError: If *value* cannot be read
+        TypeError: If *value* cannot be cast to a string
     """
     if not file_ok and not directory_ok:
         raise ArgumentConflictError(
@@ -166,7 +175,17 @@ def validate_output_path(
         str: Absolute path to output file or directory
 
     Raises:
-        ValueError: If output path is not valid
+        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
+        DirectoryNotFoundError: If *value*'s containing directory does not exist
+        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
+          is not a directory, or if *value's* containing directory is not a directory
+        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
+          not a file
+        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
+          is not a file or directory
+        PermissionError: If *value* exists and cannot be written, or if *value*'s
+          containing directory exists but is not a directory
+        TypeError: If *value* cannot be cast to a string
     """
     if not file_ok and not directory_ok:
         raise ArgumentConflictError(
