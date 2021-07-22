@@ -62,9 +62,9 @@ def validate_float(
         raise TypeError(f"'{value}' is of type '{type(value)}', not float")
 
     if min_value is not None and value < min_value:
-        raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
+        raise ValueError(f"{value} is less than minimum value of {min_value}")
     if max_value is not None and value > max_value:
-        raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+        raise ValueError(f"{value} is greater than maximum value of {max_value}")
 
     return value
 
@@ -146,13 +146,41 @@ def validate_int(
         raise TypeError(f"'{value}' is of type '{type(value)}', not int")
 
     if min_value is not None and value < min_value:
-        raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
+        raise ValueError(f"{value} is less than minimum value of {min_value}")
     if max_value is not None and value > max_value:
-        raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+        raise ValueError(f"{value} is greater than maximum value of {max_value}")
     if choices is not None and value not in choices:
-        raise ValueError(f"'{value}' is not one of {choices}")
+        raise ValueError(f"{value} is not one of {choices}")
 
     return value
+
+
+def validate_ints(
+    values: Any,
+    length: Optional[int] = None,
+    min_value: Optional[int] = None,
+    max_value: Optional[int] = None,
+    choices: Optional[Tuple[int]] = None,
+):
+    if min_value is not None and max_value is not None and (min_value >= max_value):
+        raise ArgumentConflictError("min_value must be greater than max_value")
+
+    try:
+        len(values)
+    except TypeError:
+        values = [values]
+
+    validated_values = []
+    for value in values:
+        validated_values.append(validate_int(value, min_value, max_value, choices))
+
+    if length is not None and len(validated_values) != length:
+        raise ValueError(
+            f"'{validated_values}' is of length {len(validated_values)}, not "
+            f"'{min_value}'"
+        )
+
+    return validated_values
 
 
 def validate_output_path(

@@ -25,6 +25,7 @@ from .validation import (
     validate_float,
     validate_input_path,
     validate_int,
+    validate_ints,
     validate_output_path,
     validate_str,
 )
@@ -84,7 +85,7 @@ class CLTool(ABC):
             action="count",
             default=1,
             dest="verbosity",
-            help="enable verbose output, may be specified " "more than once",
+            help="enable verbose output, may be specified more than once",
         )
         verbosity.add_argument(
             "-q",
@@ -179,6 +180,32 @@ class CLTool(ABC):
         def func(value: Any) -> int:
             try:
                 return validate_int(value, min_value, max_value)
+            except TypeError as e:
+                raise ArgumentTypeError(e)
+
+        return func
+
+    @staticmethod
+    def ints_arg(
+        length: Optional[int] = None,
+        min_value: Optional[int] = None,
+        max_value: Optional[int] = None,
+    ) -> Callable[[Any], int]:
+        """
+        Validates a tuple of ints argument.
+
+        Args:
+            length (Optional[int]): Number of values required
+            min_value (Optional[int]): Minimum permissible value
+            max_value (Optional[int]): Maximum permissible value
+
+        Returns:
+            Callable[[Any], int]: Value validator function
+        """
+
+        def func(value: Any) -> int:
+            try:
+                return validate_ints(value, length, min_value, max_value)
             except TypeError as e:
                 raise ArgumentTypeError(e)
 

@@ -6,11 +6,7 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""
-General-purpose code not tied to a particular project.
-
-Last updated 2020-10-10.
-"""
+"""General-purpose code not tied to a particular project."""
 ####################################### MODULES ########################################
 from pathlib import Path
 from typing import List
@@ -40,6 +36,7 @@ from .validation import (
     validate_float,
     validate_input_path,
     validate_int,
+    validate_ints,
     validate_output_path,
     validate_str,
     validate_type,
@@ -73,6 +70,7 @@ __all__: List[str] = [
     "validate_float",
     "validate_input_path",
     "validate_int",
+    "validate_ints",
     "validate_output_path",
     "validate_str",
     "validate_type",
