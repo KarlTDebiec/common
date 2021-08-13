@@ -12,6 +12,7 @@ General-purpose command-line tool base class not tied to a particular project.
 Last updated 2020-10-10.
 """
 ####################################### MODULES ########################################
+import logging
 from abc import ABC, abstractmethod
 from argparse import (
     ArgumentParser,
@@ -19,7 +20,7 @@ from argparse import (
     RawDescriptionHelpFormatter,
     _SubParsersAction,
 )
-from typing import Any, Callable, Iterable, List, Optional, Union
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 from .validation import (
     validate_float,
@@ -40,6 +41,14 @@ class CLTool(ABC):
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
         """Initialize, including argument validation and value storage."""
         self.verbosity = validate_int(verbosity, min_value=0)
+        if self.verbosity <= 0:
+            logging.basicConfig(level=logging.ERROR)
+        elif self.verbosity == 1:
+            logging.basicConfig(level=logging.WARNING)
+        elif self.verbosity == 2:
+            logging.basicConfig(level=logging.INFO)
+        elif self.verbosity >= 3:
+            logging.basicConfig(level=logging.DEBUG)
 
     @abstractmethod
     def __call__(self, **kwargs) -> Any:
@@ -190,7 +199,7 @@ class CLTool(ABC):
         length: Optional[int] = None,
         min_value: Optional[int] = None,
         max_value: Optional[int] = None,
-    ) -> Callable[[Any], int]:
+    ) -> Callable[[Any], Tuple[int]]:
         """
         Validates a tuple of ints argument.
 
@@ -203,7 +212,7 @@ class CLTool(ABC):
             Callable[[Any], int]: Value validator function
         """
 
-        def func(value: Any) -> int:
+        def func(value: Any) -> Tuple[int]:
             try:
                 return validate_ints(value, length, min_value, max_value)
             except TypeError as e:
