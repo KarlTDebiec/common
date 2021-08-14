@@ -254,15 +254,15 @@ def validate_output_path(
 
 
 def validate_str(value: Any, options: Iterable[str]) -> str:
-    options = list(options)
-    for i, option in enumerate(options):
+    case_insensitive_options = {}
+    for option in options:
         try:
             option = str(option)
         except ValueError:
             raise ArgumentConflictError(
                 f"Option '{option}' is of type '{type(option)}', not str"
             )
-        options[i] = option.lower()
+        case_insensitive_options[option.lower()] = option
 
     try:
         value = str(value)
@@ -270,10 +270,12 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
         raise TypeError(f"'{value}' is of type '{type(value)}', not str")
     value = value.lower()
 
-    if value not in options:
-        raise ValueError(f"'{value}' is not one of options '{options}'")
+    if value not in case_insensitive_options:
+        raise ValueError(
+            f"'{value}' is not one of options '{case_insensitive_options.keys()}'"
+        )
 
-    return value
+    return case_insensitive_options[value]
 
 
 def validate_type(value: Any, cls: Any) -> Any:
