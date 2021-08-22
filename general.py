@@ -7,7 +7,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
-####################################### MODULES ########################################
+""""""
 from inspect import currentframe, getframeinfo
 from typing import Dict, Optional
 
@@ -17,7 +17,6 @@ from readline import insert_text, redisplay, set_pre_input_hook
 from . import package_root
 
 
-###################################### FUNCTIONS #######################################
 def embed_kw(verbosity: int = 2) -> Dict[str, str]:
     """
     Prepares header for IPython prompt showing current location in code.

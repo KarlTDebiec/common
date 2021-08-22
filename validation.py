@@ -6,13 +6,8 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""
-General-purpose validation functions not tied to a particular project.
-
-Last updated 2021-05-22.
-"""
-####################################### MODULES ########################################
-from os import R_OK, W_OK, access, getcwd, makedirs
+"""General-purpose validation functions not tied to a particular project."""
+from os import R_OK, W_OK, access, getcwd
 from os.path import (
     defpath,
     dirname,
@@ -25,7 +20,7 @@ from os.path import (
     normpath,
 )
 from shutil import which
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, Optional, Tuple
 
 from .exceptions import (
     ArgumentConflictError,
@@ -36,7 +31,6 @@ from .exceptions import (
 )
 
 
-###################################### FUNCTIONS #######################################
 def validate_executable(value: Any) -> str:
     try:
         value = str(value)

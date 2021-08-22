@@ -8,7 +8,6 @@
 #   BSD license. See the LICENSE file for details.
 """General-purpose command-line tool base class not tied to a particular
 project."""
-####################################### MODULES ########################################
 import logging
 from abc import ABC, abstractmethod
 from argparse import (
@@ -29,7 +28,6 @@ from .validation import (
 )
 
 
-####################################### CLASSES ########################################
 class CLTool(ABC):
     """Abstract base class for command line tools."""
 

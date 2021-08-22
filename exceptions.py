@@ -7,11 +7,9 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose exceptions not tied to a particular project."""
-####################################### MODULES ########################################
 from inspect import currentframe, getframeinfo
 
 
-####################################### CLASSES ########################################
 class ArgumentConflictError(Exception):
     pass
 

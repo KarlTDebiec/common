@@ -8,7 +8,6 @@
 #   BSD license. See the LICENSE file for details.
 """General-purpose functions for file interaction and manipulation not tied to
 a particular project."""
-####################################### MODULES ########################################
 from contextlib import contextmanager
 from os import getcwd, remove, rename
 from os.path import (
@@ -22,9 +21,6 @@ from os.path import (
     splitext,
 )
 from tempfile import NamedTemporaryFile
-
-
-###################################### FUNCTIONS #######################################
 from typing import Optional
 
 

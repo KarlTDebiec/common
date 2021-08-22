@@ -7,7 +7,6 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
-####################################### MODULES ########################################
 from pathlib import Path
 from typing import List
 
@@ -40,12 +39,10 @@ from .validation import (
     validate_type,
 )
 
-###################################### VARIABLES #######################################
 package_root: str = str(Path(__file__).parent.parent.absolute())
 """str: absolute path of package containing this common submodule (e.g. if this file is
 '/path/to/test/common/__init__.py', value is '/path/to/test"""
 
-######################################### ALL ##########################################
 __all__: List[str] = [
     "ArgumentConflictError",
     "CLTool",
