@@ -6,19 +6,10 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""
-General-purpose functions not tied to a particular project.
-
-Last updated 2020-10-10.
-"""
+"""General-purpose functions not tied to a particular project."""
 ####################################### MODULES ########################################
-from contextlib import contextmanager
 from inspect import currentframe, getframeinfo
-from os import remove
-from os.path import basename, splitext
-from readline import insert_text, set_pre_input_hook
-from tempfile import NamedTemporaryFile
-from typing import Dict, Iterator, Optional
+from typing import Dict, Optional
 
 
 ###################################### FUNCTIONS #######################################
@@ -59,14 +50,6 @@ def embed_kw(verbosity: int = 2) -> Dict[str, str]:
             header += f"{i:5d} {'>' if i == number else ' '} " f"{line.rstrip()}\n"
 
     return {"header": header}
-
-
-def get_ext(infile: str) -> str:
-    return splitext(basename(infile))[1].strip(".")
-
-
-def get_name(infile: str) -> str:
-    return splitext(basename(infile))[0]
 
 
 def get_shell_type() -> Optional[str]:
@@ -110,7 +93,7 @@ def input_prefill(prompt: str, prefill: str) -> str:
     Returns:
         str: Text inputted by user
     """
-    from readline import redisplay
+    from readline import redisplay, insert_text, set_pre_input_hook
 
     def pre_input_hook() -> None:
         insert_text(str(prefill))
@@ -121,24 +104,3 @@ def input_prefill(prompt: str, prefill: str) -> str:
     set_pre_input_hook()
 
     return result
-
-
-@contextmanager
-def temporary_filename(suffix: Optional[str] = None) -> Iterator[str]:
-    """
-    Provides a temporary filename; use with 'with'.
-
-    Args:
-        suffix (Optional[str]): Suffix (extension) for temporary filename
-
-    Yields:
-        str: Temporary filename
-    """
-    f = None
-    try:
-        f = NamedTemporaryFile(delete=False, suffix=suffix)
-        f.close()
-        yield f.name
-    finally:
-        if f is not None:
-            remove(f.name)

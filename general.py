@@ -6,25 +6,18 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""
-General-purpose functions not tied to a particular project.
-
-Last updated 2020-08-15
-"""
-################################### MODULES ###################################
-from contextlib import contextmanager
+"""General-purpose functions not tied to a particular project."""
+####################################### MODULES ########################################
 from inspect import currentframe, getframeinfo
-from os import R_OK, W_OK, access, getcwd, remove
-from os.path import basename, dirname, exists, expandvars, isdir, isfile, join
-from readline import insert_text, redisplay, set_pre_input_hook
-from tempfile import NamedTemporaryFile
 from typing import Dict, Optional
+
+from readline import insert_text, redisplay, set_pre_input_hook
 
 # noinspection Mypy
 from . import package_root
 
 
-###################################### FUNCTIONS ######################################
+###################################### FUNCTIONS #######################################
 def embed_kw(verbosity: int = 2) -> Dict[str, str]:
     """
     Prepares header for IPython prompt showing current location in code.
@@ -113,88 +106,3 @@ def input_prefill(prompt: str, prefill: str) -> str:
     set_pre_input_hook()
 
     return result
-
-
-@contextmanager
-def temporary_filename(suffix=None):
-    try:
-        f = NamedTemporaryFile(delete=False, suffix=suffix)
-        f.close()
-        yield f.name
-    finally:
-        remove(f.name)
-
-
-def validate_input_path(
-    value: str,
-    file_ok: bool = True,
-    directory_ok: bool = False,
-    default_directory: Optional[str] = None,
-) -> str:
-    if not file_ok and not directory_ok:
-        raise ValueError("both file and directory paths may not be prohibited")
-    if default_directory is None:
-        default_directory = getcwd()
-
-    try:
-        value = str(value)
-    except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not str")
-
-    value = expandvars(value)
-    if dirname(value) == "":
-        value = join(default_directory, basename(value))
-
-    if not exists(value):
-        raise ValueError(f"'{value}' does not exist")
-    elif file_ok and not directory_ok and not isfile(value):
-        raise ValueError(f"'{value}' is not a file")
-    elif not file_ok and directory_ok and not isdir(value):
-        raise ValueError(f"'{value}' is not a directory")
-    elif not isfile(value) and not isdir(value):
-        raise ValueError(f"'{value}' is not a file or directory")
-    elif not access(value, R_OK):
-        raise ValueError(f"'{value}' cannot be read")
-
-    return value
-
-
-def validate_output_path(
-    value: str,
-    file_ok: bool = True,
-    directory_ok: bool = False,
-    default_directory: Optional[str] = None,
-) -> str:
-    if not file_ok and not directory_ok:
-        raise ValueError("both file and directory paths may not be prohibited")
-    if default_directory is None:
-        default_directory = getcwd()
-
-    try:
-        value = str(value)
-    except ValueError:
-        raise ValueError(f"'{value}' is of type '{type(value)}', not str")
-
-    value = expandvars(value)
-    if dirname(value) == "":
-        value = join(default_directory, basename(value))
-
-    if exists(value):
-        if file_ok and not directory_ok and not isfile(value):
-            raise ValueError(f"'{value}' is not a file")
-        elif not file_ok and directory_ok and not isdir(value):
-            raise ValueError(f"'{value}' is not a directory")
-        elif not isfile(value) and not isdir(value):
-            raise ValueError(f"'{value}' is not a file or directory")
-        elif not access(value, W_OK):
-            raise ValueError(f"'{value}' cannot be written")
-    else:
-        directory = dirname(value)
-        if not exists(directory):
-            raise ValueError(f"'{directory}' does not exist")
-        elif not isdir(directory):
-            raise ValueError(f"'{directory}' is not a directory")
-        if not access(directory, W_OK):
-            raise ValueError(f"'{directory}' cannot be written")
-
-    return value

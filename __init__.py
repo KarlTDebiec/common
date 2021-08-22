@@ -23,13 +23,11 @@ from .exceptions import (
     NotAFileOrDirectoryError,
     SetterError,
 )
+from .files import get_ext, get_name, temporary_filename, rename_preexisting_outfile
 from .misc import (
     embed_kw,
-    get_ext,
-    get_name,
     get_shell_type,
     input_prefill,
-    temporary_filename,
 )
 from .validation import (
     validate_executable,
@@ -65,6 +63,7 @@ __all__: List[str] = [
     "get_shell_type",
     "input_prefill",
     "package_root",
+    "rename_preexisting_outfile",
     "temporary_filename",
     "validate_executable",
     "validate_float",

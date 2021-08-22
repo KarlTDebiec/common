@@ -6,11 +6,8 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""
-General-purpose command-line tool base class not tied to a particular project.
-
-Last updated 2020-10-10.
-"""
+"""General-purpose command-line tool base class not tied to a particular
+project."""
 ####################################### MODULES ########################################
 import logging
 from abc import ABC, abstractmethod
