@@ -9,8 +9,9 @@
 """General-purpose functions not tied to a particular project."""
 ####################################### MODULES ########################################
 from inspect import currentframe, getframeinfo
-from readline import insert_text, redisplay, set_pre_input_hook
 from typing import Dict, Optional
+
+from readline import insert_text, redisplay, set_pre_input_hook
 
 # noinspection Mypy
 from . import package_root

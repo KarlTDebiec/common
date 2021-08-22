@@ -34,7 +34,9 @@ from .validation import (
     validate_float,
     validate_input_path,
     validate_int,
+    validate_ints,
     validate_output_path,
+    validate_str,
     validate_type,
 )
 
@@ -67,6 +69,8 @@ __all__: List[str] = [
     "validate_float",
     "validate_input_path",
     "validate_int",
+    "validate_ints",
     "validate_output_path",
+    "validate_str",
     "validate_type",
 ]

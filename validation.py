@@ -12,7 +12,7 @@ General-purpose validation functions not tied to a particular project.
 Last updated 2021-05-22.
 """
 ####################################### MODULES ########################################
-from os import R_OK, W_OK, access, getcwd
+from os import R_OK, W_OK, access, getcwd, makedirs
 from os.path import (
     defpath,
     dirname,
@@ -25,7 +25,7 @@ from os.path import (
     normpath,
 )
 from shutil import which
-from typing import Any, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from .exceptions import (
     ArgumentConflictError,
@@ -62,9 +62,9 @@ def validate_float(
         raise TypeError(f"'{value}' is of type '{type(value)}', not float")
 
     if min_value is not None and value < min_value:
-        raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
+        raise ValueError(f"{value} is less than minimum value of {min_value}")
     if max_value is not None and value > max_value:
-        raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+        raise ValueError(f"{value} is greater than maximum value of {max_value}")
 
     return value
 
@@ -89,7 +89,16 @@ def validate_input_path(
         str: Absolute path to input file or directory
 
     Raises:
-        ValueError: If input path is not valid
+        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
+        FileNotFoundError: If *value* does not exist
+        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
+          is not a directory
+        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
+          not a file
+        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
+          is not a file or directory
+        PermissionError: If *value* cannot be read
+        TypeError: If *value* cannot be cast to a string
     """
     if not file_ok and not directory_ok:
         raise ArgumentConflictError(
@@ -137,13 +146,41 @@ def validate_int(
         raise TypeError(f"'{value}' is of type '{type(value)}', not int")
 
     if min_value is not None and value < min_value:
-        raise ValueError(f"'{value}' is less than minimum value of '{min_value}'")
+        raise ValueError(f"{value} is less than minimum value of {min_value}")
     if max_value is not None and value > max_value:
-        raise ValueError(f"'{value}' is greater than maximum value of '{max_value}'")
+        raise ValueError(f"{value} is greater than maximum value of {max_value}")
     if choices is not None and value not in choices:
-        raise ValueError(f"'{value}' is not one of {choices}")
+        raise ValueError(f"{value} is not one of {choices}")
 
     return value
+
+
+def validate_ints(
+    values: Any,
+    length: Optional[int] = None,
+    min_value: Optional[int] = None,
+    max_value: Optional[int] = None,
+    choices: Optional[Tuple[int]] = None,
+):
+    if min_value is not None and max_value is not None and (min_value >= max_value):
+        raise ArgumentConflictError("min_value must be greater than max_value")
+
+    try:
+        len(values)
+    except TypeError:
+        values = [values]
+
+    validated_values = []
+    for value in values:
+        validated_values.append(validate_int(value, min_value, max_value, choices))
+
+    if length is not None and len(validated_values) != length:
+        raise ValueError(
+            f"'{validated_values}' is of length {len(validated_values)}, not "
+            f"'{min_value}'"
+        )
+
+    return validated_values
 
 
 def validate_output_path(
@@ -154,8 +191,6 @@ def validate_output_path(
 ) -> str:
     """
     Validates an output path and makes it absolute.
-
-    TODO: option to try to create directory if it does not exist
 
     Args:
         value (Any): Provided output path
@@ -168,7 +203,17 @@ def validate_output_path(
         str: Absolute path to output file or directory
 
     Raises:
-        ValueError: If output path is not valid
+        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
+        DirectoryNotFoundError: If *value*'s containing directory does not exist
+        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
+          is not a directory, or if *value's* containing directory is not a directory
+        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
+          not a file
+        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
+          is not a file or directory
+        PermissionError: If *value* exists and cannot be written, or if *value*'s
+          containing directory exists but is not a directory
+        TypeError: If *value* cannot be cast to a string
     """
     if not file_ok and not directory_ok:
         raise ArgumentConflictError(
@@ -206,6 +251,31 @@ def validate_output_path(
             raise PermissionError(f"'{directory}' cannot be written")
 
     return value
+
+
+def validate_str(value: Any, options: Iterable[str]) -> str:
+    case_insensitive_options = {}
+    for option in options:
+        try:
+            option = str(option)
+        except ValueError:
+            raise ArgumentConflictError(
+                f"Option '{option}' is of type '{type(option)}', not str"
+            )
+        case_insensitive_options[option.lower()] = option
+
+    try:
+        value = str(value)
+    except ValueError:
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    value = value.lower()
+
+    if value not in case_insensitive_options:
+        raise ValueError(
+            f"'{value}' is not one of options '{case_insensitive_options.keys()}'"
+        )
+
+    return case_insensitive_options[value]
 
 
 def validate_type(value: Any, cls: Any) -> Any:
