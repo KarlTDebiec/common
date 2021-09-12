@@ -241,16 +241,16 @@ def validate_output_path(
         if not access(value, W_OK):
             raise PermissionError(f"'{value}' cannot be written")
     else:
-        directory = dirname(value)
-        if not exists(directory):
-            if create_directory:
-                makedirs(directory)
-            else:
+        if create_directory:
+            makedirs(value)
+        else:
+            directory = dirname(value)
+            if not exists(directory):
                 raise DirectoryNotFoundError(f"'{directory}' does not exist")
-        if not isdir(directory):
-            raise NotADirectoryError(f"'{directory}' is not a directory")
-        if not access(directory, W_OK):
-            raise PermissionError(f"'{directory}' cannot be written")
+            if not isdir(directory):
+                raise NotADirectoryError(f"'{directory}' is not a directory")
+            if not access(directory, W_OK):
+                raise PermissionError(f"'{directory}' cannot be written")
 
     return value
 
