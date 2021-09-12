@@ -31,8 +31,6 @@ from .validation import (
 class CLTool(ABC):
     """Abstract base class for command line tools."""
 
-    # region Builtins
-
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
         """Initialize, including argument validation and value storage."""
         self.verbosity = validate_int(verbosity, min_value=0)
@@ -49,10 +47,6 @@ class CLTool(ABC):
     def __call__(self, **kwargs) -> Any:
         """Perform operations."""
         raise NotImplementedError()
-
-    # endregion
-
-    # region Class Methods
 
     @classmethod
     def construct_argparser(cls, **kwargs: Any) -> ArgumentParser:
@@ -109,10 +103,6 @@ class CLTool(ABC):
         kwargs = vars(parser.parse_args())
         tool = cls(**kwargs)
         tool()
-
-    # endregion
-
-    # region Static methods
 
     @staticmethod
     def float_arg(
@@ -263,5 +253,3 @@ class CLTool(ABC):
                 raise ArgumentTypeError(e)
 
         return func
-
-    # endregion
