@@ -7,7 +7,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
-from os import R_OK, W_OK, access, getcwd
+from os import R_OK, W_OK, access, getcwd, makedirs
 from os.path import (
     defpath,
     dirname,
@@ -68,6 +68,7 @@ def validate_input_path(
     file_ok: bool = True,
     directory_ok: bool = False,
     default_directory: Optional[str] = None,
+    create_directory: bool = False,
 ) -> str:
     """
     Validates an input path and makes it absolute.
@@ -112,7 +113,10 @@ def validate_input_path(
     value = normpath(value)
 
     if not exists(value):
-        raise FileNotFoundError(f"'{value}' does not exist")
+        if directory_ok and create_directory:
+            makedirs(value)
+        else:
+            raise FileNotFoundError(f"'{value}' does not exist")
     if file_ok and not directory_ok and not isfile(value):
         raise NotAFileError(f"'{value}' is not a file")
     if not file_ok and directory_ok and not isdir(value):
@@ -182,6 +186,7 @@ def validate_output_path(
     file_ok: bool = True,
     directory_ok: bool = False,
     default_directory: Optional[str] = None,
+    create_directory: bool = False,
 ) -> str:
     """
     Validates an output path and makes it absolute.
@@ -238,7 +243,10 @@ def validate_output_path(
     else:
         directory = dirname(value)
         if not exists(directory):
-            raise DirectoryNotFoundError(f"'{directory}' does not exist")
+            if create_directory:
+                makedirs(directory)
+            else:
+                raise DirectoryNotFoundError(f"'{directory}' does not exist")
         if not isdir(directory):
             raise NotADirectoryError(f"'{directory}' is not a directory")
         if not access(directory, W_OK):
