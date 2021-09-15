@@ -116,7 +116,10 @@ def validate_input_path(
         if directory_ok and create_directory:
             makedirs(value)
         else:
-            raise FileNotFoundError(f"'{value}' does not exist")
+            if not file_ok and directory_ok:
+                raise DirectoryNotFoundError(f"'{value}' does not exist")
+            else:
+                raise FileNotFoundError(f"'{value}' does not exist")
     if file_ok and not directory_ok and not isfile(value):
         raise NotAFileError(f"'{value}' is not a file")
     if not file_ok and directory_ok and not isdir(value):
@@ -216,7 +219,14 @@ def validate_output_path(
     """
     if not file_ok and not directory_ok:
         raise ArgumentConflictError(
-            "both file and directory paths may not be prohibited"
+            "Arguments 'file_ok' and 'directory_ok' are in conflict; both file and "
+            "directory paths may not be prohibited"
+        )
+    if not directory_ok and create_directory:
+        raise ArgumentConflictError(
+            "Arguments 'directory_ok' and 'create_directory' "
+            "are in conflict; may not prohibit diretory paths and enable directory "
+            "creation"
         )
     if default_directory is None:
         default_directory = getcwd()
