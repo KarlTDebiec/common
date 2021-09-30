@@ -6,8 +6,7 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""General-purpose command-line tool base class not tied to a particular
-project."""
+"""General-purpose command-line tool base class not tied to a particular project."""
 import logging
 from abc import ABC, abstractmethod
 from argparse import (
