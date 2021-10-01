@@ -22,12 +22,8 @@ from .exceptions import (
     NotAFileOrDirectoryError,
     SetterError,
 )
-from .files import get_ext, get_name, temporary_filename, rename_preexisting_outfile
-from .misc import (
-    embed_kw,
-    get_shell_type,
-    input_prefill,
-)
+from .files import get_ext, get_name, rename_preexisting_outfile, temporary_filename
+from .general import embed_kw, get_shell_type, input_prefill, run_command
 from .validation import (
     validate_executable,
     validate_float,
@@ -61,6 +57,7 @@ __all__: List[str] = [
     "input_prefill",
     "package_root",
     "rename_preexisting_outfile",
+    "run_command",
     "temporary_filename",
     "validate_executable",
     "validate_float",

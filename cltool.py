@@ -6,7 +6,6 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""General-purpose command-line tool base class not tied to a particular project."""
 import logging
 from abc import ABC, abstractmethod
 from argparse import (
@@ -15,6 +14,7 @@ from argparse import (
     RawDescriptionHelpFormatter,
     _SubParsersAction,
 )
+from inspect import cleandoc
 from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 from .validation import (
@@ -28,7 +28,7 @@ from .validation import (
 
 
 class CLTool(ABC):
-    """Abstract base class for command line tools."""
+    """General-purpose command-line tool base class not tied to a particular project."""
 
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
         """Initialize, including argument validation and value storage."""
@@ -58,7 +58,7 @@ class CLTool(ABC):
         Returns:
             ArgumentParser: Argument parser
         """
-        description = kwargs.pop("description", __doc__.strip())
+        description = kwargs.pop("description", cleandoc(cls.__doc__))
         # noinspection PyTypeChecker
         parser: Union[ArgumentParser, _SubParsersAction] = kwargs.get(
             "parser",

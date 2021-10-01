@@ -7,9 +7,9 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
-""""""
 from inspect import currentframe, getframeinfo
-from typing import Dict, Optional
+from subprocess import PIPE, Popen
+from typing import Dict, Iterable, Optional, Tuple
 
 from readline import insert_text, redisplay, set_pre_input_hook
 
@@ -80,6 +80,32 @@ def get_shell_type() -> Optional[str]:
         return None
 
 
+def get_shell_type() -> Optional[str]:
+    """
+    Determines if inside IPython prompt.
+
+    Returns:
+        Optional[str]: Type of shell in use, or None if not in a shell
+    """
+    try:
+        # noinspection Mypy
+        shell = str(get_ipython().__class__.__name__)
+        if shell == "ZMQInteractiveShell":
+            # IPython in Jupyter Notebook
+            return shell
+        if shell == "InteractiveShellEmbed":
+            # IPython in Jupyter Notebook using IPython.embed
+            return shell
+        if shell == "TerminalInteractiveShell":
+            # IPython in terminal
+            return shell
+        # Other
+        return shell
+    except NameError:
+        # Not in IPython
+        return None
+
+
 def input_prefill(prompt: str, prefill: str) -> str:
     """
     Prompts user for input with pre-filled text.
@@ -105,3 +131,37 @@ def input_prefill(prompt: str, prefill: str) -> str:
     set_pre_input_hook()
 
     return result
+
+
+def run_command(
+    command: str, timeout: int = 600, **kwargs: Any
+) -> Tuple[int, Optional[str], Optional[str]]:
+    """
+
+    Args:
+        command: command to run
+        timeout: maximum time to await command's completion
+        acceptable_exitcodes: acceptable exit codes
+
+    Returns:
+        exitcode, standard output, and standard error
+
+    Raises:
+        ValueError: If exitcode is not in acceptable_exitcodes
+    """
+    acceptable_exitcodes: Iterable[int] = kwargs.get("acceptable_exitcodes", [0])
+
+    with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
+        exitcode = child.wait(timeout)
+        stdout, stderr = child.communicate()
+        stdout = stdout.decode("utf8")
+        stderr = stderr.decode("utf8")
+        if exitcode not in acceptable_exitcodes:
+            raise ValueError(
+                f"subprocess failed with exit code {exitcode};\n\n"
+                f"STDOUT:\n"
+                f"{stdout}\n\n"
+                f"STDERR:\n"
+                f"{stderr}"
+            )
+        return (exitcode, stdout, stderr)
