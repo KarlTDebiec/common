@@ -23,7 +23,7 @@ from .exceptions import (
     SetterError,
 )
 from .files import get_ext, get_name, rename_preexisting_outfile, temporary_filename
-from .general import embed_kw, get_shell_type, input_prefill, run_command
+from .general import get_shell_type, input_prefill, run_command
 from .validation import (
     validate_executable,
     validate_float,
@@ -50,7 +50,6 @@ __all__: List[str] = [
     "NotAFileError",
     "NotAFileOrDirectoryError",
     "SetterError",
-    "embed_kw",
     "get_ext",
     "get_name",
     "get_shell_type",

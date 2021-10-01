@@ -7,50 +7,8 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
-from inspect import currentframe, getframeinfo
 from subprocess import PIPE, Popen
-from typing import Dict, Iterable, Optional, Tuple
-
-from readline import insert_text, redisplay, set_pre_input_hook
-
-# noinspection Mypy
-from . import package_root
-
-
-def embed_kw(verbosity: int = 2) -> Dict[str, str]:
-    """
-    Prepares header for IPython prompt showing current location in code.
-
-    Use ``IPython.embed(**embed_kw())``.
-
-    Args:
-        verbosity (int): Level of verbose output
-
-    Returns:
-        Dict[str, str]: Keyword arguments to be passed to IPython.embed
-    """
-    frame = currentframe()
-    if frame is None:
-        raise ValueError()
-    frameinfo = getframeinfo(frame.f_back)
-    file = frameinfo.filename.replace(package_root, "")
-    func = frameinfo.function
-    number = frameinfo.lineno - 1
-    header = ""
-    if verbosity >= 1:
-        header = f"IPython prompt in file {file}, function {func}," f" line {number}\n"
-    if verbosity >= 2:
-        header += "\n"
-        with open(frameinfo.filename, "r") as infile:
-            lines = [
-                (i, line)
-                for i, line in enumerate(infile)
-                if i in range(number - 5, number + 6)
-            ]
-        for i, line in lines:
-            header += f"{i:5d} {'>' if i == number else ' '} " f"{line.rstrip()}\n"
-
-    return {"header": header}
+from typing import Any, Iterable, Optional, Tuple
 
 
 def get_shell_type() -> Optional[str]:
@@ -121,6 +79,7 @@ def input_prefill(prompt: str, prefill: str) -> str:
     Returns:
         str: Text inputted by user
     """
+    from readline import insert_text, redisplay, set_pre_input_hook
 
     def pre_input_hook() -> None:
         insert_text(prefill)
@@ -154,8 +113,14 @@ def run_command(
     with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
         exitcode = child.wait(timeout)
         stdout, stderr = child.communicate()
-        stdout = stdout.decode("utf8")
-        stderr = stderr.decode("utf8")
+        try:
+            stdout = stdout.decode("utf8")
+        except UnicodeDecodeError:
+            stdout = stdout.decode("ISO-8859-1")
+        try:
+            stderr = stderr.decode("utf8")
+        except UnicodeDecodeError:
+            stderr = stderr.decode("ISO-8859-1")
         if exitcode not in acceptable_exitcodes:
             raise ValueError(
                 f"subprocess failed with exit code {exitcode};\n\n"
