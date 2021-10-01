@@ -58,7 +58,7 @@ class CLTool(ABC):
         Returns:
             ArgumentParser: Argument parser
         """
-        description = kwargs.get("description", __doc__.strip())
+        description = kwargs.pop("description", __doc__.strip())
         # noinspection PyTypeChecker
         parser: Union[ArgumentParser, _SubParsersAction] = kwargs.get(
             "parser",
