@@ -21,6 +21,7 @@ from .exceptions import (
     NotAFileError,
     NotAFileOrDirectoryError,
     SetterError,
+    UnsupportedPlatformError,
 )
 from .files import get_ext, get_name, rename_preexisting_outfile, temporary_filename
 from .general import get_shell_type, input_prefill, run_command
@@ -50,6 +51,7 @@ __all__: List[str] = [
     "NotAFileError",
     "NotAFileOrDirectoryError",
     "SetterError",
+    "UnsupportedPlatformError",
     "get_ext",
     "get_name",
     "get_shell_type",

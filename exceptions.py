@@ -58,3 +58,7 @@ class SetterError(TypeError):
 
     def __str__(self) -> str:
         return self.message
+
+
+class UnsupportedPlatformError(OSError):
+    pass

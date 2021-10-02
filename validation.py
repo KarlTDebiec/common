@@ -19,8 +19,9 @@ from os.path import (
     join,
     normpath,
 )
+from platform import system
 from shutil import which
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Iterable, Optional, Set, Tuple
 
 from .exceptions import (
     ArgumentConflictError,
@@ -28,18 +29,51 @@ from .exceptions import (
     ExecutableNotFoundError,
     NotAFileError,
     NotAFileOrDirectoryError,
+    UnsupportedPlatformError,
 )
 
 
-def validate_executable(value: Any) -> str:
+def validate_executable(
+    value: Any, supported_platforms: Optional[Set[str]] = None
+) -> str:
+    """
+    Validates that executable name and returns its absolute path
+
+    Args:
+        value: executable name
+        supported_platforms: Platforms that support executable
+          (default: {"Darwin", "Linux", "Windows"})
+
+    Raises:
+        ExecutableNotFoundError: if executable is not found in path
+        TypeError: if value or supported platform are not of the expected types
+        UnsupportedPlatformError: if executable is not supported on current platform
+
+    Returns:
+        Absolute path of executable
+    """
     try:
         value = str(value)
     except ValueError:
         raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    if supported_platforms is None:
+        supported_platforms = {"Darwin", "Linux", "Windows"}
+    else:
+        try:
+            supported_platforms = set(supported_platforms)
+        except:
+            raise TypeError(
+                f"'{supported_platforms}' is of type '{type(value)}', not Set[str]"
+            )
 
-    if which(value) is None:
-        raise ExecutableNotFoundError(f"'{value}' executable not found in '{defpath}'")
+    if system() not in supported_platforms:
+        raise UnsupportedPlatformError(
+            f"Executable '{value}' us not supported on {system()}"
+        )
+
     value = which(value)
+    if value is None:
+        raise ExecutableNotFoundError(f"Executable '{value}' not found in '{defpath}'")
 
     return value
 

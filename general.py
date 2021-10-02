@@ -24,33 +24,6 @@ def get_shell_type() -> Optional[str]:
         if shell == "ZMQInteractiveShell":
             # IPython in Jupyter Notebook
             return shell
-        elif shell == "InteractiveShellEmbed":
-            # IPython in Jupyter Notebook using IPython.embed
-            return shell
-        elif shell == "TerminalInteractiveShell":
-            # IPython in terminal
-            return shell
-        else:
-            # Other
-            return shell
-    except NameError:
-        # Not in IPython
-        return None
-
-
-def get_shell_type() -> Optional[str]:
-    """
-    Determines if inside IPython prompt.
-
-    Returns:
-        Optional[str]: Type of shell in use, or None if not in a shell
-    """
-    try:
-        # noinspection Mypy
-        shell = str(get_ipython().__class__.__name__)
-        if shell == "ZMQInteractiveShell":
-            # IPython in Jupyter Notebook
-            return shell
         if shell == "InteractiveShellEmbed":
             # IPython in Jupyter Notebook using IPython.embed
             return shell
@@ -93,7 +66,9 @@ def input_prefill(prompt: str, prefill: str) -> str:
 
 
 def run_command(
-    command: str, timeout: int = 600, **kwargs: Any
+    command: str,
+    timeout: int = 600,
+    acceptable_exitcodes: Optional[Iterable[int]] = None,
 ) -> Tuple[int, Optional[str], Optional[str]]:
     """
 
@@ -108,7 +83,8 @@ def run_command(
     Raises:
         ValueError: If exitcode is not in acceptable_exitcodes
     """
-    acceptable_exitcodes: Iterable[int] = kwargs.get("acceptable_exitcodes", [0])
+    if acceptable_exitcodes is None:
+        acceptable_exitcodes = [0]
 
     with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
         exitcode = child.wait(timeout)
