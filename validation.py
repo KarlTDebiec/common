@@ -68,7 +68,7 @@ def validate_executable(
 
     if system() not in supported_platforms:
         raise UnsupportedPlatformError(
-            f"Executable '{value}' us not supported on {system()}"
+            f"Executable '{value}' is not supported on {system()}"
         )
 
     value = which(value)
