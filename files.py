@@ -9,6 +9,7 @@
 """General-purpose functions for file interaction and manipulation not tied to
 a particular project."""
 from contextlib import contextmanager
+from logging import debug, info
 from os import getcwd, remove, rename
 from os.path import (
     basename,
@@ -32,7 +33,7 @@ def get_name(filename: str) -> str:
     return splitext(basename(filename))[0]
 
 
-def rename_preexisting_outfile(outfile: str, verbosity: int = 1) -> None:
+def rename_preexisting_outfile(outfile: str) -> None:
     outfile = expandvars(outfile)
     if not isabs(outfile):
         outfile = join(getcwd(), outfile)
@@ -45,8 +46,8 @@ def rename_preexisting_outfile(outfile: str, verbosity: int = 1) -> None:
         while True:
             backup_outfile = join(directory, f"{filename}_{backup_i:03d}.{extension}")
             if not exists(backup_outfile):
-                if verbosity >= 1:
-                    print(f"Moving up '{outfile}' to '{backup_outfile}'")
+                info(f"Moving up '{outfile}' to '{backup_outfile}'")
+                debug(f"Moving up '{outfile}' to '{backup_outfile}'")
                 rename(outfile, backup_outfile)
                 break
             backup_i += 1
