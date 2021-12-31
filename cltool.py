@@ -52,7 +52,7 @@ class CLTool(ABC):
         """
         Constructs argument parser.
 
-        Args:
+        Arguments:
             kwargs (Any): Additional keyword arguments
 
         Returns:
@@ -110,7 +110,7 @@ class CLTool(ABC):
         """
         Validates a float argument.
 
-        Args:
+        Arguments:
             min_value (Optional[float]): Minimum permissible value
             max_value (Optional[float]): Maximum permissible value
 
@@ -135,7 +135,7 @@ class CLTool(ABC):
         """
         Validates an input path argument.
 
-        Args:
+        Arguments:
             file_ok (bool): Whether or not file paths are permissible
             directory_ok (bool): Whether or not directory paths are permissible
             default_directory (Optional[str]): Default directory to prepend to *value*
@@ -162,7 +162,7 @@ class CLTool(ABC):
         """
         Validates an int argument.
 
-        Args:
+        Arguments:
             min_value (Optional[int]): Minimum permissible value
             max_value (Optional[int]): Maximum permissible value
 
@@ -187,7 +187,7 @@ class CLTool(ABC):
         """
         Validates a tuple of ints argument.
 
-        Args:
+        Arguments:
             length (Optional[int]): Number of values required
             min_value (Optional[int]): Minimum permissible value
             max_value (Optional[int]): Maximum permissible value
@@ -213,7 +213,7 @@ class CLTool(ABC):
         """
         Validates an output path argument.
 
-        Args:
+        Arguments:
             file_ok (bool): Whether or not file paths are permissible
             directory_ok (bool): Whether or not directory paths are permissible
             default_directory (Optional[str]): Default directory to prepend to *value*
@@ -238,7 +238,7 @@ class CLTool(ABC):
         """
         Validates a string argument.
 
-        Args:
+        Arguments:
             options (List[str]): Permissible values
 
         Returns:

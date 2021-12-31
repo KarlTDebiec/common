@@ -45,7 +45,7 @@ def input_prefill(prompt: str, prefill: str) -> str:
 
     TODO: Does this block CTRL-D?
 
-    Args:
+    Arguments:
         prompt (str): Prompt to present to user
         prefill (str): Text to prefill for user
 
@@ -72,7 +72,7 @@ def run_command(
 ) -> Tuple[int, Optional[str], Optional[str]]:
     """
 
-    Args:
+    Arguments:
         command: command to run
         timeout: maximum time to await command's completion
         acceptable_exitcodes: acceptable exit codes

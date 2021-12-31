@@ -39,7 +39,7 @@ def validate_executable(
     """
     Validates that executable name and returns its absolute path
 
-    Args:
+    Arguments:
         value: executable name
         supported_platforms: Platforms that support executable
           (default: {"Darwin", "Linux", "Windows"})
@@ -107,7 +107,7 @@ def validate_input_path(
     """
     Validates an input path and makes it absolute.
 
-    Args:
+    Arguments:
         value (Any): Provided input path
         file_ok (bool): Whether or not file paths are permissible
         directory_ok (bool): Whether or not directory paths are permissible
@@ -228,7 +228,7 @@ def validate_output_path(
     """
     Validates an output path and makes it absolute.
 
-    Args:
+    Arguments:
         value (Any): Provided output path
         file_ok (bool): Whether or not file paths are permissible
         directory_ok (bool): Whether or not directory paths are permissible
