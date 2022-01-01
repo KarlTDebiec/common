@@ -17,6 +17,7 @@ from os.path import (
     exists,
     expandvars,
     isabs,
+    isfile,
     join,
     normpath,
     splitext,
@@ -58,6 +59,8 @@ def temporary_filename(suffix: Optional[str] = None) -> None:
     try:
         f = NamedTemporaryFile(delete=False, suffix=suffix)
         f.close()
+        remove(f.name)
         yield f.name
     finally:
-        remove(f.name)
+        if isfile(f.name):
+            remove(f.name)
