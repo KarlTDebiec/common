@@ -6,6 +6,7 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
+"""General-purpose command-line tool base class not tied to a particular project"""
 import logging
 from abc import ABC, abstractmethod
 from argparse import (
@@ -28,10 +29,16 @@ from .validation import (
 
 
 class CLTool(ABC):
-    """General-purpose command-line tool base class not tied to a particular project."""
+    """General-purpose command-line tool base class not tied to a particular project"""
 
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
-        """Initialize, including argument validation and value storage."""
+        """
+        Validate and store static configuration
+
+        Args:
+            verbosity: Verbosity of logging
+            **kwargs: Additional keyword arguments
+        """
         self.verbosity = validate_int(verbosity, min_value=0)
         if self.verbosity <= 0:
             logging.basicConfig(level=logging.ERROR)
@@ -43,20 +50,20 @@ class CLTool(ABC):
             logging.basicConfig(level=logging.DEBUG)
 
     @abstractmethod
-    def __call__(self, **kwargs) -> Any:
-        """Perform operations."""
+    def __call__(self, **kwargs: Any) -> Any:
+        """Perform operations"""
         raise NotImplementedError()
 
     @classmethod
     def construct_argparser(cls, **kwargs: Any) -> ArgumentParser:
         """
-        Constructs argument parser.
+        Construct argument parser
 
         Arguments:
-            kwargs (Any): Additional keyword arguments
+            **kwargs: Additional keyword arguments
 
         Returns:
-            ArgumentParser: Argument parser
+            Argument parser
         """
         description = kwargs.pop(
             "description", cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
@@ -99,7 +106,7 @@ class CLTool(ABC):
 
     @classmethod
     def main(cls) -> None:
-        """Parses arguments, constructs tool, and calls tool."""
+        """Parse argument, construct tool, and call tool"""
         parser = cls.construct_argparser()
         kwargs = vars(parser.parse_args())
         tool = cls(**kwargs)
