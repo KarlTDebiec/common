@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #   common/command_line_tool.py
 #
-#   Copyright (C) 2017-2021 Karl T Debiec
+#   Copyright (C) 2017-2022 Karl T Debiec
 #   All rights reserved.
 #
 #   This software may be modified and distributed under the terms of the
