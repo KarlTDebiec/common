@@ -6,7 +6,10 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""General-purpose command-line tool base class not tied to a particular project"""
+"""
+General-purpose configurable command-line tool base class not tied to a particular
+project
+"""
 from abc import ABC
 from argparse import ArgumentParser
 from inspect import cleandoc
@@ -18,7 +21,10 @@ from pipescaler.core.file import read_yaml
 
 
 class ConfigurableCommandLineTool(ABC):
-    """General-purpose command-line tool base class not tied to a particular project"""
+    """
+    General-purpose configurable command-line tool base class not tied to a particular
+    project
+    """
 
     @classmethod
     def construct_argparser(cls, **kwargs: Any) -> ArgumentParser:
