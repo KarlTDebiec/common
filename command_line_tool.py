@@ -35,7 +35,7 @@ class CommandLineTool(ABC):
         """
         Validate and store static configuration
 
-        Args:
+        Arguments:
             verbosity: Verbosity of logging
             **kwargs: Additional keyword arguments
         """
