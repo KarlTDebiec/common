@@ -23,7 +23,7 @@ from platform import system
 from shutil import which
 from typing import Any, Iterable, Optional, Set, Tuple
 
-from .exceptions import (
+from .exception import (
     ArgumentConflictError,
     DirectoryNotFoundError,
     ExecutableNotFoundError,

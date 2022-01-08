@@ -12,7 +12,7 @@ from typing import List
 
 from .command_line_tool import CommandLineTool
 from .configurable_command_line_tool import ConfigurableCommandLineTool
-from .exceptions import (
+from .exception import (
     ArgumentConflictError,
     DirectoryExistsError,
     DirectoryNotFoundError,
@@ -24,7 +24,7 @@ from .exceptions import (
     SetterError,
     UnsupportedPlatformError,
 )
-from .files import get_ext, get_name, rename_preexisting_outfile, temporary_filename
+from .file import get_ext, get_name, rename_preexisting_outfile, temporary_filename
 from .general import get_shell_type, input_prefill, run_command
 from .validation import (
     validate_executable,

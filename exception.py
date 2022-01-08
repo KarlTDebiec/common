@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#   common/exceptions.py
+#   common/exception.py
 #
 #   Copyright (C) 2017-2022 Karl T Debiec
 #   All rights reserved.
