@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import List
 
 from .command_line_tool import CommandLineTool
-from .configurable_command_line_tool import ConfigurableCommandLineTool
 from .exception import (
     ArgumentConflictError,
     DirectoryExistsError,
@@ -44,7 +43,6 @@ package_root: str = str(Path(__file__).parent.parent.absolute())
 __all__: List[str] = [
     "ArgumentConflictError",
     "CommandLineTool",
-    "ConfigurableCommandLineTool",
     "DirectoryExistsError",
     "DirectoryNotFoundError",
     "ExecutableNotFoundError",
