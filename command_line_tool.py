@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#   common/cltool.py
+#   common/command_line_tool.py
 #
 #   Copyright (C) 2017-2021 Karl T Debiec
 #   All rights reserved.
@@ -28,7 +28,7 @@ from .validation import (
 )
 
 
-class CLTool(ABC):
+class CommandLineTool(ABC):
     """General-purpose command-line tool base class not tied to a particular project"""
 
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
@@ -109,6 +109,7 @@ class CLTool(ABC):
         """Parse argument, construct tool, and call tool"""
         parser = cls.construct_argparser()
         kwargs = vars(parser.parse_args())
+
         tool = cls(**kwargs)
         tool()
 
