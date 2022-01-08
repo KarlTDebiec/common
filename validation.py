@@ -7,6 +7,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
+from functools import partial
 from os import R_OK, W_OK, access, getcwd, makedirs
 from os.path import (
     defpath,
@@ -105,17 +106,17 @@ def validate_input_path(
     create_directory: bool = False,
 ) -> str:
     """
-    Validates an input path and makes it absolute.
+    Validate an input path and make it absolute
 
     Arguments:
-        value (Any): Provided input path
-        file_ok (bool): Whether or not file paths are permissible
-        directory_ok (bool): Whether or not directory paths are permissible
-        default_directory (Optional[str]): Default directory to prepend to *value* if
-          not absolute (default: current working directory)
+        value: Provided input path
+        file_ok: Whether or not file paths are permissible
+        directory_ok: Whether or not directory paths are permissible
+        default_directory: Default directory to prepend to *value* if not absolute
+          (default: current working directory)
 
     Returns:
-        str: Absolute path to input file or directory
+        Absolute path to input file or directory
 
     Raises:
         ArgumentConflictError: If neither *file_ok* nor *directory_ok*
@@ -226,14 +227,15 @@ def validate_output_path(
     create_directory: bool = False,
 ) -> str:
     """
-    Validates an output path and makes it absolute.
+    Validate an output path and makes it absolute
 
     Arguments:
-        value (Any): Provided output path
-        file_ok (bool): Whether or not file paths are permissible
-        directory_ok (bool): Whether or not directory paths are permissible
-        default_directory (Optional[str]): Default directory to prepend to *value* if
-          not absolute (default: current working directory)
+        value: Provided output path
+        file_ok: Whether or not file paths are permissible
+        directory_ok: Whether or not directory paths are permissible
+        default_directory: Default directory to prepend to *value* if not absolute
+          (default: current working directory)
+        create_directory: Create output directory if it does not already exist
 
     Returns:
         str: Absolute path to output file or directory
@@ -328,3 +330,20 @@ def validate_type(value: Any, cls: Any) -> Any:
     if not isinstance(value, cls):
         raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
     return value
+
+
+validate_input_directory = partial(
+    validate_input_path, file_ok=False, directory_ok=True
+)
+"""Validate an input directory path and make it absolute"""
+
+validate_input_file = partial(validate_input_path, file_ok=True, directory_ok=False)
+"""Validate an input file path and make it absolute"""
+
+validate_output_directory = partial(
+    validate_output_path, file_ok=False, directory_ok=True, create_directory=True
+)
+"""Validate an output directory path and make it absolute"""
+
+validate_output_file = partial(validate_output_path, file_ok=True, directory_ok=False)
+"""Validate an output file path and make it absolute"""

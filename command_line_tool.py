@@ -106,7 +106,7 @@ class CommandLineTool(ABC):
 
     @classmethod
     def main(cls) -> None:
-        """Parse argument, construct tool, and call tool"""
+        """Parse arguments, construct tool, and call tool"""
         parser = cls.construct_argparser()
         kwargs = vars(parser.parse_args())
 

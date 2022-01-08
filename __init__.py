@@ -23,14 +23,18 @@ from .exception import (
     SetterError,
     UnsupportedPlatformError,
 )
-from .file import get_ext, get_name, rename_preexisting_outfile, temporary_filename
+from .file import rename_preexisting_outfile, temporary_filename
 from .general import get_shell_type, input_prefill, run_command
 from .validation import (
     validate_executable,
     validate_float,
+    validate_input_directory,
+    validate_input_file,
     validate_input_path,
     validate_int,
     validate_ints,
+    validate_output_directory,
+    validate_output_file,
     validate_output_path,
     validate_str,
     validate_type,
@@ -52,8 +56,6 @@ __all__: List[str] = [
     "NotAFileOrDirectoryError",
     "SetterError",
     "UnsupportedPlatformError",
-    "get_ext",
-    "get_name",
     "get_shell_type",
     "input_prefill",
     "package_root",
@@ -62,9 +64,13 @@ __all__: List[str] = [
     "temporary_filename",
     "validate_executable",
     "validate_float",
+    "validate_input_directory",
+    "validate_input_file",
     "validate_input_path",
     "validate_int",
     "validate_ints",
+    "validate_output_directory",
+    "validate_output_file",
     "validate_output_path",
     "validate_str",
     "validate_type",

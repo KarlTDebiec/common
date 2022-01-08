@@ -26,22 +26,14 @@ from tempfile import NamedTemporaryFile
 from typing import Optional
 
 
-def get_ext(filename: str) -> str:
-    return splitext(basename(filename))[1].strip(".")
-
-
-def get_name(filename: str) -> str:
-    return splitext(basename(filename))[0]
-
-
 def rename_preexisting_outfile(outfile: str) -> None:
     outfile = expandvars(outfile)
     if not isabs(outfile):
         outfile = join(getcwd(), outfile)
     outfile = normpath(outfile)
     directory = dirname(outfile)
-    filename = get_name(outfile)
-    extension = get_ext(outfile)
+    filename = splitext(basename(outfile))[0]
+    extension = splitext(basename(outfile))[1].strip(".")
     if exists(outfile):
         backup_i = 0
         while True:
