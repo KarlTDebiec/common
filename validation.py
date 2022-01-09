@@ -109,7 +109,7 @@ def validate_input_path(
     Validate an input path and make it absolute
 
     Arguments:
-        value: Provided input path
+        value: Input path to validate
         file_ok: Whether or not file paths are permissible
         directory_ok: Whether or not directory paths are permissible
         default_directory: Default directory to prepend to *value* if not absolute
