@@ -40,14 +40,15 @@ class CommandLineTool(ABC):
             **kwargs: Additional keyword arguments
         """
         self.verbosity = validate_int(verbosity, min_value=0)
+        logging.basicConfig()
         if self.verbosity <= 0:
-            logging.basicConfig(level=logging.ERROR)
+            logging.getLogger().setLevel(level=logging.ERROR)
         elif self.verbosity == 1:
-            logging.basicConfig(level=logging.WARNING)
+            logging.getLogger().setLevel(level=logging.WARNING)
         elif self.verbosity == 2:
-            logging.basicConfig(level=logging.INFO)
+            logging.getLogger().setLevel(level=logging.INFO)
         elif self.verbosity >= 3:
-            logging.basicConfig(level=logging.DEBUG)
+            logging.getLogger().setLevel(level=logging.DEBUG)
 
     @abstractmethod
     def __call__(self, **kwargs: Any) -> Any:
