@@ -341,7 +341,9 @@ validate_input_file = partial(validate_input_path, file_ok=True, directory_ok=Fa
 """Validate an input file path and make it absolute"""
 
 validate_output_directory = partial(
-    validate_output_path, file_ok=False, directory_ok=True, create_directory=True
+    validate_output_path,
+    file_ok=False,
+    directory_ok=True,
 )
 """Validate an output directory path and make it absolute"""
 
