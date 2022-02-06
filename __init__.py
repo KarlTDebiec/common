@@ -26,6 +26,7 @@ from .exception import (
 from .file import rename_preexisting_outfile, temporary_filename
 from .general import get_shell_type, input_prefill, run_command
 from .validation import (
+    validate_enum,
     validate_executable,
     validate_float,
     validate_input_directory,
@@ -62,6 +63,7 @@ __all__: List[str] = [
     "rename_preexisting_outfile",
     "run_command",
     "temporary_filename",
+    "validate_enum",
     "validate_executable",
     "validate_float",
     "validate_input_directory",

@@ -7,6 +7,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
+from enum import Enum
 from functools import partial
 from os import R_OK, W_OK, access, getcwd, makedirs
 from os.path import (
@@ -22,7 +23,7 @@ from os.path import (
 )
 from platform import system
 from shutil import which
-from typing import Any, Iterable, Optional, Set, Tuple
+from typing import Any, Iterable, Optional, Set, Tuple, Type
 
 from .exception import (
     ArgumentConflictError,
@@ -32,6 +33,17 @@ from .exception import (
     NotAFileOrDirectoryError,
     UnsupportedPlatformError,
 )
+
+
+def validate_enum(value: Any, enum: Type[Enum]) -> Type[Enum]:
+    try:
+        value = str(value)
+    except ValueError:
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    if hasattr(enum, value):
+        return enum[value]
+    else:
+        raise TypeError()
 
 
 def validate_executable(
