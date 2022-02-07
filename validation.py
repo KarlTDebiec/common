@@ -36,14 +36,31 @@ from .exception import (
 
 
 def validate_enum(value: Any, enum: Type[Enum]) -> Type[Enum]:
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    """
+    Validate an enum member, if necessary converted from a string
+
+    Arguments:
+        value: Member name
+        enum: Enum
+    Returns:
+        validated enum member
+    Raises:
+        TypeError: If enum is not an Enum, or value is not a member of enum
+    """
+    if not isinstance(enum, type(Enum)):
+        raise TypeError(f"'{enum}' is of type '{type(enum)}', not Enum")
+    if isinstance(value, enum):
+        return value
+    value = str(value)
+    if value.startswith(Enum.__name__):
+        value = value[len(Enum.__name__) :].lstrip(".")
     if hasattr(enum, value):
         return enum[value]
     else:
-        raise TypeError()
+        raise TypeError(
+            f"{value} is not a member of {enum.__name__}, must be one of "
+            f"{list(enum.__members__.keys())}"
+        )
 
 
 def validate_executable(
