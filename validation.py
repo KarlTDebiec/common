@@ -35,15 +35,17 @@ from .exception import (
 )
 
 
-def validate_enum(value: Any, enum: Type[Enum]) -> Type[Enum]:
+def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
     """
     Validate an enum member, if necessary converted from a string
 
     Arguments:
         value: Member name
         enum: Enum
+
     Returns:
         validated enum member
+
     Raises:
         TypeError: If enum is not an Enum, or value is not a member of enum
     """
