@@ -42,10 +42,8 @@ def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
     Arguments:
         value: Member name
         enum: Enum
-
     Returns:
         validated enum member
-
     Raises:
         TypeError: If enum is not an Enum, or value is not a member of enum
     """
@@ -58,11 +56,11 @@ def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
         value = value[len(Enum.__name__) :].lstrip(".")
     if hasattr(enum, value):
         return enum[value]
-    else:
-        raise TypeError(
-            f"{value} is not a member of {enum.__name__}, must be one of "
-            f"{list(enum.__members__.keys())}"
-        )
+
+    raise TypeError(
+        f"{value} is not a member of {enum.__name__}, must be one of "
+        f"{list(enum.__members__.keys())}"
+    )
 
 
 def validate_executable(
@@ -73,16 +71,14 @@ def validate_executable(
 
     Arguments:
         value: executable name
-        supported_platforms: Platforms that support executable
-          (default: {"Darwin", "Linux", "Windows"})
-
+        supported_platforms: Platforms that support executable (default: {"Darwin",
+          "Linux", "Windows"})
+    Returns:
+        Absolute path of executable
     Raises:
         ExecutableNotFoundError: if executable is not found in path
         TypeError: if value or supported platform are not of the expected types
         UnsupportedPlatformError: if executable is not supported on current platform
-
-    Returns:
-        Absolute path of executable
     """
     try:
         value = str(value)

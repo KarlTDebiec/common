@@ -11,38 +11,40 @@ from inspect import currentframe, getframeinfo
 
 
 class ArgumentConflictError(Exception):
-    pass
+    """Two or more arguments are in conflict with one another"""
 
 
 class DirectoryExistsError(OSError):
-    pass
+    """Directory already exists"""
 
 
 class DirectoryNotFoundError(OSError):
-    pass
+    """Directory not found"""
 
 
 class ExecutableNotFoundError(OSError):
-    pass
+    """Executable not found"""
 
 
 class GetterError(TypeError):
-    pass
+    """Error encountered in getter method"""
 
 
 class IsAFileError(OSError):
-    pass
+    """Is a file"""
 
 
 class NotAFileError(OSError):
-    pass
+    """Is not a file"""
 
 
 class NotAFileOrDirectoryError(OSError):
-    pass
+    """Is not a file or directory"""
 
 
 class SetterError(TypeError):
+    """Error encountered in setter method"""
+
     def __init__(self, cls: object, value: object):
         cls_type_name = type(cls).__name__
         # noinspection Mypy
@@ -61,4 +63,4 @@ class SetterError(TypeError):
 
 
 class UnsupportedPlatformError(OSError):
-    pass
+    """Platform is unsupported"""
