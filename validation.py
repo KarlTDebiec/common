@@ -83,16 +83,16 @@ def validate_executable(
     try:
         value = str(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
     if supported_platforms is None:
         supported_platforms = {"Darwin", "Linux", "Windows"}
     else:
         try:
             supported_platforms = set(supported_platforms)
-        except:
+        except ValueError:
             raise TypeError(
                 f"'{supported_platforms}' is of type '{type(value)}', not Set[str]"
-            )
+            ) from None
 
     if system() not in supported_platforms:
         raise UnsupportedPlatformError(
@@ -115,7 +115,7 @@ def validate_float(
     try:
         value = float(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not float")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not float") from None
 
     if min_value is not None and value < min_value:
         raise ValueError(f"{value} is less than minimum value of {min_value}")
@@ -167,7 +167,7 @@ def validate_input_path(
     try:
         value = str(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
 
     value = expandvars(value)
     if not isabs(value):
@@ -206,7 +206,7 @@ def validate_int(
     try:
         value = int(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not int")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not int") from None
 
     if min_value is not None and value < min_value:
         raise ValueError(f"{value} is less than minimum value of {min_value}")
@@ -297,7 +297,7 @@ def validate_output_path(
     try:
         value = str(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
 
     value = expandvars(value)
     if not isabs(value):
@@ -336,19 +336,19 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
         except ValueError:
             raise ArgumentConflictError(
                 f"Option '{option}' is of type '{type(option)}', not str"
-            )
+            ) from None
         case_insensitive_options[option.lower()] = option
 
     try:
         value = str(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
     value = value.lower()
 
     if value not in case_insensitive_options:
         raise ValueError(
             f"'{value}' is not one of options '{case_insensitive_options.keys()}'"
-        )
+        ) from None
 
     return case_insensitive_options[value]
 
