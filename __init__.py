@@ -24,7 +24,7 @@ from .exception import (
     UnsupportedPlatformError,
 )
 from .file import rename_preexisting_outfile, temporary_filename
-from .general import get_shell_type, input_prefill, run_command
+from .general import get_shell_type, run_command
 from .validation import (
     validate_enum,
     validate_executable,
@@ -58,7 +58,6 @@ __all__: List[str] = [
     "SetterError",
     "UnsupportedPlatformError",
     "get_shell_type",
-    "input_prefill",
     "package_root",
     "rename_preexisting_outfile",
     "run_command",

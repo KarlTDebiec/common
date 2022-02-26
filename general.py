@@ -8,7 +8,7 @@
 #   BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
 from subprocess import PIPE, Popen
-from typing import Any, Iterable, Optional, Tuple
+from typing import Iterable, Optional, Tuple
 
 
 def get_shell_type() -> Optional[str]:
@@ -16,7 +16,7 @@ def get_shell_type() -> Optional[str]:
     Determines if inside IPython prompt.
 
     Returns:
-        Optional[str]: Type of shell in use, or None if not in a shell
+        Type of shell in use, or None if not in a shell
     """
     try:
         # noinspection Mypy
@@ -37,34 +37,6 @@ def get_shell_type() -> Optional[str]:
         return None
 
 
-def input_prefill(prompt: str, prefill: str) -> str:
-    """
-    Prompts user for input with pre-filled text.
-
-    Does not handle colored prompt correctly
-
-    TODO: Does this block CTRL-D?
-
-    Arguments:
-        prompt (str): Prompt to present to user
-        prefill (str): Text to prefill for user
-
-    Returns:
-        str: Text inputted by user
-    """
-    from readline import insert_text, redisplay, set_pre_input_hook
-
-    def pre_input_hook() -> None:
-        insert_text(prefill)
-        redisplay()
-
-    set_pre_input_hook(pre_input_hook)
-    result = input(prompt)
-    set_pre_input_hook()
-
-    return result
-
-
 def run_command(
     command: str,
     timeout: int = 600,
@@ -76,10 +48,8 @@ def run_command(
         command: command to run
         timeout: maximum time to await command's completion
         acceptable_exitcodes: acceptable exit codes
-
     Returns:
         exitcode, standard output, and standard error
-
     Raises:
         ValueError: If exitcode is not in acceptable_exitcodes
     """

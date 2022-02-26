@@ -16,7 +16,7 @@ from argparse import (
     _SubParsersAction,
 )
 from inspect import cleandoc
-from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Iterable, Optional, Tuple, Union
 
 from .validation import (
     validate_float,
@@ -62,7 +62,6 @@ class CommandLineTool(ABC):
 
         Arguments:
             **kwargs: Additional keyword arguments
-
         Returns:
             Argument parser
         """
@@ -119,21 +118,20 @@ class CommandLineTool(ABC):
         min_value: Optional[float] = None, max_value: Optional[float] = None
     ) -> Callable[[Any], float]:
         """
-        Validates a float argument.
+        Validate a float argument
 
         Arguments:
-            min_value (Optional[float]): Minimum permissible value
-            max_value (Optional[float]): Maximum permissible value
-
+            min_value: Minimum permissible value
+            max_value: Maximum permissible value
         Returns:
-            Callable[[Any], float]: Value validator function
+            Value validator function
         """
 
         def func(value: Any) -> float:
             try:
                 return validate_float(value, min_value, max_value)
             except TypeError as e:
-                raise ArgumentTypeError(e)
+                raise ArgumentTypeError from e
 
         return func
 
@@ -144,16 +142,15 @@ class CommandLineTool(ABC):
         default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
         """
-        Validates an input path argument.
+        Validate an input path argument
 
         Arguments:
-            file_ok (bool): Whether or not file paths are permissible
-            directory_ok (bool): Whether or not directory paths are permissible
-            default_directory (Optional[str]): Default directory to prepend to *value*
-               if not absolute (default: current working directory)
-
+            file_ok: Whether  file paths are permissible
+            directory_ok: Whether  directory paths are permissible
+            default_directory: Default directory to prepend to *value* if not absolute
+              (default: current working directory)
         Returns:
-            Callable[[Any], str]: Value validator function
+            Value validator function
         """
 
         def func(value: Any) -> str:
@@ -162,7 +159,7 @@ class CommandLineTool(ABC):
                     value, file_ok, directory_ok, default_directory
                 )
             except TypeError as e:
-                raise ArgumentTypeError(e)
+                raise ArgumentTypeError from e
 
         return func
 
@@ -171,21 +168,20 @@ class CommandLineTool(ABC):
         min_value: Optional[int] = None, max_value: Optional[int] = None
     ) -> Callable[[Any], int]:
         """
-        Validates an int argument.
+        Validate an int argument
 
         Arguments:
-            min_value (Optional[int]): Minimum permissible value
-            max_value (Optional[int]): Maximum permissible value
-
+            min_value: Minimum permissible value
+            max_value: Maximum permissible value
         Returns:
-            Callable[[Any], int]: Value validator function
+            Value validator function
         """
 
         def func(value: Any) -> int:
             try:
                 return validate_int(value, min_value, max_value)
             except TypeError as e:
-                raise ArgumentTypeError(e)
+                raise ArgumentTypeError from e
 
         return func
 
@@ -196,22 +192,21 @@ class CommandLineTool(ABC):
         max_value: Optional[int] = None,
     ) -> Callable[[Any], Tuple[int]]:
         """
-        Validates a tuple of ints argument.
+        Validate a tuple of ints argument
 
         Arguments:
-            length (Optional[int]): Number of values required
-            min_value (Optional[int]): Minimum permissible value
-            max_value (Optional[int]): Maximum permissible value
-
+            length: Number of values required
+            min_value: Minimum permissible value
+            max_value: Maximum permissible value
         Returns:
-            Callable[[Any], int]: Value validator function
+            Value validator function
         """
 
         def func(value: Any) -> Tuple[int]:
             try:
                 return validate_ints(value, length, min_value, max_value)
             except TypeError as e:
-                raise ArgumentTypeError(e)
+                raise ArgumentTypeError from e
 
         return func
 
@@ -222,16 +217,15 @@ class CommandLineTool(ABC):
         default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
         """
-        Validates an output path argument.
+        Validate an output path argument
 
         Arguments:
-            file_ok (bool): Whether or not file paths are permissible
-            directory_ok (bool): Whether or not directory paths are permissible
-            default_directory (Optional[str]): Default directory to prepend to *value*
-               if not absolute (default: current working directory)
-
+            file_ok: Whether file paths are permissible
+            directory_ok: Whether directory paths are permissible
+            default_directory: Default directory to prepend to *value* if not absolute
+              (default: current working directory)
         Returns:
-            Callable[[Any], str]: Value validator function
+            Value validator function
         """
 
         def func(value: Any) -> str:
@@ -240,26 +234,25 @@ class CommandLineTool(ABC):
                     value, file_ok, directory_ok, default_directory
                 )
             except TypeError as e:
-                raise ArgumentTypeError(e)
+                raise ArgumentTypeError from e
 
         return func
 
     @staticmethod
     def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
         """
-        Validates a string argument.
+        Validate a string argument
 
         Arguments:
-            options (List[str]): Permissible values
-
+            options: Permissible values
         Returns:
-            Callable[[Any], float]: Value validator function
+            Value validator function
         """
 
         def func(value: Any) -> str:
             try:
                 return validate_str(value, options)
             except TypeError as e:
-                raise ArgumentTypeError(e)
+                raise ArgumentTypeError from e
 
         return func
