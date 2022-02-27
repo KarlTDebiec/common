@@ -109,6 +109,20 @@ def validate_executable(
 def validate_float(
     value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
 ) -> float:
+    """
+    Validate a float
+
+    Arguments:
+        value: Input value to validate
+        min_value: Minimum value of float, if applicable
+        max_value: Maximum value of float, if applicable
+    Returns:
+        value as a float
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        TypeError: If value may not be cast to a float
+        ValueError: If value is less than min_value or greater than max_value
+    """
     if min_value is not None and max_value is not None and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
@@ -136,9 +150,9 @@ def validate_input_path(
     Validate an input path and make it absolute
 
     Arguments:
-        value: Input path to validate
-        file_ok: Whether or not file paths are permissible
-        directory_ok: Whether or not directory paths are permissible
+        value: Input value to validate
+        file_ok: Whether file paths are permissible
+        directory_ok: Whether directory paths are permissible
         default_directory: Default directory to prepend to *value* if not absolute
           (default: current working directory)
 
@@ -180,8 +194,7 @@ def validate_input_path(
         else:
             if not file_ok and directory_ok:
                 raise DirectoryNotFoundError(f"'{value}' does not exist")
-            else:
-                raise FileNotFoundError(f"'{value}' does not exist")
+            raise FileNotFoundError(f"'{value}' does not exist")
     if file_ok and not directory_ok and not isfile(value):
         raise NotAFileError(f"'{value}' is not a file")
     if not file_ok and directory_ok and not isdir(value):
@@ -200,6 +213,22 @@ def validate_int(
     max_value: Optional[int] = None,
     choices: Optional[Tuple[int, ...]] = None,
 ) -> int:
+    """
+    Validate an int
+
+    Arguments:
+        value: Input value to validate
+        min_value: Minimum value of int, if applicable
+        max_value: Maximum value of int, if applicable
+        choices: Acceptable int values, if applicable
+    Returns:
+        value as an int
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        TypeError: If value may not be cast to an int
+        ValueError: If value is less than min_value or greater than max_value, or is not
+          one of the provided options
+    """
     if min_value is not None and max_value is not None and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
@@ -225,6 +254,21 @@ def validate_ints(
     max_value: Optional[int] = None,
     choices: Optional[Tuple[int]] = None,
 ):
+    """
+    Validate a collection of int
+
+    Arguments:
+        values: Input values to validate
+        length:  Number of values expected, if applicable
+        min_value: Minimum value of int, if applicable
+        max_value: Maximum value of int, if applicable
+        choices: Acceptable int values, if applicable
+    Returns:
+        values as a list of ints
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        ValueError: If value is less than min_value or greater than max_value
+    """
     if min_value is not None and max_value is not None and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
@@ -258,8 +302,8 @@ def validate_output_path(
 
     Arguments:
         value: Provided output path
-        file_ok: Whether or not file paths are permissible
-        directory_ok: Whether or not directory paths are permissible
+        file_ok: Whether file paths are permissible
+        directory_ok: Whether directory paths are permissible
         default_directory: Default directory to prepend to *value* if not absolute
           (default: current working directory)
         create_directory: Create output directory if it does not already exist
@@ -288,7 +332,7 @@ def validate_output_path(
     if not directory_ok and create_directory:
         raise ArgumentConflictError(
             "Arguments 'directory_ok' and 'create_directory' "
-            "are in conflict; may not prohibit diretory paths and enable directory "
+            "are in conflict; may not prohibit directory paths and enable directory "
             "creation"
         )
     if default_directory is None:
@@ -329,6 +373,19 @@ def validate_output_path(
 
 
 def validate_str(value: Any, options: Iterable[str]) -> str:
+    """
+    Validate a str
+
+    Arguments
+        value: Input value to validate
+        options: Acceptable string values, if applicable
+    Returns:
+        Value as a str
+    Raises:
+        ArgumentConflictError: If an option cannot be cast to a string
+        TypeError: If value may not be cast to a str
+        ValueError: If value is not one of the provided options
+    """
     case_insensitive_options = {}
     for option in options:
         try:
@@ -354,6 +411,17 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
 
 
 def validate_type(value: Any, cls: Any) -> Any:
+    """
+    Validate that value is of type cls
+
+    Arguments:
+        value: Input object to validate
+        cls: Required type of object
+    Returns:
+        value
+    Raises:
+        TypeError: If value is not of type cls
+    """
     if not isinstance(value, cls):
         raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
     return value

@@ -130,8 +130,8 @@ class CommandLineTool(ABC):
         def func(value: Any) -> float:
             try:
                 return validate_float(value, min_value, max_value)
-            except TypeError as e:
-                raise ArgumentTypeError from e
+            except TypeError as error:
+                raise ArgumentTypeError from error
 
         return func
 
@@ -158,8 +158,8 @@ class CommandLineTool(ABC):
                 return validate_input_path(
                     value, file_ok, directory_ok, default_directory
                 )
-            except TypeError as e:
-                raise ArgumentTypeError from e
+            except TypeError as error:
+                raise ArgumentTypeError from error
 
         return func
 
@@ -180,8 +180,8 @@ class CommandLineTool(ABC):
         def func(value: Any) -> int:
             try:
                 return validate_int(value, min_value, max_value)
-            except TypeError as e:
-                raise ArgumentTypeError from e
+            except TypeError as error:
+                raise ArgumentTypeError from error
 
         return func
 
@@ -205,8 +205,8 @@ class CommandLineTool(ABC):
         def func(value: Any) -> Tuple[int]:
             try:
                 return validate_ints(value, length, min_value, max_value)
-            except TypeError as e:
-                raise ArgumentTypeError from e
+            except TypeError as error:
+                raise ArgumentTypeError from error
 
         return func
 
@@ -233,8 +233,8 @@ class CommandLineTool(ABC):
                 return validate_output_path(
                     value, file_ok, directory_ok, default_directory
                 )
-            except TypeError as e:
-                raise ArgumentTypeError from e
+            except TypeError as error:
+                raise ArgumentTypeError from error
 
         return func
 
@@ -252,7 +252,7 @@ class CommandLineTool(ABC):
         def func(value: Any) -> str:
             try:
                 return validate_str(value, options)
-            except TypeError as e:
-                raise ArgumentTypeError from e
+            except TypeError as error:
+                raise ArgumentTypeError from error
 
         return func

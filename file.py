@@ -27,6 +27,12 @@ from typing import Optional
 
 
 def rename_preexisting_outfile(outfile: str) -> None:
+    """
+    Check if a proposed outfile exists, and if so rename the existing file
+
+    Arguments:
+        outfile: Proposed outfile
+    """
     outfile = expandvars(outfile)
     if not isabs(outfile):
         outfile = join(getcwd(), outfile)
@@ -48,11 +54,20 @@ def rename_preexisting_outfile(outfile: str) -> None:
 
 @contextmanager
 def temporary_filename(suffix: Optional[str] = None) -> None:
+    """
+    Context manager providing a named temporary file and removing it once no longer
+    needed
+
+    Arguments
+        suffix: Suffix of named temporary file
+    """
+    named_temporary_file = None
     try:
-        f = NamedTemporaryFile(delete=False, suffix=suffix)
-        f.close()
-        remove(f.name)
-        yield f.name
+        named_temporary_file = NamedTemporaryFile(delete=False, suffix=suffix)
+        named_temporary_file.close()
+        remove(named_temporary_file.name)
+        yield named_temporary_file.name
     finally:
-        if isfile(f.name):
-            remove(f.name)
+        if named_temporary_file is not None:
+            if isfile(named_temporary_file.name):
+                remove(named_temporary_file.name)

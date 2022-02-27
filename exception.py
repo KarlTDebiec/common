@@ -46,8 +46,9 @@ class SetterError(TypeError):
     """Error encountered in setter method"""
 
     def __init__(self, cls: object, value: object):
+        super().__init__()
+
         cls_type_name = type(cls).__name__
-        # noinspection Mypy
         prop_name = getframeinfo(currentframe().f_back).function
         value_type_name = type(value).__name__
         prop_docstring = getattr(type(cls), prop_name).__doc__
