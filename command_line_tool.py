@@ -6,7 +6,7 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""General-purpose command-line tool base class not tied to a particular project"""
+"""General-purpose command-line tool base class."""
 import logging
 from abc import ABC, abstractmethod
 from argparse import (
@@ -29,11 +29,10 @@ from .validation import (
 
 
 class CommandLineTool(ABC):
-    """General-purpose command-line tool base class not tied to a particular project"""
+    """General-purpose command-line tool base class."""
 
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
-        """
-        Validate and store static configuration
+        """Validate and store static configuration.
 
         Arguments:
             verbosity: Verbosity of logging
@@ -52,13 +51,12 @@ class CommandLineTool(ABC):
 
     @abstractmethod
     def __call__(self, **kwargs: Any) -> Any:
-        """Perform operations"""
+        """Perform operations."""
         raise NotImplementedError()
 
     @classmethod
     def construct_argparser(cls, **kwargs: Any) -> ArgumentParser:
-        """
-        Construct argument parser
+        """Construct argument parser.
 
         Arguments:
             **kwargs: Additional keyword arguments
@@ -106,7 +104,7 @@ class CommandLineTool(ABC):
 
     @classmethod
     def main(cls) -> None:
-        """Parse arguments, construct tool, and call tool"""
+        """Parse arguments, construct tool, and call tool."""
         parser = cls.construct_argparser()
         kwargs = vars(parser.parse_args())
 
@@ -117,8 +115,7 @@ class CommandLineTool(ABC):
     def float_arg(
         min_value: Optional[float] = None, max_value: Optional[float] = None
     ) -> Callable[[Any], float]:
-        """
-        Validate a float argument
+        """Validate a float argument.
 
         Arguments:
             min_value: Minimum permissible value
@@ -141,14 +138,13 @@ class CommandLineTool(ABC):
         directory_ok: bool = False,
         default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
-        """
-        Validate an input path argument
+        """Validate an input path argument.
 
         Arguments:
             file_ok: Whether  file paths are permissible
             directory_ok: Whether  directory paths are permissible
-            default_directory: Default directory to prepend to *value* if not absolute
-              (default: current working directory)
+            default_directory: Default directory to prepend to *value* if not absolute;
+              default: current working directory
         Returns:
             Value validator function
         """
@@ -167,8 +163,7 @@ class CommandLineTool(ABC):
     def int_arg(
         min_value: Optional[int] = None, max_value: Optional[int] = None
     ) -> Callable[[Any], int]:
-        """
-        Validate an int argument
+        """Validate an int argument.
 
         Arguments:
             min_value: Minimum permissible value
@@ -191,8 +186,7 @@ class CommandLineTool(ABC):
         min_value: Optional[int] = None,
         max_value: Optional[int] = None,
     ) -> Callable[[Any], Tuple[int]]:
-        """
-        Validate a tuple of ints argument
+        """Validate a tuple of ints argument.
 
         Arguments:
             length: Number of values required
@@ -216,14 +210,13 @@ class CommandLineTool(ABC):
         directory_ok: bool = False,
         default_directory: Optional[str] = None,
     ) -> Callable[[Any], str]:
-        """
-        Validate an output path argument
+        """Validate an output path argument.
 
         Arguments:
             file_ok: Whether file paths are permissible
             directory_ok: Whether directory paths are permissible
-            default_directory: Default directory to prepend to *value* if not absolute
-              (default: current working directory)
+            default_directory: Default directory to prepend to *value* if not absolute;
+              default: current working directory
         Returns:
             Value validator function
         """
@@ -240,8 +233,7 @@ class CommandLineTool(ABC):
 
     @staticmethod
     def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
-        """
-        Validate a string argument
+        """Validate a string argument.
 
         Arguments:
             options: Permissible values

@@ -12,8 +12,7 @@ from typing import Iterable, Optional, Tuple
 
 
 def get_shell_type() -> Optional[str]:
-    """
-    Determines if inside IPython prompt.
+    """Determines if inside IPython prompt.
 
     Returns:
         Type of shell in use, or None if not in a shell
@@ -42,7 +41,7 @@ def run_command(
     timeout: int = 600,
     acceptable_exitcodes: Optional[Iterable[int]] = None,
 ) -> Tuple[int, Optional[str], Optional[str]]:
-    """
+    """Run a provided command.
 
     Arguments:
         command: command to run

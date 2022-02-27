@@ -6,8 +6,7 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""General-purpose functions for file interaction and manipulation not tied to
-a particular project."""
+"""General-purpose functions for file interaction and manipulation."""
 from contextlib import contextmanager
 from logging import debug, info
 from os import getcwd, remove, rename
@@ -27,8 +26,7 @@ from typing import Optional
 
 
 def rename_preexisting_outfile(outfile: str) -> None:
-    """
-    Check if a proposed outfile exists, and if so rename the existing file
+    """Check if a proposed outfile exists, and if so rename the existing file.
 
     Arguments:
         outfile: Proposed outfile
@@ -54,11 +52,9 @@ def rename_preexisting_outfile(outfile: str) -> None:
 
 @contextmanager
 def temporary_filename(suffix: Optional[str] = None) -> None:
-    """
-    Context manager providing a named temporary file and removing it once no longer
-    needed
+    """Provide a named temporary file and remove it once no longer needed.
 
-    Arguments
+    Arguments:
         suffix: Suffix of named temporary file
     """
     named_temporary_file = None

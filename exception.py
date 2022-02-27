@@ -6,46 +6,52 @@
 #
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
-"""General-purpose exceptions not tied to a particular project."""
+"""General-purpose exceptions."""
 from inspect import currentframe, getframeinfo
 
 
 class ArgumentConflictError(Exception):
-    """Two or more arguments are in conflict with one another"""
+    """Two or more arguments are in conflict with one another."""
 
 
 class DirectoryExistsError(OSError):
-    """Directory already exists"""
+    """Directory already exists."""
 
 
 class DirectoryNotFoundError(OSError):
-    """Directory not found"""
+    """Directory not found."""
 
 
 class ExecutableNotFoundError(OSError):
-    """Executable not found"""
+    """Executable not found."""
 
 
 class GetterError(TypeError):
-    """Error encountered in getter method"""
+    """Error encountered in getter method."""
 
 
 class IsAFileError(OSError):
-    """Is a file"""
+    """Is a file."""
 
 
 class NotAFileError(OSError):
-    """Is not a file"""
+    """Is not a file."""
 
 
 class NotAFileOrDirectoryError(OSError):
-    """Is not a file or directory"""
+    """Is not a file or directory."""
 
 
 class SetterError(TypeError):
-    """Error encountered in setter method"""
+    """Error encountered in setter method."""
 
     def __init__(self, cls: object, value: object):
+        """Initialize.
+
+        Arguments:
+            cls: Class to which setter belongs
+            value: Value passed to setter
+        """
         super().__init__()
 
         cls_type_name = type(cls).__name__
@@ -60,8 +66,9 @@ class SetterError(TypeError):
         )
 
     def __str__(self) -> str:
+        """String representation."""
         return self.message
 
 
 class UnsupportedPlatformError(OSError):
-    """Platform is unsupported"""
+    """Platform is unsupported."""

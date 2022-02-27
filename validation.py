@@ -36,8 +36,7 @@ from .exception import (
 
 
 def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
-    """
-    Validate an enum member, if necessary converted from a string
+    """Validate an enum member, if necessary converted from a string.
 
     Arguments:
         value: Member name
@@ -66,13 +65,12 @@ def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
 def validate_executable(
     value: Any, supported_platforms: Optional[Set[str]] = None
 ) -> str:
-    """
-    Validates that executable name and returns its absolute path
+    """Validates that executable name and returns its absolute path.
 
     Arguments:
         value: executable name
-        supported_platforms: Platforms that support executable (default: {"Darwin",
-          "Linux", "Windows"})
+        supported_platforms: Platforms that support executable;
+          default: "Darwin", "Linux", "Windows"
     Returns:
         Absolute path of executable
     Raises:
@@ -109,8 +107,7 @@ def validate_executable(
 def validate_float(
     value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
 ) -> float:
-    """
-    Validate a float
+    """Validate a float.
 
     Arguments:
         value: Input value to validate
@@ -146,19 +143,17 @@ def validate_input_path(
     default_directory: Optional[str] = None,
     create_directory: bool = False,
 ) -> str:
-    """
-    Validate an input path and make it absolute
+    """Validate an input path and make it absolute.
 
     Arguments:
         value: Input value to validate
         file_ok: Whether file paths are permissible
         directory_ok: Whether directory paths are permissible
-        default_directory: Default directory to prepend to *value* if not absolute
-          (default: current working directory)
-
+        default_directory: Default directory to prepend to *value* if not absolute;
+          default: current working directory
+        create_directory: Whether to create directory if it does not already exist
     Returns:
         Absolute path to input file or directory
-
     Raises:
         ArgumentConflictError: If neither *file_ok* nor *directory_ok*
         FileNotFoundError: If *value* does not exist
@@ -213,8 +208,7 @@ def validate_int(
     max_value: Optional[int] = None,
     choices: Optional[Tuple[int, ...]] = None,
 ) -> int:
-    """
-    Validate an int
+    """Validate an int.
 
     Arguments:
         value: Input value to validate
@@ -254,8 +248,7 @@ def validate_ints(
     max_value: Optional[int] = None,
     choices: Optional[Tuple[int]] = None,
 ):
-    """
-    Validate a collection of int
+    """Validate a collection of int.
 
     Arguments:
         values: Input values to validate
@@ -297,20 +290,17 @@ def validate_output_path(
     default_directory: Optional[str] = None,
     create_directory: bool = False,
 ) -> str:
-    """
-    Validate an output path and makes it absolute
+    """Validate an output path and makes it absolute.
 
     Arguments:
         value: Provided output path
         file_ok: Whether file paths are permissible
         directory_ok: Whether directory paths are permissible
-        default_directory: Default directory to prepend to *value* if not absolute
-          (default: current working directory)
+        default_directory: Default directory to prepend to *value* if not absolute;
+          default: current working directory
         create_directory: Create output directory if it does not already exist
-
     Returns:
         str: Absolute path to output file or directory
-
     Raises:
         ArgumentConflictError: If neither *file_ok* nor *directory_ok*
         DirectoryNotFoundError: If *value*'s containing directory does not exist
@@ -373,10 +363,9 @@ def validate_output_path(
 
 
 def validate_str(value: Any, options: Iterable[str]) -> str:
-    """
-    Validate a str
+    """Validate a str.
 
-    Arguments
+    Arguments:
         value: Input value to validate
         options: Acceptable string values, if applicable
     Returns:
@@ -411,8 +400,7 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
 
 
 def validate_type(value: Any, cls: Any) -> Any:
-    """
-    Validate that value is of type cls
+    """Validate that value is of type cls.
 
     Arguments:
         value: Input object to validate
