@@ -97,11 +97,11 @@ def validate_executable(
             f"Executable '{value}' is not supported on {system()}"
         )
 
-    value = which(value)
-    if value is None:
+    which_value = which(value)
+    if which_value is None:
         raise ExecutableNotFoundError(f"Executable '{value}' not found in '{defpath}'")
 
-    return value
+    return which_value
 
 
 def validate_float(
