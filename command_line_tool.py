@@ -55,7 +55,9 @@ class CommandLineTool(ABC):
         raise NotImplementedError()
 
     @classmethod
-    def construct_argparser(cls, **kwargs: Any) -> ArgumentParser:
+    def construct_argparser(
+        cls, **kwargs: Any
+    ) -> Union[ArgumentParser, _SubParsersAction]:
         """Construct argument parser.
 
         Arguments:

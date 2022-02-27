@@ -19,7 +19,7 @@ def get_shell_type() -> Optional[str]:
     """
     try:
         # noinspection Mypy
-        shell = str(get_ipython().__class__.__name__)
+        shell = str(get_ipython().__class__.__name__)  # type: ignore
         if shell == "ZMQInteractiveShell":
             # IPython in Jupyter Notebook
             return shell
