@@ -66,4 +66,11 @@ def temporary_filename(suffix: Optional[str] = None) -> None:
     finally:
         if named_temporary_file is not None:
             if isfile(named_temporary_file.name):
-                remove(named_temporary_file.name)
+                try:
+                    remove(named_temporary_file.name)
+                except PermissionError as error:
+                    debug(
+                        f"temporary_filename encountered PermissionException "
+                        f"'{error}'; temporary file '{named_temporary_file.name}', "
+                        f"will not be removed."
+                    )
