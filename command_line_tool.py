@@ -13,10 +13,11 @@ from argparse import (
     ArgumentParser,
     ArgumentTypeError,
     RawDescriptionHelpFormatter,
+    _ArgumentGroup,
     _SubParsersAction,
 )
 from inspect import cleandoc
-from typing import Any, Callable, Iterable, Optional, Tuple, Union
+from typing import Any, Callable, Iterable, Optional, Union
 
 from .validation import (
     validate_float,
@@ -55,36 +56,10 @@ class CommandLineTool(ABC):
         raise NotImplementedError()
 
     @classmethod
-    def construct_argparser(
-        cls, **kwargs: Any
-    ) -> Union[ArgumentParser, _SubParsersAction]:
-        """Construct argument parser.
-
-        Arguments:
-            **kwargs: Additional keyword arguments
-        Returns:
-            Argument parser
-        """
-        description = kwargs.pop(
-            "description", cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
-        )
-        # noinspection PyTypeChecker
-        parser: Union[ArgumentParser, _SubParsersAction] = kwargs.get(
-            "parser",
-            ArgumentParser(
-                description=description, formatter_class=RawDescriptionHelpFormatter
-            ),
-        )
-        if isinstance(parser, _SubParsersAction):
-            name = kwargs.pop("name", cls.__name__.lower())
-            parser = parser.add_parser(
-                name=name,
-                description=description,
-                help=description,
-                formatter_class=RawDescriptionHelpFormatter,
-            )
-
-        # General
+    def add_arguments_to_argparser(
+        cls,
+        parser: Union[ArgumentParser, _SubParsersAction],
+    ) -> None:
         verbosity = parser.add_mutually_exclusive_group()
         verbosity.add_argument(
             "-v",
@@ -103,7 +78,56 @@ class CommandLineTool(ABC):
             help="disable verbose output",
         )
 
+    @classmethod
+    def construct_argparser(
+        cls,
+        parser: Optional[_SubParsersAction] = None,
+    ) -> Union[ArgumentParser, _SubParsersAction]:
+        """Construct argument parser.
+
+        Returns:
+            Argument parser
+        """
+        if parser is None:
+            parser = ArgumentParser(
+                description=str(cls.description),
+                formatter_class=RawDescriptionHelpFormatter,
+            )
+        if isinstance(parser, _SubParsersAction):
+            parser = parser.add_parser(
+                name=cls.name,
+                description=str(cls.description),
+                help=str(cls.description),
+                formatter_class=RawDescriptionHelpFormatter,
+            )
+
+        cls.add_arguments_to_argparser(parser)
+
         return parser
+
+    @classmethod
+    def get_optional_arguments_group(
+        cls,
+        parser: Union[ArgumentParser, _SubParsersAction],
+    ) -> _ArgumentGroup:
+        return next(
+            ag for ag in parser._action_groups if ag.title == "optional arguments"
+        )
+
+    @classmethod
+    def get_required_arguments_group(
+        cls,
+        parser: Union[ArgumentParser, _SubParsersAction],
+    ) -> _ArgumentGroup:
+        if any(
+            (required := ag).title == "required arguments"
+            for ag in parser._action_groups
+        ):
+            return required
+        optional = parser._action_groups.pop()
+        required = parser.add_argument_group("required arguments")
+        parser._action_groups.append(optional)
+        return required
 
     @classmethod
     def main(cls) -> None:
@@ -113,6 +137,16 @@ class CommandLineTool(ABC):
 
         tool = cls(**kwargs)
         tool()
+
+    @classmethod
+    @property
+    def description(cls) -> str:
+        return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        return cls.__name__
 
     @staticmethod
     def float_arg(
@@ -188,7 +222,7 @@ class CommandLineTool(ABC):
         length: Optional[int] = None,
         min_value: Optional[int] = None,
         max_value: Optional[int] = None,
-    ) -> Callable[[Any], Tuple[int]]:
+    ) -> Callable[[Any], tuple[int]]:
         """Validate a tuple of ints argument.
 
         Arguments:
@@ -199,7 +233,7 @@ class CommandLineTool(ABC):
             Value validator function
         """
 
-        def func(value: Any) -> Tuple[int]:
+        def func(value: Any) -> tuple[int]:
             try:
                 return validate_ints(value, length, min_value, max_value)
             except TypeError as error:
