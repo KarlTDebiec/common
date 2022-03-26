@@ -50,11 +50,6 @@ class CommandLineTool(ABC):
         elif self.verbosity >= 3:
             logging.getLogger().setLevel(level=logging.DEBUG)
 
-    @abstractmethod
-    def __call__(self, **kwargs: Any) -> Any:
-        """Perform operations."""
-        raise NotImplementedError()
-
     @classmethod
     def add_arguments_to_argparser(
         cls,
@@ -106,30 +101,6 @@ class CommandLineTool(ABC):
         return parser
 
     @classmethod
-    def get_optional_arguments_group(
-        cls,
-        parser: Union[ArgumentParser, _SubParsersAction],
-    ) -> _ArgumentGroup:
-        return next(
-            ag for ag in parser._action_groups if ag.title == "optional arguments"
-        )
-
-    @classmethod
-    def get_required_arguments_group(
-        cls,
-        parser: Union[ArgumentParser, _SubParsersAction],
-    ) -> _ArgumentGroup:
-        if any(
-            (required := ag).title == "required arguments"
-            for ag in parser._action_groups
-        ):
-            return required
-        optional = parser._action_groups.pop()
-        required = parser.add_argument_group("required arguments")
-        parser._action_groups.append(optional)
-        return required
-
-    @classmethod
     def main(cls) -> None:
         """Parse arguments, construct tool, and call tool."""
         parser = cls.construct_argparser()
@@ -168,6 +139,28 @@ class CommandLineTool(ABC):
                 raise ArgumentTypeError from error
 
         return func
+
+    @staticmethod
+    def get_optional_arguments_group(
+        parser: Union[ArgumentParser, _SubParsersAction],
+    ) -> _ArgumentGroup:
+        return next(
+            ag for ag in parser._action_groups if ag.title == "optional arguments"
+        )
+
+    @staticmethod
+    def get_required_arguments_group(
+        parser: Union[ArgumentParser, _SubParsersAction],
+    ) -> _ArgumentGroup:
+        if any(
+            (required := ag).title == "required arguments"
+            for ag in parser._action_groups
+        ):
+            return required
+        optional = parser._action_groups.pop()
+        required = parser.add_argument_group("required arguments")
+        parser._action_groups.append(optional)
+        return required
 
     @staticmethod
     def input_path_arg(
