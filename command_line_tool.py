@@ -76,8 +76,9 @@ class CommandLineTool(ABC):
             ),
         )
         if isinstance(parser, _SubParsersAction):
+            name = kwargs.pop("name", cls.__name__.lower())
             parser = parser.add_parser(
-                name=cls.__name__.lower(),
+                name=name,
                 description=description,
                 help=description,
                 formatter_class=RawDescriptionHelpFormatter,
