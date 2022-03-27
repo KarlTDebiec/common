@@ -51,11 +51,20 @@ class CommandLineTool(ABC):
         elif self.verbosity >= 3:
             logging.getLogger().setLevel(level=logging.DEBUG)
 
+    @abstractmethod
+    def __call__(self):
+        raise NotImplementedError()
+
     @classmethod
     def add_arguments_to_argparser(
         cls,
         parser: Union[ArgumentParser, _SubParsersAction],
     ) -> None:
+        """Add arguments to a nascent argument parser.
+
+        Arguments:
+            parser: Nascent argument parser
+        """
         verbosity = parser.add_mutually_exclusive_group()
         verbosity.add_argument(
             "-v",
@@ -81,6 +90,11 @@ class CommandLineTool(ABC):
     ) -> Union[ArgumentParser, _SubParsersAction]:
         """Construct argument parser.
 
+        Arguments
+            parser: May be a one of 1) a pre-existing argument parser, to which
+              arguments will be added, 2) a pre-exising subparsers group, to which a
+              new subparser with arguments will be added, or 3) None, in which case a
+              new parser will be created with arguments
         Returns:
             Argument parser
         """
