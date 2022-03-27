@@ -8,6 +8,7 @@
 #   BSD license. See the LICENSE file for details.
 """General-purpose command-line tool base class."""
 import logging
+import re
 from abc import ABC, abstractmethod
 from argparse import (
     ArgumentParser,
@@ -91,8 +92,8 @@ class CommandLineTool(ABC):
         if isinstance(parser, _SubParsersAction):
             parser = parser.add_parser(
                 name=cls.name,
-                description=str(cls.description),
-                help=str(cls.description),
+                description=cls.description,
+                help=cls.help,
                 formatter_class=RawDescriptionHelpFormatter,
             )
 
@@ -112,11 +113,19 @@ class CommandLineTool(ABC):
     @classmethod
     @property
     def description(cls) -> str:
+        """Long description of this tool displayed below usage."""
         return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
 
     @classmethod
     @property
+    def help(cls) -> str:
+        """Short description of this tool used when it is a subparser."""
+        return re.split(r"\.\s+", cls.description)[0].rstrip(".")
+
+    @classmethod
+    @property
     def name(cls) -> str:
+        """Name of this tool used to define it when it is a subparser."""
         return cls.__name__
 
     @staticmethod
