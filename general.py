@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-#   common/general.py
-#
 #   Copyright (C) 2017-2020 Karl T Debiec
 #   All rights reserved.
 #

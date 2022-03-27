@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-#   common/__init__.py
-#
 #   Copyright (C) 2017-2022 Karl T Debiec
 #   All rights reserved.
 #
