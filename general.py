@@ -4,7 +4,7 @@
 #   the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
 from subprocess import PIPE, Popen
-from typing import Iterable, Optional, Tuple
+from typing import Iterable, Optional
 
 
 def get_shell_type() -> Optional[str]:
@@ -36,7 +36,7 @@ def run_command(
     command: str,
     timeout: int = 600,
     acceptable_exitcodes: Optional[Iterable[int]] = None,
-) -> Tuple[int, Optional[str], Optional[str]]:
+) -> tuple[int, Optional[str], Optional[str]]:
     """Run a provided command.
 
     Arguments:

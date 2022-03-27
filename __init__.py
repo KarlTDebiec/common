@@ -4,7 +4,6 @@
 #   the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
 from pathlib import Path
-from typing import List
 
 from .command_line_tool import CommandLineTool
 from .exception import (
@@ -41,7 +40,7 @@ package_root: str = str(Path(__file__).parent.parent.absolute())
 """str: absolute path of package containing this common submodule (e.g. if this file is
 '/path/to/test/common/__init__.py', value is '/path/to/test"""
 
-__all__: List[str] = [
+__all__: list[str] = [
     "ArgumentConflictError",
     "CommandLineTool",
     "DirectoryExistsError",

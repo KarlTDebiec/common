@@ -19,7 +19,7 @@ from os.path import (
 )
 from platform import system
 from shutil import which
-from typing import Any, Iterable, Optional, Set, Tuple, Type
+from typing import Any, Iterable, Optional, Type
 
 from .exception import (
     ArgumentConflictError,
@@ -59,7 +59,7 @@ def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
 
 
 def validate_executable(
-    value: Any, supported_platforms: Optional[Set[str]] = None
+    value: Any, supported_platforms: Optional[set[str]] = None
 ) -> str:
     """Validates that executable name and returns its absolute path.
 
@@ -85,7 +85,7 @@ def validate_executable(
             supported_platforms = set(supported_platforms)
         except ValueError:
             raise TypeError(
-                f"'{supported_platforms}' is of type '{type(value)}', not Set[str]"
+                f"'{supported_platforms}' is of type '{type(value)}', not set[str]"
             ) from None
 
     if system() not in supported_platforms:
@@ -202,7 +202,7 @@ def validate_int(
     value: Any,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[Tuple[int, ...]] = None,
+    choices: Optional[tuple[int, ...]] = None,
 ) -> int:
     """Validate an int.
 
@@ -242,7 +242,7 @@ def validate_ints(
     length: Optional[int] = None,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[Tuple[int]] = None,
+    choices: Optional[tuple[int]] = None,
 ):
     """Validate a collection of int.
 
