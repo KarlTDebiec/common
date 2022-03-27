@@ -30,7 +30,7 @@ class CommandLineTool(ABC):
     """General-purpose command-line tool base class."""
 
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
-        """Validate and store static configuration.
+        """Validate and store configuration.
 
         Arguments:
             verbosity: Verbosity of logging
@@ -49,6 +49,7 @@ class CommandLineTool(ABC):
 
     @abstractmethod
     def __call__(self):
+        """Perform operations."""
         raise NotImplementedError()
 
     @classmethod
@@ -86,7 +87,7 @@ class CommandLineTool(ABC):
     ) -> Union[ArgumentParser, _SubParsersAction]:
         """Construct argument parser.
 
-        Arguments
+        Arguments:
             parser: May be a one of 1) a pre-existing argument parser, to which
               arguments will be added, 2) a pre-exising subparsers group, to which a
               new subparser with arguments will be added, or 3) None, in which case a
@@ -163,6 +164,7 @@ class CommandLineTool(ABC):
     def get_optional_arguments_group(
         parser: Union[ArgumentParser, _SubParsersAction],
     ) -> _ArgumentGroup:
+        """Get the 'optional arguments' group from a nascent argparser."""
         return next(
             ag for ag in parser._action_groups if ag.title == "optional arguments"
         )
@@ -171,6 +173,7 @@ class CommandLineTool(ABC):
     def get_required_arguments_group(
         parser: Union[ArgumentParser, _SubParsersAction],
     ) -> _ArgumentGroup:
+        """Get or create a 'required arguments' group from a nascent argparser."""
         if any(
             (required := ag).title == "required arguments"
             for ag in parser._action_groups
