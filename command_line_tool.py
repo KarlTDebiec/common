@@ -89,7 +89,7 @@ class CommandLineTool(ABC):
 
         Arguments:
             parser: May be a one of 1) a pre-existing argument parser, to which
-              arguments will be added, 2) a pre-exising subparsers group, to which a
+              arguments will be added, 2) a pre-existing subparsers group, to which a
               new subparser with arguments will be added, or 3) None, in which case a
               new parser will be created with arguments
         Returns:
