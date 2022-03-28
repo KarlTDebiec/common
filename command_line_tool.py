@@ -37,15 +37,7 @@ class CommandLineTool(ABC):
             **kwargs: Additional keyword arguments
         """
         self.verbosity = validate_int(verbosity, min_value=0)
-        logging.basicConfig()
-        if self.verbosity <= 0:
-            logging.getLogger().setLevel(level=logging.ERROR)
-        elif self.verbosity == 1:
-            logging.getLogger().setLevel(level=logging.WARNING)
-        elif self.verbosity == 2:
-            logging.getLogger().setLevel(level=logging.INFO)
-        elif self.verbosity >= 3:
-            logging.getLogger().setLevel(level=logging.DEBUG)
+        self.set_logging_verbosity(self.verbosity)
 
     @abstractmethod
     def __call__(self):
@@ -282,6 +274,18 @@ class CommandLineTool(ABC):
                 raise ArgumentTypeError from error
 
         return func
+
+    @staticmethod
+    def set_logging_verbosity(verbosity: int) -> None:
+        logging.basicConfig()
+        if verbosity <= 0:
+            logging.getLogger().setLevel(level=logging.ERROR)
+        elif verbosity == 1:
+            logging.getLogger().setLevel(level=logging.WARNING)
+        elif verbosity == 2:
+            logging.getLogger().setLevel(level=logging.INFO)
+        elif verbosity >= 3:
+            logging.getLogger().setLevel(level=logging.DEBUG)
 
     @staticmethod
     def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
