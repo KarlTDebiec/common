@@ -3,33 +3,9 @@
 #   All rights reserved. This software may be modified and distributed under
 #   the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
+import logging
 from subprocess import PIPE, Popen
 from typing import Iterable, Optional
-
-
-def get_shell_type() -> Optional[str]:
-    """Determines if inside IPython prompt.
-
-    Returns:
-        Type of shell in use, or None if not in a shell
-    """
-    try:
-        # noinspection Mypy
-        shell = str(get_ipython().__class__.__name__)  # type: ignore
-        if shell == "ZMQInteractiveShell":
-            # IPython in Jupyter Notebook
-            return shell
-        if shell == "InteractiveShellEmbed":
-            # IPython in Jupyter Notebook using IPython.embed
-            return shell
-        if shell == "TerminalInteractiveShell":
-            # IPython in terminal
-            return shell
-        # Other
-        return shell
-    except NameError:
-        # Not in IPython
-        return None
 
 
 def run_command(
@@ -46,7 +22,7 @@ def run_command(
     Returns:
         exitcode, standard output, and standard error
     Raises:
-        ValueError: If exitcode is not in acceptable_exitcodes
+        ValueError: If exitcode is not one of acceptable_exitcodes
     """
     if acceptable_exitcodes is None:
         acceptable_exitcodes = [0]
@@ -71,3 +47,20 @@ def run_command(
                 f"{stderr}"
             )
         return (exitcode, stdout, stderr)
+
+
+def set_logging_verbosity(verbosity: int) -> None:
+    """Set the level of verbosity of logging.
+
+    Arguments:
+        verbosity: level of verbosity
+    """
+    logging.basicConfig()
+    if verbosity <= 0:
+        logging.getLogger().setLevel(level=logging.ERROR)
+    elif verbosity == 1:
+        logging.getLogger().setLevel(level=logging.WARNING)
+    elif verbosity == 2:
+        logging.getLogger().setLevel(level=logging.INFO)
+    elif verbosity >= 3:
+        logging.getLogger().setLevel(level=logging.DEBUG)

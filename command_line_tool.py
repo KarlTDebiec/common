@@ -3,7 +3,6 @@
 #   All rights reserved. This software may be modified and distributed under
 #   the terms of the BSD license. See the LICENSE file for details.
 """General-purpose command-line tool base class."""
-import logging
 import re
 from abc import ABC, abstractmethod
 from argparse import (
@@ -16,6 +15,7 @@ from argparse import (
 from inspect import cleandoc
 from typing import Any, Callable, Iterable, Optional, Union
 
+from .general import set_logging_verbosity
 from .validation import (
     validate_float,
     validate_input_path,
@@ -37,7 +37,7 @@ class CommandLineTool(ABC):
             **kwargs: Additional keyword arguments
         """
         self.verbosity = validate_int(verbosity, min_value=0)
-        self.set_logging_verbosity(self.verbosity)
+        set_logging_verbosity(self.verbosity)
 
     @abstractmethod
     def __call__(self):
@@ -274,18 +274,6 @@ class CommandLineTool(ABC):
                 raise ArgumentTypeError from error
 
         return func
-
-    @staticmethod
-    def set_logging_verbosity(verbosity: int) -> None:
-        logging.basicConfig()
-        if verbosity <= 0:
-            logging.getLogger().setLevel(level=logging.ERROR)
-        elif verbosity == 1:
-            logging.getLogger().setLevel(level=logging.WARNING)
-        elif verbosity == 2:
-            logging.getLogger().setLevel(level=logging.INFO)
-        elif verbosity >= 3:
-            logging.getLogger().setLevel(level=logging.DEBUG)
 
     @staticmethod
     def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
