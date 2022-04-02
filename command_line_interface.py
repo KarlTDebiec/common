@@ -2,7 +2,7 @@
 #   Copyright (C) 2017-2022 Karl T Debiec
 #   All rights reserved. This software may be modified and distributed under
 #   the terms of the BSD license. See the LICENSE file for details.
-"""General-purpose command-line tool base class."""
+"""General-purpose command line interface base class."""
 import re
 from abc import ABC, abstractmethod
 from argparse import (
@@ -26,8 +26,8 @@ from .validation import (
 )
 
 
-class CommandLineTool(ABC):
-    """General-purpose command-line tool base class."""
+class CommandLineInterface(ABC):
+    """General-purpose command line interface base class."""
 
     def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
         """Validate and store configuration.
@@ -172,9 +172,12 @@ class CommandLineTool(ABC):
             for ag in parser._action_groups
         ):
             return required
+
+        # Move "optional arguments" group below "required arguments" group
         optional = parser._action_groups.pop()
         required = parser.add_argument_group("required arguments")
         parser._action_groups.append(optional)
+
         return required
 
     @staticmethod

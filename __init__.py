@@ -5,7 +5,7 @@
 """General-purpose code not tied to a particular project."""
 from pathlib import Path
 
-from .command_line_tool import CommandLineTool
+from .command_line_interface import CommandLineInterface
 from .exception import (
     ArgumentConflictError,
     DirectoryExistsError,
@@ -42,7 +42,7 @@ package_root: str = str(Path(__file__).parent.parent.absolute())
 
 __all__: list[str] = [
     "ArgumentConflictError",
-    "CommandLineTool",
+    "CommandLineInterface",
     "DirectoryExistsError",
     "DirectoryNotFoundError",
     "ExecutableNotFoundError",
