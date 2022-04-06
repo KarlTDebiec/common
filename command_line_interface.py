@@ -39,11 +39,6 @@ class CommandLineInterface(ABC):
         self.verbosity = validate_int(verbosity, min_value=0)
         set_logging_verbosity(self.verbosity)
 
-    @abstractmethod
-    def __call__(self):
-        """Perform operations."""
-        raise NotImplementedError()
-
     @classmethod
     def add_arguments_to_argparser(
         cls,
@@ -105,13 +100,10 @@ class CommandLineInterface(ABC):
         return parser
 
     @classmethod
+    @abstractmethod
     def main(cls) -> None:
-        """Parse arguments, construct tool, and call tool."""
-        parser = cls.construct_argparser()
-        kwargs = vars(parser.parse_args())
-
-        tool = cls(**kwargs)
-        tool()
+        """Parse arguments and perform operations."""
+        raise NotImplementedError()
 
     @classmethod
     @property
