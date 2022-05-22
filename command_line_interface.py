@@ -101,9 +101,20 @@ class CommandLineInterface(ABC):
 
     @classmethod
     @abstractmethod
-    def main(cls) -> None:
-        """Parse arguments and perform operations."""
+    def execute(cls, **kwargs: Any) -> None:
+        """Execute with provided keyword arguments.
+
+        Args:
+            **kwargs: Command-line arguments
+        """
         raise NotImplementedError()
+
+    @classmethod
+    def main(cls) -> None:
+        """Execute from command line."""
+        parser = cls.construct_argparser()
+        kwargs = vars(parser.parse_args())
+        cls.execute(**kwargs)
 
     @classmethod
     @property
