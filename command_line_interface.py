@@ -126,7 +126,6 @@ class CommandLineInterface(ABC):
     @property
     def help(cls) -> str:
         """Short description of this tool used when it is a subparser."""
-        # noinspection PyTypeChecker
         return re.split(r"\.\s+", cls.description)[0].rstrip(".")
 
     @classmethod
