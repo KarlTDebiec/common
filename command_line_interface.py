@@ -93,7 +93,7 @@ class CommandLineInterface(ABC):
     def execute(cls, **kwargs: Any) -> None:
         """Execute with provided keyword arguments.
 
-        Args:
+        Arguments:
             **kwargs: Command-line arguments
         """
         raise NotImplementedError()
