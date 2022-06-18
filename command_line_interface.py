@@ -15,7 +15,6 @@ from argparse import (
 from inspect import cleandoc
 from typing import Any, Callable, Iterable, Optional, Union
 
-from .general import set_logging_verbosity
 from .validation import (
     validate_float,
     validate_input_path,
@@ -28,16 +27,6 @@ from .validation import (
 
 class CommandLineInterface(ABC):
     """General-purpose command line interface base class."""
-
-    def __init__(self, verbosity: int = 1, **kwargs: Any) -> None:
-        """Validate and store configuration.
-
-        Arguments:
-            verbosity: Verbosity of logging
-            **kwargs: Additional keyword arguments
-        """
-        self.verbosity = validate_int(verbosity, min_value=0)
-        set_logging_verbosity(self.verbosity)
 
     @classmethod
     def add_arguments_to_argparser(
