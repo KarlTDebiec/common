@@ -36,8 +36,8 @@ from .validation import (
     validate_type,
 )
 
-package_root: str = str(Path(__file__).parent.parent.absolute())
-"""str: absolute path of package containing this common submodule (e.g. if this file is
+package_root = Path(__file__).parent.parent.absolute()
+"""absolute path of package containing this common submodule (e.g. if this file is
 '/path/to/test/common/__init__.py', value is '/path/to/test"""
 
 __all__: list[str] = [
