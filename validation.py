@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-#   Copyright (C) 2017-2022 Karl T Debiec
-#   All rights reserved. This software may be modified and distributed under
-#   the terms of the BSD license. See the LICENSE file for details.
+#  Copyright (C) 2020-2022. Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
 from enum import Enum
 from functools import partial
+from logging import warning
 from os import R_OK, W_OK, access, getcwd, makedirs
 from os.path import (
     defpath,
@@ -17,9 +18,10 @@ from os.path import (
     join,
     normpath,
 )
+from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Iterable, Optional, Type
+from typing import Any, Iterable, Optional, Type, Union
 
 from .exception import (
     ArgumentConflictError,
@@ -130,6 +132,33 @@ def validate_float(
         raise ValueError(f"{value} is greater than maximum value of {max_value}")
 
     return value
+
+
+def validate_input_directories(
+    directories: Union[str, Path, Iterable[Union[str, Path]]]
+) -> list[Path]:
+    """Validate input directory paths and make them absolute.
+
+    Arguments:
+        directories: Directory or directories of input files
+    Returns:
+        List of absolute directory paths
+    """
+    if isinstance(directories, (str, Path)):
+        directories = [directories]
+    validated_directories = []
+    for directory in directories:
+        directory = Path(directory).absolute()
+        if directory.exists():
+            validated_directories.append(directory)
+        else:
+            warning(f"Input directory '{directory}' does not exist")
+    if len(validated_directories) == 0:
+        raise DirectoryNotFoundError(
+            f"No directories provided in '{directories}' exist"
+        )
+
+    return validated_directories
 
 
 def validate_input_path(
