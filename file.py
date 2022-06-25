@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-#   Copyright (C) 2017-2022 Karl T Debiec
-#   All rights reserved. This software may be modified and distributed under
-#   the terms of the BSD license. See the LICENSE file for details.
+#  Copyright (C) 2020-2022. Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions for file interaction and manipulation."""
 from contextlib import contextmanager
 from logging import debug, info
@@ -17,7 +17,8 @@ from os.path import (
     normpath,
     splitext,
 )
-from tempfile import NamedTemporaryFile
+from pathlib import Path
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from typing import Optional
 
 
@@ -70,3 +71,39 @@ def temporary_filename(suffix: Optional[str] = None) -> None:
                         f"'{error}'; temporary file '{named_temporary_file.name}', "
                         f"will not be removed."
                     )
+
+
+@contextmanager
+def temp_file(suffix: Optional[str] = None) -> None:
+    """Provide path to a temporary file and remove it once no longer needed.
+
+    Arguments:
+        suffix: Suffix of named temporary file
+    """
+    temp_file = None
+    try:
+        temp_file = NamedTemporaryFile(delete=False, suffix=suffix)
+        temp_file.close()
+        remove(temp_file)
+        yield Path(temp_file)
+    finally:
+        if temp_file is not None and temp_file.exists():
+            try:
+                remove(temp_file)
+            except PermissionError as error:
+                debug(
+                    f"temp_file_path encountered PermissionException '{error}'; "
+                    f"temporary file '{temp_file}', will not be removed."
+                )
+
+
+@contextmanager
+def temp_directory() -> None:
+    """Provide path to a temporary directory and remove it once no longer needed."""
+    temp_directory = None
+    try:
+        temp_directory = TemporaryDirectory()
+        yield Path(temp_directory.name)
+    finally:
+        if temp_directory is not None:
+            temp_directory.cleanup()
