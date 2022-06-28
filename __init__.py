@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-#   Copyright (C) 2017-2022 Karl T Debiec
-#   All rights reserved. This software may be modified and distributed under
-#   the terms of the BSD license. See the LICENSE file for details.
+#  Copyright (C) 2017-2022. Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
 from pathlib import Path
 
@@ -24,14 +24,14 @@ from .validation import (
     validate_enum,
     validate_executable,
     validate_float,
+    validate_input_directories,
     validate_input_directory,
     validate_input_file,
-    validate_input_path,
+    validate_input_files,
     validate_int,
     validate_ints,
     validate_output_directory,
     validate_output_file,
-    validate_output_path,
     validate_str,
     validate_type,
 )
@@ -61,13 +61,13 @@ __all__: list[str] = [
     "validate_executable",
     "validate_float",
     "validate_input_directory",
+    "validate_input_directories",
     "validate_input_file",
-    "validate_input_path",
+    "validate_input_files",
     "validate_int",
     "validate_ints",
     "validate_output_directory",
     "validate_output_file",
-    "validate_output_path",
     "validate_str",
     "validate_type",
 ]

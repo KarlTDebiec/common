@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-#   Copyright (C) 2017-2022 Karl T Debiec
-#   All rights reserved. This software may be modified and distributed under
-#   the terms of the BSD license. See the LICENSE file for details.
+#  Copyright (C) 2020-2022. Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose command line interface base class."""
 import re
 from abc import ABC, abstractmethod
@@ -13,20 +13,43 @@ from argparse import (
     _SubParsersAction,
 )
 from inspect import cleandoc
-from typing import Any, Callable, Iterable, Optional, Union
+from pathlib import Path
+from typing import Any, Callable, Optional, Union
 
 from .validation import (
     validate_float,
-    validate_input_path,
+    validate_input_directories,
+    validate_input_directory,
+    validate_input_file,
+    validate_input_files,
     validate_int,
     validate_ints,
-    validate_output_path,
+    validate_output_directory,
+    validate_output_file,
     validate_str,
 )
 
 
 class CommandLineInterface(ABC):
     """General-purpose command line interface base class."""
+
+    @classmethod
+    @property
+    def description(cls) -> str:
+        """Long description of this tool displayed below usage."""
+        return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
+
+    @classmethod
+    @property
+    def help(cls) -> str:
+        """Short description of this tool used when it is a subparser."""
+        return re.split(r"\.\s+", cls.description)[0].rstrip(".")
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        """Name of this tool used to define it when it is a subparser."""
+        return cls.__name__
 
     @classmethod
     def add_arguments_to_argparser(
@@ -89,6 +112,17 @@ class CommandLineInterface(ABC):
         return parser
 
     @classmethod
+    def float_arg(cls, **kwargs: Any) -> Callable[[Any], float]:
+        """Validate a float argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_float
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_float, **kwargs)
+
+    @classmethod
     @abstractmethod
     def execute(cls, **kwargs: Any) -> None:
         """Execute with provided keyword arguments.
@@ -99,6 +133,72 @@ class CommandLineInterface(ABC):
         raise NotImplementedError()
 
     @classmethod
+    def input_directories_arg(cls, **kwargs: Any) -> Callable[[Any], list[Path]]:
+        """Validate an input directory paths argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_input_directory_paths
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_input_directories, **kwargs)
+
+    @classmethod
+    def input_directory_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
+        """Validate an input directory path argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_input_directory_path
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_input_directory, **kwargs)
+
+    @classmethod
+    def input_file_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
+        """Validate an input file path argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_input_file_path
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_input_file, **kwargs)
+
+    @classmethod
+    def input_files_arg(cls, **kwargs: Any) -> Callable[[Any], list[Path]]:
+        """Validate an input file paths argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_input_file_paths
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_input_files, **kwargs)
+
+    @classmethod
+    def int_arg(cls, **kwargs: Any) -> Callable[[Any], int]:
+        """Validate an int argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_int
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_int, **kwargs)
+
+    @classmethod
+    def ints_arg(cls, **kwargs: Any) -> Callable[[Any], int]:
+        """Validate a tuple of ints argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_ints
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_ints, **kwargs)
+
+    @classmethod
     def main(cls) -> None:
         """Execute from command line."""
         parser = cls.construct_argparser()
@@ -106,49 +206,49 @@ class CommandLineInterface(ABC):
         cls.execute(**kwargs)
 
     @classmethod
-    @property
-    def description(cls) -> str:
-        """Long description of this tool displayed below usage."""
-        return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
-
-    @classmethod
-    @property
-    def help(cls) -> str:
-        """Short description of this tool used when it is a subparser."""
-        return re.split(r"\.\s+", cls.description)[0].rstrip(".")
-
-    @classmethod
-    @property
-    def name(cls) -> str:
-        """Name of this tool used to define it when it is a subparser."""
-        return cls.__name__
-
-    @staticmethod
-    def float_arg(
-        min_value: Optional[float] = None, max_value: Optional[float] = None
-    ) -> Callable[[Any], float]:
-        """Validate a float argument.
+    def output_directory_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
+        """Validate an output directory path argument.
 
         Arguments:
-            min_value: Minimum permissible value
-            max_value: Maximum permissible value
+            **kwargs: Keyword arguments to pass to validate_output_directory_path
         Returns:
             Value validator function
         """
+        return cls.get_validator(validate_output_directory, **kwargs)
 
-        def func(value: Any) -> float:
-            try:
-                return validate_float(value, min_value, max_value)
-            except TypeError as error:
-                raise ArgumentTypeError from error
+    @classmethod
+    def output_file_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
+        """Validate an output file path argument.
 
-        return func
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_output_file_path
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_output_file, **kwargs)
+
+    @classmethod
+    def str_arg(cls, **kwargs: Any) -> Callable[[Any], str]:
+        """Validate a string argument.
+
+        Arguments:
+            **kwargs: Keyword arguments to pass to validate_str
+        Returns:
+            Value validator function
+        """
+        return cls.get_validator(validate_str, **kwargs)
 
     @staticmethod
     def get_optional_arguments_group(
         parser: Union[ArgumentParser, _SubParsersAction],
     ) -> _ArgumentGroup:
-        """Get the 'optional arguments' group from a nascent argparser."""
+        """Get the 'optional arguments' group from an argparser.
+
+        Arguments:
+            parser: Argparser to get group from
+        Returns:
+            Optional arguments group
+        """
         return next(
             ag for ag in parser._action_groups if ag.title == "optional arguments"
         )
@@ -157,7 +257,13 @@ class CommandLineInterface(ABC):
     def get_required_arguments_group(
         parser: Union[ArgumentParser, _SubParsersAction],
     ) -> _ArgumentGroup:
-        """Get or create a 'required arguments' group from a nascent argparser."""
+        """Get or create a 'required arguments' group from an argparser.
+
+        Arguments:
+            parser: Argparser to get group from
+        Returns:
+            Required arguments group
+        """
         if any(
             (required := ag).title == "required arguments"
             for ag in parser._action_groups
@@ -172,118 +278,19 @@ class CommandLineInterface(ABC):
         return required
 
     @staticmethod
-    def input_path_arg(
-        file_ok: bool = True,
-        directory_ok: bool = False,
-        default_directory: Optional[str] = None,
-    ) -> Callable[[Any], str]:
-        """Validate an input path argument.
+    def get_validator(function: Callable, **kwargs: Any) -> Callable:
+        """Get a function that can be called with the same signature as function.
 
         Arguments:
-            file_ok: Whether  file paths are permissible
-            directory_ok: Whether  directory paths are permissible
-            default_directory: Default directory to prepend to *value* if not absolute;
-              default: current working directory
+            function: Function to be wrapped
         Returns:
-            Value validator function
+            Wrapped function
         """
 
-        def func(value: Any) -> str:
+        def wrapped(value: Any) -> Path:
             try:
-                return validate_input_path(
-                    value, file_ok, directory_ok, default_directory
-                )
+                return function(value, **kwargs)
             except TypeError as error:
                 raise ArgumentTypeError from error
 
-        return func
-
-    @staticmethod
-    def int_arg(
-        min_value: Optional[int] = None, max_value: Optional[int] = None
-    ) -> Callable[[Any], int]:
-        """Validate an int argument.
-
-        Arguments:
-            min_value: Minimum permissible value
-            max_value: Maximum permissible value
-        Returns:
-            Value validator function
-        """
-
-        def func(value: Any) -> int:
-            try:
-                return validate_int(value, min_value, max_value)
-            except TypeError as error:
-                raise ArgumentTypeError from error
-
-        return func
-
-    @staticmethod
-    def ints_arg(
-        length: Optional[int] = None,
-        min_value: Optional[int] = None,
-        max_value: Optional[int] = None,
-    ) -> Callable[[Any], tuple[int]]:
-        """Validate a tuple of ints argument.
-
-        Arguments:
-            length: Number of values required
-            min_value: Minimum permissible value
-            max_value: Maximum permissible value
-        Returns:
-            Value validator function
-        """
-
-        def func(value: Any) -> tuple[int]:
-            try:
-                return validate_ints(value, length, min_value, max_value)
-            except TypeError as error:
-                raise ArgumentTypeError from error
-
-        return func
-
-    @staticmethod
-    def output_path_arg(
-        file_ok: bool = True,
-        directory_ok: bool = False,
-        default_directory: Optional[str] = None,
-    ) -> Callable[[Any], str]:
-        """Validate an output path argument.
-
-        Arguments:
-            file_ok: Whether file paths are permissible
-            directory_ok: Whether directory paths are permissible
-            default_directory: Default directory to prepend to *value* if not absolute;
-              default: current working directory
-        Returns:
-            Value validator function
-        """
-
-        def func(value: Any) -> str:
-            try:
-                return validate_output_path(
-                    value, file_ok, directory_ok, default_directory
-                )
-            except TypeError as error:
-                raise ArgumentTypeError from error
-
-        return func
-
-    @staticmethod
-    def str_arg(options: Iterable[str]) -> Callable[[Any], str]:
-        """Validate a string argument.
-
-        Arguments:
-            options: Permissible values
-        Returns:
-            Value validator function
-        """
-
-        def func(value: Any) -> str:
-            try:
-                return validate_str(value, options)
-            except TypeError as error:
-                raise ArgumentTypeError from error
-
-        return func
+        return wrapped

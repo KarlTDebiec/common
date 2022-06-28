@@ -1,23 +1,11 @@
 #!/usr/bin/env python
-#  Copyright (C) 2020-2022. Karl T Debiec
+#  Copyright (C) 2017-2022. Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
 from enum import Enum
-from functools import partial
-from logging import warning
-from os import R_OK, W_OK, access, getcwd, makedirs
-from os.path import (
-    defpath,
-    dirname,
-    exists,
-    expandvars,
-    isabs,
-    isdir,
-    isfile,
-    join,
-    normpath,
-)
+from logging import info
+from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
@@ -28,7 +16,6 @@ from .exception import (
     DirectoryNotFoundError,
     ExecutableNotFoundError,
     NotAFileError,
-    NotAFileOrDirectoryError,
     UnsupportedPlatformError,
 )
 
@@ -134,97 +121,84 @@ def validate_float(
     return value
 
 
+def validate_input_directory(path: Union[str, Path]) -> Path:
+    """Validate input directory path and make it absolute.
+
+    Arguments:
+        path: Path to directory of input files
+    Returns:
+        Absolute path to input directory
+    """
+    path = Path(expandvars(str(path))).absolute()
+    if not path.exists():
+        raise DirectoryNotFoundError(f"Input directory {path} does not exist")
+
+    return path
+
+
 def validate_input_directories(
-    directories: Union[str, Path, Iterable[Union[str, Path]]]
+    paths: Union[str, Path, Iterable[Union[str, Path]]]
 ) -> list[Path]:
     """Validate input directory paths and make them absolute.
 
     Arguments:
-        directories: Directory or directories of input files
+        paths: Path to directory or directories of input files
     Returns:
         List of absolute directory paths
     """
-    if isinstance(directories, (str, Path)):
-        directories = [directories]
-    validated_directories = []
-    for directory in directories:
-        directory = Path(directory).absolute()
-        if directory.exists():
-            validated_directories.append(directory)
-        else:
-            warning(f"Input directory '{directory}' does not exist")
-    if len(validated_directories) == 0:
-        raise DirectoryNotFoundError(
-            f"No directories provided in '{directories}' exist"
-        )
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    validated_paths = []
+    for path in paths:
+        try:
+            path = validate_input_directory(path)
+        except DirectoryNotFoundError as error:
+            info(str(error))
+        validated_paths.append(path)
+    if len(validated_paths) == 0:
+        raise DirectoryNotFoundError(f"No directories provided in {paths} exist")
 
-    return validated_directories
+    return validated_paths
 
 
-def validate_input_path(
-    value: Any,
-    file_ok: bool = True,
-    directory_ok: bool = False,
-    default_directory: Optional[str] = None,
-    create_directory: bool = False,
-) -> str:
-    """Validate an input path and make it absolute.
+def validate_input_file(path: Union[str, Path]) -> Path:
+    """Validate input file path and make it absolute.
 
     Arguments:
-        value: Input value to validate
-        file_ok: Whether file paths are permissible
-        directory_ok: Whether directory paths are permissible
-        default_directory: Default directory to prepend to *value* if not absolute;
-          default: current working directory
-        create_directory: Whether to create directory if it does not already exist
+        path: Path to input file
     Returns:
-        Absolute path to input file or directory
-    Raises:
-        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
-        FileNotFoundError: If *value* does not exist
-        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
-          is not a directory
-        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
-          not a file
-        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
-          is not a file or directory
-        PermissionError: If *value* cannot be read
-        TypeError: If *value* cannot be cast to a string
+        Absolute path to input file
     """
-    if not file_ok and not directory_ok:
-        raise ArgumentConflictError(
-            "both file and directory paths may not be prohibited"
-        )
-    if default_directory is None:
-        default_directory = getcwd()
+    path = Path(expandvars(str(path))).absolute()
+    if not path.exists():
+        raise FileNotFoundError(f"Input file {path} does not exist")
 
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
+    return path
 
-    value = expandvars(value)
-    if not isabs(value):
-        value = join(default_directory, value)
-    value = normpath(value)
 
-    if not exists(value):
-        if directory_ok and create_directory:
-            makedirs(value)
-        else:
-            if not file_ok and directory_ok:
-                raise DirectoryNotFoundError(f"'{value}' does not exist")
-            raise FileNotFoundError(f"'{value}' does not exist")
-    if file_ok and not directory_ok and not isfile(value):
-        raise NotAFileError(f"'{value}' is not a file")
-    if not file_ok and directory_ok and not isdir(value):
-        raise NotADirectoryError(f"'{value}' is not a directory")
-    if not isfile(value) and not isdir(value):
-        raise NotAFileOrDirectoryError(f"'{value}' is not a file or directory")
-    if not access(value, R_OK):
-        raise PermissionError(f"'{value}' cannot be read")
+def validate_input_files(
+    paths: Union[str, Path, Iterable[Union[str, Path]]]
+) -> list[Path]:
+    """Validate input file paths and make them absolute.
 
-    return value
+    Arguments:
+        paths: Paths to input file or files
+    Returns:
+        List of absolute file paths
+    """
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    validated_paths = []
+    for path in paths:
+        try:
+            path = validate_input_file(path)
+        except FileNotFoundError as error:
+            info(str(error))
+        validated_paths.append(path)
+    if len(validated_paths) == 0:
+        raise FileNotFoundError(f"No files provided in {paths} exist")
+
+    return validated_paths
 
 
 def validate_int(
@@ -308,83 +282,47 @@ def validate_ints(
     return validated_values
 
 
-def validate_output_path(
-    value: Any,
-    file_ok: bool = True,
-    directory_ok: bool = False,
-    default_directory: Optional[str] = None,
-    create_directory: bool = False,
-) -> str:
-    """Validate an output path and makes it absolute.
+def validate_output_file(path: Union[str, Path], exists_ok=True) -> Path:
+    """Validate output file path and make it absolute.
 
     Arguments:
-        value: Provided output path
-        file_ok: Whether file paths are permissible
-        directory_ok: Whether directory paths are permissible
-        default_directory: Default directory to prepend to *value* if not absolute;
-          default: current working directory
-        create_directory: Create output directory if it does not already exist
+        path: Output file path
+        exists_ok: If True, do not raise an error if the file already exists
     Returns:
-        str: Absolute path to output file or directory
-    Raises:
-        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
-        DirectoryNotFoundError: If *value*'s containing directory does not exist
-        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
-          is not a directory, or if *value's* containing directory is not a directory
-        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
-          not a file
-        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
-          is not a file or directory
-        PermissionError: If *value* exists and cannot be written, or if *value*'s
-          containing directory exists but is not a directory
-        TypeError: If *value* cannot be cast to a string
+        Absolute path to output file
     """
-    if not file_ok and not directory_ok:
-        raise ArgumentConflictError(
-            "Arguments 'file_ok' and 'directory_ok' are in conflict; both file and "
-            "directory paths may not be prohibited"
-        )
-    if not directory_ok and create_directory:
-        raise ArgumentConflictError(
-            "Arguments 'directory_ok' and 'create_directory' "
-            "are in conflict; may not prohibit directory paths and enable directory "
-            "creation"
-        )
-    if default_directory is None:
-        default_directory = getcwd()
+    path = Path(expandvars(str(path))).absolute()
+    if path.exists():
+        if path.is_file():
+            if not exists_ok:
+                raise FileExistsError(f"{path} already exists")
+            info(f"{path} already exists and may be overwritten")
+            return path
+        raise NotAFileError(f"{path} already exists and is not a file")
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True)
+        info(f"Created directory {path.parent}")
 
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
+    return path
 
-    value = expandvars(value)
-    if not isabs(value):
-        value = join(default_directory, value)
-    value = normpath(value)
 
-    if exists(value):
-        if file_ok and not directory_ok and not isfile(value):
-            raise NotAFileError(f"'{value}' is not a file")
-        if not file_ok and directory_ok and not isdir(value):
-            raise NotADirectoryError(f"'{value}' is not a directory")
-        if not isfile(value) and not isdir(value):
-            raise NotAFileOrDirectoryError(f"'{value}' is not a file or directory")
-        if not access(value, W_OK):
-            raise PermissionError(f"'{value}' cannot be written")
+def validate_output_directory(path: Union[str, Path]) -> Path:
+    """Validate output directory path and make it absolute.
+
+    Arguments:
+        path: Output directory path
+    Returns:
+        Absolute to of output directory
+    """
+    path = Path(expandvars(str(path))).absolute()
+    if path.exists():
+        if not path.is_dir():
+            raise NotADirectoryError(f"{path} already exists and is not a directory")
     else:
-        if create_directory:
-            makedirs(value)
-        else:
-            directory = dirname(value)
-            if not exists(directory):
-                raise DirectoryNotFoundError(f"'{directory}' does not exist")
-            if not isdir(directory):
-                raise NotADirectoryError(f"'{directory}' is not a directory")
-            if not access(directory, W_OK):
-                raise PermissionError(f"'{directory}' cannot be written")
+        path.mkdir(parents=True)
+        info(f"Created directory {path}")
 
-    return value
+    return path
 
 
 def validate_str(value: Any, options: Iterable[str]) -> str:
@@ -438,22 +376,3 @@ def validate_type(value: Any, cls: Any) -> Any:
     if not isinstance(value, cls):
         raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
     return value
-
-
-validate_input_directory = partial(
-    validate_input_path, file_ok=False, directory_ok=True
-)
-"""Validate an input directory path and make it absolute"""
-
-validate_input_file = partial(validate_input_path, file_ok=True, directory_ok=False)
-"""Validate an input file path and make it absolute"""
-
-validate_output_directory = partial(
-    validate_output_path,
-    file_ok=False,
-    directory_ok=True,
-)
-"""Validate an output directory path and make it absolute"""
-
-validate_output_file = partial(validate_output_path, file_ok=True, directory_ok=False)
-"""Validate an output file path and make it absolute"""
