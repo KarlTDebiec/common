@@ -132,6 +132,8 @@ def validate_input_directory(path: Union[str, Path]) -> Path:
     path = Path(expandvars(str(path))).absolute()
     if not path.exists():
         raise DirectoryNotFoundError(f"Input directory {path} does not exist")
+    if not path.is_dir():
+        raise NotADirectoryError(f"Input directory {path} is not a directory")
 
     return path
 
@@ -152,8 +154,9 @@ def validate_input_directories(
     for path in paths:
         try:
             path = validate_input_directory(path)
-        except DirectoryNotFoundError as error:
+        except (DirectoryNotFoundError, NotADirectoryError) as error:
             info(str(error))
+            continue
         validated_paths.append(path)
     if len(validated_paths) == 0:
         raise DirectoryNotFoundError(f"No directories provided in {paths} exist")
@@ -172,6 +175,8 @@ def validate_input_file(path: Union[str, Path]) -> Path:
     path = Path(expandvars(str(path))).absolute()
     if not path.exists():
         raise FileNotFoundError(f"Input file {path} does not exist")
+    if not path.is_file():
+        raise NotAFileError(f"Input file {path} is not a file")
 
     return path
 
@@ -192,8 +197,9 @@ def validate_input_files(
     for path in paths:
         try:
             path = validate_input_file(path)
-        except FileNotFoundError as error:
+        except (FileNotFoundError, NotAFileError) as error:
             info(str(error))
+            continue
         validated_paths.append(path)
     if len(validated_paths) == 0:
         raise FileNotFoundError(f"No files provided in {paths} exist")
