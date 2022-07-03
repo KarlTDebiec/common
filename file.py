@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  Copyright (C) 2020-2022. Karl T Debiec
+#  Copyright (C) 2017-2022. Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions for file interaction and manipulation."""
@@ -81,19 +81,21 @@ def temp_file(suffix: Optional[str] = None) -> None:
         suffix: Suffix of named temporary file
     """
     temp_file = None
+    temp_file_path = None
     try:
         temp_file = NamedTemporaryFile(delete=False, suffix=suffix)
         temp_file.close()
-        remove(temp_file)
-        yield Path(temp_file)
+        temp_file_path = Path(temp_file.name)
+        remove(temp_file_path)
+        yield temp_file_path
     finally:
-        if temp_file is not None and temp_file.exists():
+        if temp_file_path is not None and temp_file_path.exists():
             try:
-                remove(temp_file)
+                remove(temp_file_path)
             except PermissionError as error:
                 debug(
                     f"temp_file_path encountered PermissionException '{error}'; "
-                    f"temporary file '{temp_file}', will not be removed."
+                    f"temporary file '{temp_file_path}', will not be removed."
                 )
 
 
