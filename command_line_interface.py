@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  Copyright (C) 2020-2022. Karl T Debiec
+#  Copyright (C) 2017-2022. Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose command line interface base class."""
@@ -250,7 +250,9 @@ class CommandLineInterface(ABC):
             Optional arguments group
         """
         return next(
-            ag for ag in parser._action_groups if ag.title == "optional arguments"
+            ag
+            for ag in parser._action_groups  # noqa
+            if ag.title == "optional arguments"
         )
 
     @staticmethod
@@ -266,14 +268,14 @@ class CommandLineInterface(ABC):
         """
         if any(
             (required := ag).title == "required arguments"
-            for ag in parser._action_groups
+            for ag in parser._action_groups  # noqa
         ):
-            return required
+            return required  # noqa
 
         # Move "optional arguments" group below "required arguments" group
-        optional = parser._action_groups.pop()
+        optional = parser._action_groups.pop()  # noqa
         required = parser.add_argument_group("required arguments")
-        parser._action_groups.append(optional)
+        parser._action_groups.append(optional)  # noqa
 
         return required
 
