@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-#   Copyright (C) 2017-2020 Karl T Debiec
-#   All rights reserved. This software may be modified and distributed under
-#   the terms of the BSD license. See the LICENSE file for details.
+#  Copyright 2017-2022 Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
 import logging
 from subprocess import PIPE, Popen
@@ -31,22 +31,22 @@ def run_command(
         exitcode = child.wait(timeout)
         stdout, stderr = child.communicate()
         try:
-            stdout = stdout.decode("utf8")
+            stdout_str = stdout.decode("utf8")
         except UnicodeDecodeError:
-            stdout = stdout.decode("ISO-8859-1")
+            stdout_str = stdout.decode("ISO-8859-1")
         try:
-            stderr = stderr.decode("utf8")
+            stderr_str = stderr.decode("utf8")
         except UnicodeDecodeError:
-            stderr = stderr.decode("ISO-8859-1")
+            stderr_str = stderr.decode("ISO-8859-1")
         if exitcode not in acceptable_exitcodes:
             raise ValueError(
                 f"subprocess failed with exit code {exitcode};\n\n"
                 f"STDOUT:\n"
-                f"{stdout}\n\n"
+                f"{stdout_str}\n\n"
                 f"STDERR:\n"
-                f"{stderr}"
+                f"{stderr_str}"
             )
-        return (exitcode, stdout, stderr)
+        return (exitcode, stdout_str, stderr_str)
 
 
 def set_logging_verbosity(verbosity: int) -> None:

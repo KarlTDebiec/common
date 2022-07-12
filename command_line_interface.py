@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  Copyright (C) 2017-2022. Karl T Debiec
+#  Copyright 2017-2022 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose command line interface base class."""
@@ -43,7 +43,7 @@ class CommandLineInterface(ABC):
     @property
     def help(cls) -> str:
         """Short description of this tool used when it is a subparser."""
-        return re.split(r"\.\s+", cls.description)[0].rstrip(".")
+        return re.split(r"\.\s+", str(cls.description))[0].rstrip(".")
 
     @classmethod
     @property
@@ -80,28 +80,27 @@ class CommandLineInterface(ABC):
         )
 
     @classmethod
-    def construct_argparser(
+    def argparser(
         cls,
-        parser: Optional[_SubParsersAction] = None,
+        *,
+        subparsers: Optional[_SubParsersAction] = None,
     ) -> Union[ArgumentParser, _SubParsersAction]:
         """Construct argument parser.
 
         Arguments:
-            parser: May be a one of 1) a pre-existing argument parser, to which
-              arguments will be added, 2) a pre-existing subparsers group, to which a
-              new subparser with arguments will be added, or 3) None, in which case a
-              new parser will be created with arguments
+            subparsers: Subparsers group to which a new subparser will be added; if
+              None, a new ArgumentParser will be created
         Returns:
             Argument parser
         """
-        if parser is None:
+        if not subparsers:
             parser = ArgumentParser(
                 description=str(cls.description),
                 formatter_class=RawDescriptionHelpFormatter,
             )
-        if isinstance(parser, _SubParsersAction):
-            parser = parser.add_parser(
-                name=cls.name,
+        else:
+            parser = subparsers.add_parser(
+                name=str(cls.name),
                 description=cls.description,
                 help=cls.help,
                 formatter_class=RawDescriptionHelpFormatter,
@@ -201,7 +200,7 @@ class CommandLineInterface(ABC):
     @classmethod
     def main(cls) -> None:
         """Execute from command line."""
-        parser = cls.construct_argparser()
+        parser = cls.argparser()
         kwargs = vars(parser.parse_args())
         cls.execute(**kwargs)
 

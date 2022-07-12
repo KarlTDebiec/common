@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  Copyright (C) 2017-2022. Karl T Debiec
+#  Copyright 2017-2022 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
@@ -15,10 +15,13 @@ from .exception import (
     IsAFileError,
     NotAFileError,
     NotAFileOrDirectoryError,
-    SetterError,
     UnsupportedPlatformError,
 )
-from .file import rename_preexisting_outfile, temporary_filename
+from .file import (
+    get_temp_directory_path,
+    get_temp_file_path,
+    rename_preexisting_output_file_path,
+)
 from .general import run_command, set_logging_verbosity
 from .validation import (
     validate_enum,
@@ -50,13 +53,13 @@ __all__: list[str] = [
     "IsAFileError",
     "NotAFileError",
     "NotAFileOrDirectoryError",
-    "SetterError",
     "UnsupportedPlatformError",
     "package_root",
-    "rename_preexisting_outfile",
+    "rename_preexisting_output_file_path",
     "run_command",
     "set_logging_verbosity",
-    "temporary_filename",
+    "get_temp_directory_path",
+    "get_temp_file_path",
     "validate_enum",
     "validate_executable",
     "validate_float",
