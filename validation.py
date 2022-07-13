@@ -9,7 +9,7 @@ from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Iterable, Optional, Type, Union
+from typing import Any, Collection, Iterable, Optional, Type, Union
 
 from .exception import (
     ArgumentConflictError,
@@ -48,49 +48,38 @@ def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
 
 
 def validate_executable(
-    value: Any, supported_platforms: Optional[set[str]] = None
-) -> str:
+    name: str, supported_platforms: Optional[Collection[str]] = None
+) -> Path:
     """Validates that executable name and returns its absolute path.
 
     Arguments:
-        value: executable name
+        name: executable name
         supported_platforms: Platforms that support executable;
           default: "Darwin", "Linux", "Windows"
     Returns:
         Absolute path of executable
     Raises:
         ExecutableNotFoundError: if executable is not found in path
-        TypeError: if value or supported platform are not of the expected types
         UnsupportedPlatformError: if executable is not supported on current platform
     """
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
     if supported_platforms is None:
         supported_platforms = {"Darwin", "Linux", "Windows"}
-    else:
-        try:
-            supported_platforms = set(supported_platforms)
-        except ValueError:
-            raise TypeError(
-                f"'{supported_platforms}' is of type '{type(value)}', not set[str]"
-            ) from None
 
     if system() not in supported_platforms:
         raise UnsupportedPlatformError(
-            f"Executable '{value}' is not supported on {system()}"
+            f"Executable '{name}' is not supported on {system()}"
         )
 
-    which_value = which(value)
-    if which_value is None:
-        raise ExecutableNotFoundError(f"Executable '{value}' not found in '{defpath}'")
+    which_executable = which(name)
+    if not which_executable:
+        raise ExecutableNotFoundError(f"Executable '{name}' not found in '{defpath}'")
+    executable_path = Path(which_executable).resolve()
 
-    return which_value
+    return executable_path
 
 
 def validate_float(
-    value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
+    value: float, min_value: Optional[float] = None, max_value: Optional[float] = None
 ) -> float:
     """Validate a float.
 
@@ -102,20 +91,14 @@ def validate_float(
         value as a float
     Raises:
         ArgumentConflictError: If min_value is greater than max_value
-        TypeError: If value may not be cast to a float
         ValueError: If value is less than min_value or greater than max_value
     """
-    if min_value is not None and max_value is not None and (min_value >= max_value):
+    if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
-    try:
-        value = float(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not float") from None
-
-    if min_value is not None and value < min_value:
+    if min_value and value < min_value:
         raise ValueError(f"{value} is less than minimum value of {min_value}")
-    if max_value is not None and value > max_value:
+    if max_value and value > max_value:
         raise ValueError(f"{value} is greater than maximum value of {max_value}")
 
     return value
@@ -208,10 +191,10 @@ def validate_input_files(
 
 
 def validate_int(
-    value: Any,
+    value: int,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[tuple[int, ...]] = None,
+    options: Optional[Collection[int]] = None,
 ) -> int:
     """Validate an int.
 
@@ -219,7 +202,7 @@ def validate_int(
         value: Input value to validate
         min_value: Minimum value of int, if applicable
         max_value: Maximum value of int, if applicable
-        choices: Acceptable int values, if applicable
+        options: Acceptable int values, if applicable
     Returns:
         value as an int
     Raises:
@@ -228,20 +211,15 @@ def validate_int(
         ValueError: If value is less than min_value or greater than max_value, or is not
           one of the provided options
     """
-    if min_value is not None and max_value is not None and (min_value >= max_value):
+    if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
-    try:
-        value = int(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not int") from None
-
-    if min_value is not None and value < min_value:
+    if min_value and value < min_value:
         raise ValueError(f"{value} is less than minimum value of {min_value}")
-    if max_value is not None and value > max_value:
+    if max_value and value > max_value:
         raise ValueError(f"{value} is greater than maximum value of {max_value}")
-    if choices is not None and value not in choices:
-        raise ValueError(f"{value} is not one of {choices}")
+    if options and value not in options:
+        raise ValueError(f"{value} is not one of {options}")
 
     return value
 
@@ -251,7 +229,7 @@ def validate_ints(
     length: Optional[int] = None,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[tuple[int]] = None,
+    options: Optional[Collection[int]] = None,
 ):
     """Validate a collection of int.
 
@@ -260,7 +238,7 @@ def validate_ints(
         length:  Number of values expected, if applicable
         min_value: Minimum value of int, if applicable
         max_value: Maximum value of int, if applicable
-        choices: Acceptable int values, if applicable
+        options: Acceptable int values, if applicable
     Returns:
         values as a list of ints
     Raises:
@@ -277,7 +255,7 @@ def validate_ints(
 
     validated_values = []
     for value in values:
-        validated_values.append(validate_int(value, min_value, max_value, choices))
+        validated_values.append(validate_int(value, min_value, max_value, options))
 
     if length is not None and len(validated_values) != length:
         raise ValueError(
