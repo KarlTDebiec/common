@@ -40,7 +40,9 @@ def run_command(
             stderr_str = stderr.decode("ISO-8859-1")
         if exitcode not in acceptable_exitcodes:
             raise ValueError(
-                f"subprocess failed with exit code {exitcode};\n\n"
+                f"subprocess for command:\n"
+                f"{command}\n\n"
+                f"failed with exit code {exitcode};\n\n"
                 f"STDOUT:\n"
                 f"{stdout_str}\n\n"
                 f"STDERR:\n"

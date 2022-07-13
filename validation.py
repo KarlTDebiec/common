@@ -79,7 +79,7 @@ def validate_executable(
 
 
 def validate_float(
-    value: float, min_value: Optional[float] = None, max_value: Optional[float] = None
+    value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
 ) -> float:
     """Validate a float.
 
@@ -95,6 +95,13 @@ def validate_float(
     """
     if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
+
+    try:
+        value = float(value)
+    except ValueError as error:
+        raise TypeError(
+            f"{value} is of type {type(value)}, cannot be cast to int"
+        ) from error
 
     if min_value and value < min_value:
         raise ValueError(f"{value} is less than minimum value of {min_value}")
@@ -191,7 +198,7 @@ def validate_input_files(
 
 
 def validate_int(
-    value: int,
+    value: Any,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
     options: Optional[Collection[int]] = None,
@@ -213,6 +220,13 @@ def validate_int(
     """
     if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
+
+    try:
+        value = int(value)
+    except ValueError as error:
+        raise TypeError(
+            f"{value} is of type {type(value)}, cannot be cast to float"
+        ) from error
 
     if min_value and value < min_value:
         raise ValueError(f"{value} is less than minimum value of {min_value}")
