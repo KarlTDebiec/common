@@ -34,24 +34,6 @@ class CommandLineInterface(ABC):
     """General-purpose command line interface base class."""
 
     @classmethod
-    @property
-    def description(cls) -> str:
-        """Long description of this tool displayed below usage."""
-        return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
-
-    @classmethod
-    @property
-    def help(cls) -> str:
-        """Short description of this tool used when it is a subparser."""
-        return re.split(r"\.\s+", str(cls.description))[0].rstrip(".")
-
-    @classmethod
-    @property
-    def name(cls) -> str:
-        """Name of this tool used to define it when it is a subparser."""
-        return cls.__name__
-
-    @classmethod
     def add_arguments_to_argparser(
         cls,
         parser: Union[ArgumentParser, _SubParsersAction],
@@ -95,20 +77,25 @@ class CommandLineInterface(ABC):
         """
         if not subparsers:
             parser = ArgumentParser(
-                description=str(cls.description),
+                description=str(cls.description()),
                 formatter_class=RawDescriptionHelpFormatter,
             )
         else:
             parser = subparsers.add_parser(
-                name=str(cls.name),
-                description=cls.description,
-                help=cls.help,
+                name=cls.name(),
+                description=cls.description(),
+                help=cls.help(),
                 formatter_class=RawDescriptionHelpFormatter,
             )
 
         cls.add_arguments_to_argparser(parser)
 
         return parser
+
+    @classmethod
+    def description(cls) -> str:
+        """Long description of this tool displayed below usage."""
+        return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
 
     @classmethod
     def float_arg(cls, **kwargs: Any) -> Callable[[Any], float]:
@@ -130,6 +117,11 @@ class CommandLineInterface(ABC):
             **kwargs: Command-line arguments
         """
         raise NotImplementedError()
+
+    @classmethod
+    def help(cls) -> str:
+        """Short description of this tool used when it is a subparser."""
+        return re.split(r"\.\s+", str(cls.description))[0].rstrip(".")
 
     @classmethod
     def input_directories_arg(cls, **kwargs: Any) -> Callable[[Any], list[Path]]:
@@ -203,6 +195,11 @@ class CommandLineInterface(ABC):
         parser = cls.argparser()
         kwargs = vars(parser.parse_args())
         cls.execute(**kwargs)
+
+    @classmethod
+    def name(cls) -> str:
+        """Name of this tool used to define it when it is a subparser."""
+        return cls.__name__
 
     @classmethod
     def output_directory_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
