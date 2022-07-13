@@ -14,7 +14,7 @@ from argparse import (
 )
 from inspect import cleandoc
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
 from .validation import (
     validate_float,
@@ -34,10 +34,7 @@ class CommandLineInterface(ABC):
     """General-purpose command line interface base class."""
 
     @classmethod
-    def add_arguments_to_argparser(
-        cls,
-        parser: Union[ArgumentParser, _SubParsersAction],
-    ) -> None:
+    def add_arguments_to_argparser(cls, parser: ArgumentParser) -> None:
         """Add arguments to a nascent argument parser.
 
         Arguments:
@@ -63,10 +60,8 @@ class CommandLineInterface(ABC):
 
     @classmethod
     def argparser(
-        cls,
-        *,
-        subparsers: Optional[_SubParsersAction] = None,
-    ) -> Union[ArgumentParser, _SubParsersAction]:
+        cls, *, subparsers: Optional[_SubParsersAction] = None
+    ) -> ArgumentParser:
         """Construct argument parser.
 
         Arguments:
@@ -95,7 +90,7 @@ class CommandLineInterface(ABC):
     @classmethod
     def description(cls) -> str:
         """Long description of this tool displayed below usage."""
-        return cleandoc(cls.__doc__) if cls.__doc__ is not None else ""
+        return cleandoc(cls.__doc__) if cls.__doc__ else ""
 
     @classmethod
     def float_arg(cls, **kwargs: Any) -> Callable[[Any], float]:
@@ -121,7 +116,7 @@ class CommandLineInterface(ABC):
     @classmethod
     def help(cls) -> str:
         """Short description of this tool used when it is a subparser."""
-        return re.split(r"\.\s+", str(cls.description))[0].rstrip(".")
+        return re.split(r"\.\s+", str(cls.description()))[0].rstrip(".")
 
     @classmethod
     def input_directories_arg(cls, **kwargs: Any) -> Callable[[Any], list[Path]]:
@@ -235,9 +230,7 @@ class CommandLineInterface(ABC):
         return cls.get_validator(validate_str, **kwargs)
 
     @staticmethod
-    def get_optional_arguments_group(
-        parser: Union[ArgumentParser, _SubParsersAction],
-    ) -> _ArgumentGroup:
+    def get_optional_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
         """Get the 'optional arguments' group from an argparser.
 
         Arguments:
@@ -252,9 +245,7 @@ class CommandLineInterface(ABC):
         )
 
     @staticmethod
-    def get_required_arguments_group(
-        parser: Union[ArgumentParser, _SubParsersAction],
-    ) -> _ArgumentGroup:
+    def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
         """Get or create a 'required arguments' group from an argparser.
 
         Arguments:
@@ -285,7 +276,7 @@ class CommandLineInterface(ABC):
             Wrapped function
         """
 
-        def wrapped(value: Any) -> Path:
+        def wrapped(value: Any) -> Any:
             try:
                 return function(value, **kwargs)
             except TypeError as error:
