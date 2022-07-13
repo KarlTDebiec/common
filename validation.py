@@ -97,18 +97,18 @@ def validate_float(
         raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
-        value = float(value)
+        return_value = float(value)
     except ValueError as error:
         raise TypeError(
             f"{value} is of type {type(value)}, cannot be cast to int"
         ) from error
 
-    if min_value and value < min_value:
-        raise ValueError(f"{value} is less than minimum value of {min_value}")
-    if max_value and value > max_value:
-        raise ValueError(f"{value} is greater than maximum value of {max_value}")
+    if min_value and return_value < min_value:
+        raise ValueError(f"{return_value} is less than minimum value of {min_value}")
+    if max_value and return_value > max_value:
+        raise ValueError(f"{return_value} is greater than maximum value of {max_value}")
 
-    return value
+    return return_value
 
 
 def validate_input_directory(path: Union[str, Path]) -> Path:
@@ -222,20 +222,20 @@ def validate_int(
         raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
-        value = int(value)
+        return_value = int(value)
     except ValueError as error:
         raise TypeError(
             f"{value} is of type {type(value)}, cannot be cast to float"
         ) from error
 
-    if min_value and value < min_value:
-        raise ValueError(f"{value} is less than minimum value of {min_value}")
-    if max_value and value > max_value:
-        raise ValueError(f"{value} is greater than maximum value of {max_value}")
-    if options and value not in options:
-        raise ValueError(f"{value} is not one of {options}")
+    if min_value and return_value < min_value:
+        raise ValueError(f"{return_value} is less than minimum value of {min_value}")
+    if max_value and return_value > max_value:
+        raise ValueError(f"{return_value} is greater than maximum value of {max_value}")
+    if options and return_value not in options:
+        raise ValueError(f"{return_value} is not one of {options}")
 
-    return value
+    return return_value
 
 
 def validate_ints(
