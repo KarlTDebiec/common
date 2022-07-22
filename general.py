@@ -1,87 +1,28 @@
 #!/usr/bin/env python
-#   common/general.py
-#
-#   Copyright (C) 2017-2020 Karl T Debiec
-#   All rights reserved.
-#
-#   This software may be modified and distributed under the terms of the
-#   BSD license. See the LICENSE file for details.
+#  Copyright 2017-2022 Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
+import logging
 from subprocess import PIPE, Popen
-from typing import Any, Iterable, Optional, Tuple
-
-
-def get_shell_type() -> Optional[str]:
-    """
-    Determines if inside IPython prompt.
-
-    Returns:
-        Optional[str]: Type of shell in use, or None if not in a shell
-    """
-    try:
-        # noinspection Mypy
-        shell = str(get_ipython().__class__.__name__)
-        if shell == "ZMQInteractiveShell":
-            # IPython in Jupyter Notebook
-            return shell
-        if shell == "InteractiveShellEmbed":
-            # IPython in Jupyter Notebook using IPython.embed
-            return shell
-        if shell == "TerminalInteractiveShell":
-            # IPython in terminal
-            return shell
-        # Other
-        return shell
-    except NameError:
-        # Not in IPython
-        return None
-
-
-def input_prefill(prompt: str, prefill: str) -> str:
-    """
-    Prompts user for input with pre-filled text.
-
-    Does not handle colored prompt correctly
-
-    TODO: Does this block CTRL-D?
-
-    Arguments:
-        prompt (str): Prompt to present to user
-        prefill (str): Text to prefill for user
-
-    Returns:
-        str: Text inputted by user
-    """
-    from readline import insert_text, redisplay, set_pre_input_hook
-
-    def pre_input_hook() -> None:
-        insert_text(prefill)
-        redisplay()
-
-    set_pre_input_hook(pre_input_hook)
-    result = input(prompt)
-    set_pre_input_hook()
-
-    return result
+from typing import Iterable, Optional
 
 
 def run_command(
     command: str,
     timeout: int = 600,
     acceptable_exitcodes: Optional[Iterable[int]] = None,
-) -> Tuple[int, Optional[str], Optional[str]]:
-    """
+) -> tuple[int, Optional[str], Optional[str]]:
+    """Run a provided command.
 
     Arguments:
         command: command to run
         timeout: maximum time to await command's completion
         acceptable_exitcodes: acceptable exit codes
-
     Returns:
         exitcode, standard output, and standard error
-
     Raises:
-        ValueError: If exitcode is not in acceptable_exitcodes
+        ValueError: If exitcode is not one of acceptable_exitcodes
     """
     if acceptable_exitcodes is None:
         acceptable_exitcodes = [0]
@@ -90,19 +31,38 @@ def run_command(
         exitcode = child.wait(timeout)
         stdout, stderr = child.communicate()
         try:
-            stdout = stdout.decode("utf8")
+            stdout_str = stdout.decode("utf8")
         except UnicodeDecodeError:
-            stdout = stdout.decode("ISO-8859-1")
+            stdout_str = stdout.decode("ISO-8859-1")
         try:
-            stderr = stderr.decode("utf8")
+            stderr_str = stderr.decode("utf8")
         except UnicodeDecodeError:
-            stderr = stderr.decode("ISO-8859-1")
+            stderr_str = stderr.decode("ISO-8859-1")
         if exitcode not in acceptable_exitcodes:
             raise ValueError(
-                f"subprocess failed with exit code {exitcode};\n\n"
+                f"subprocess for command:\n"
+                f"{command}\n\n"
+                f"failed with exit code {exitcode};\n\n"
                 f"STDOUT:\n"
-                f"{stdout}\n\n"
+                f"{stdout_str}\n\n"
                 f"STDERR:\n"
-                f"{stderr}"
+                f"{stderr_str}"
             )
-        return (exitcode, stdout, stderr)
+        return (exitcode, stdout_str, stderr_str)
+
+
+def set_logging_verbosity(verbosity: int) -> None:
+    """Set the level of verbosity of logging.
+
+    Arguments:
+        verbosity: level of verbosity
+    """
+    logging.basicConfig()
+    if verbosity <= 0:
+        logging.getLogger().setLevel(level=logging.ERROR)
+    elif verbosity == 1:
+        logging.getLogger().setLevel(level=logging.WARNING)
+    elif verbosity == 2:
+        logging.getLogger().setLevel(level=logging.INFO)
+    elif verbosity >= 3:
+        logging.getLogger().setLevel(level=logging.DEBUG)

@@ -1,17 +1,11 @@
 #!/usr/bin/env python
-#   common/__init__.py
-#
-#   Copyright (C) 2017-2022 Karl T Debiec
-#   All rights reserved.
-#
-#   This software may be modified and distributed under the terms of the
-#   BSD license. See the LICENSE file for details.
+#  Copyright 2017-2022 Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
 from pathlib import Path
-from typing import List
 
-from .command_line_tool import CommandLineTool
-from .configurable_command_line_tool import ConfigurableCommandLineTool
+from .command_line_interface import CommandLineInterface
 from .exception import (
     ArgumentConflictError,
     DirectoryExistsError,
@@ -21,30 +15,37 @@ from .exception import (
     IsAFileError,
     NotAFileError,
     NotAFileOrDirectoryError,
-    SetterError,
     UnsupportedPlatformError,
 )
-from .file import get_ext, get_name, rename_preexisting_outfile, temporary_filename
-from .general import get_shell_type, input_prefill, run_command
+from .file import (
+    get_temp_directory_path,
+    get_temp_file_path,
+    rename_preexisting_output_file_path,
+)
+from .general import run_command, set_logging_verbosity
 from .validation import (
+    validate_enum,
     validate_executable,
     validate_float,
-    validate_input_path,
+    validate_input_directories,
+    validate_input_directory,
+    validate_input_file,
+    validate_input_files,
     validate_int,
     validate_ints,
-    validate_output_path,
+    validate_output_directory,
+    validate_output_file,
     validate_str,
     validate_type,
 )
 
-package_root: str = str(Path(__file__).parent.parent.absolute())
-"""str: absolute path of package containing this common submodule (e.g. if this file is
+package_root = Path(__file__).absolute().parent.parent
+"""absolute path of package containing this common submodule (e.g. if this file is
 '/path/to/test/common/__init__.py', value is '/path/to/test"""
 
-__all__: List[str] = [
+__all__: list[str] = [
     "ArgumentConflictError",
-    "CommandLineTool",
-    "ConfigurableCommandLineTool",
+    "CommandLineInterface",
     "DirectoryExistsError",
     "DirectoryNotFoundError",
     "ExecutableNotFoundError",
@@ -52,22 +53,24 @@ __all__: List[str] = [
     "IsAFileError",
     "NotAFileError",
     "NotAFileOrDirectoryError",
-    "SetterError",
     "UnsupportedPlatformError",
-    "get_ext",
-    "get_name",
-    "get_shell_type",
-    "input_prefill",
     "package_root",
-    "rename_preexisting_outfile",
+    "rename_preexisting_output_file_path",
     "run_command",
-    "temporary_filename",
+    "set_logging_verbosity",
+    "get_temp_directory_path",
+    "get_temp_file_path",
+    "validate_enum",
     "validate_executable",
     "validate_float",
-    "validate_input_path",
+    "validate_input_directory",
+    "validate_input_directories",
+    "validate_input_file",
+    "validate_input_files",
     "validate_int",
     "validate_ints",
-    "validate_output_path",
+    "validate_output_directory",
+    "validate_output_file",
     "validate_str",
     "validate_type",
 ]

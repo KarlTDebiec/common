@@ -1,193 +1,241 @@
 #!/usr/bin/env python
-#   common/validation.py
-#
-#   Copyright (C) 2017-2022 Karl T Debiec
-#   All rights reserved.
-#
-#   This software may be modified and distributed under the terms of the
-#   BSD license. See the LICENSE file for details.
+#  Copyright 2017-2022 Karl T Debiec
+#  All rights reserved. This software may be modified and distributed under
+#  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
-from os import R_OK, W_OK, access, getcwd, makedirs
-from os.path import (
-    defpath,
-    dirname,
-    exists,
-    expandvars,
-    isabs,
-    isdir,
-    isfile,
-    join,
-    normpath,
-)
+from enum import Enum
+from logging import info
+from os.path import defpath, expandvars
+from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Iterable, Optional, Set, Tuple
+from typing import Any, Collection, Iterable, Optional, Type, Union
 
 from .exception import (
     ArgumentConflictError,
     DirectoryNotFoundError,
     ExecutableNotFoundError,
     NotAFileError,
-    NotAFileOrDirectoryError,
     UnsupportedPlatformError,
 )
 
 
-def validate_executable(
-    value: Any, supported_platforms: Optional[Set[str]] = None
-) -> str:
-    """
-    Validates that executable name and returns its absolute path
+def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
+    """Validate an enum member, if necessary converted from a string.
 
     Arguments:
-        value: executable name
-        supported_platforms: Platforms that support executable
-          (default: {"Darwin", "Linux", "Windows"})
-
+        value: Member name
+        enum: Enum
+    Returns:
+        validated enum member
     Raises:
-        ExecutableNotFoundError: if executable is not found in path
-        TypeError: if value or supported platform are not of the expected types
-        UnsupportedPlatformError: if executable is not supported on current platform
+        TypeError: If enum is not an Enum, or value is not a member of enum
+    """
+    if not isinstance(enum, type(Enum)):
+        raise TypeError(f"'{enum}' is of type '{type(enum)}', not Enum")
+    if isinstance(value, enum):
+        return value
+    value = str(value)
+    if value.startswith(Enum.__name__):
+        value = value[len(Enum.__name__) :].lstrip(".")
+    if hasattr(enum, value):
+        return enum[value]
 
+    raise TypeError(
+        f"{value} is not a member of {enum.__name__}, must be one of "
+        f"{list(enum.__members__.keys())}"
+    )
+
+
+def validate_executable(
+    name: str, supported_platforms: Optional[Collection[str]] = None
+) -> Path:
+    """Validates that executable name and returns its absolute path.
+
+    Arguments:
+        name: executable name
+        supported_platforms: Platforms that support executable;
+          default: "Darwin", "Linux", "Windows"
     Returns:
         Absolute path of executable
+    Raises:
+        ExecutableNotFoundError: if executable is not found in path
+        UnsupportedPlatformError: if executable is not supported on current platform
     """
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
     if supported_platforms is None:
         supported_platforms = {"Darwin", "Linux", "Windows"}
-    else:
-        try:
-            supported_platforms = set(supported_platforms)
-        except:
-            raise TypeError(
-                f"'{supported_platforms}' is of type '{type(value)}', not Set[str]"
-            )
 
     if system() not in supported_platforms:
         raise UnsupportedPlatformError(
-            f"Executable '{value}' is not supported on {system()}"
+            f"Executable '{name}' is not supported on {system()}"
         )
 
-    value = which(value)
-    if value is None:
-        raise ExecutableNotFoundError(f"Executable '{value}' not found in '{defpath}'")
+    which_executable = which(name)
+    if not which_executable:
+        raise ExecutableNotFoundError(f"Executable '{name}' not found in '{defpath}'")
+    executable_path = Path(which_executable).resolve()
 
-    return value
+    return executable_path
 
 
 def validate_float(
     value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
 ) -> float:
-    if min_value is not None and max_value is not None and (min_value >= max_value):
+    """Validate a float.
+
+    Arguments:
+        value: Input value to validate
+        min_value: Minimum value of float, if applicable
+        max_value: Maximum value of float, if applicable
+    Returns:
+        value as a float
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        ValueError: If value is less than min_value or greater than max_value
+    """
+    if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
-        value = float(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not float")
+        return_value = float(value)
+    except ValueError as error:
+        raise TypeError(
+            f"{value} is of type {type(value)}, cannot be cast to int"
+        ) from error
 
-    if min_value is not None and value < min_value:
-        raise ValueError(f"{value} is less than minimum value of {min_value}")
-    if max_value is not None and value > max_value:
-        raise ValueError(f"{value} is greater than maximum value of {max_value}")
+    if min_value and return_value < min_value:
+        raise ValueError(f"{return_value} is less than minimum value of {min_value}")
+    if max_value and return_value > max_value:
+        raise ValueError(f"{return_value} is greater than maximum value of {max_value}")
 
-    return value
+    return return_value
 
 
-def validate_input_path(
-    value: Any,
-    file_ok: bool = True,
-    directory_ok: bool = False,
-    default_directory: Optional[str] = None,
-    create_directory: bool = False,
-) -> str:
-    """
-    Validates an input path and makes it absolute.
+def validate_input_directory(path: Union[str, Path]) -> Path:
+    """Validate input directory path and make it absolute.
 
     Arguments:
-        value (Any): Provided input path
-        file_ok (bool): Whether or not file paths are permissible
-        directory_ok (bool): Whether or not directory paths are permissible
-        default_directory (Optional[str]): Default directory to prepend to *value* if
-          not absolute (default: current working directory)
-
+        path: Path to directory of input files
     Returns:
-        str: Absolute path to input file or directory
-
-    Raises:
-        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
-        FileNotFoundError: If *value* does not exist
-        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
-          is not a directory
-        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
-          not a file
-        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
-          is not a file or directory
-        PermissionError: If *value* cannot be read
-        TypeError: If *value* cannot be cast to a string
+        Absolute path to input directory
     """
-    if not file_ok and not directory_ok:
-        raise ArgumentConflictError(
-            "both file and directory paths may not be prohibited"
-        )
-    if default_directory is None:
-        default_directory = getcwd()
+    path = Path(expandvars(str(path))).absolute()
+    if not path.exists():
+        raise DirectoryNotFoundError(f"Input directory {path} does not exist")
+    if not path.is_dir():
+        raise NotADirectoryError(f"Input directory {path} is not a directory")
 
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    return path
 
-    value = expandvars(value)
-    if not isabs(value):
-        value = join(default_directory, value)
-    value = normpath(value)
 
-    if not exists(value):
-        if directory_ok and create_directory:
-            makedirs(value)
-        else:
-            if not file_ok and directory_ok:
-                raise DirectoryNotFoundError(f"'{value}' does not exist")
-            else:
-                raise FileNotFoundError(f"'{value}' does not exist")
-    if file_ok and not directory_ok and not isfile(value):
-        raise NotAFileError(f"'{value}' is not a file")
-    if not file_ok and directory_ok and not isdir(value):
-        raise NotADirectoryError(f"'{value}' is not a directory")
-    if not isfile(value) and not isdir(value):
-        raise NotAFileOrDirectoryError(f"'{value}' is not a file or directory")
-    if not access(value, R_OK):
-        raise PermissionError(f"'{value}' cannot be read")
+def validate_input_directories(
+    paths: Union[str, Path, Iterable[Union[str, Path]]]
+) -> list[Path]:
+    """Validate input directory paths and make them absolute.
 
-    return value
+    Arguments:
+        paths: Path to directory or directories of input files
+    Returns:
+        List of absolute directory paths
+    """
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    validated_paths = []
+    for path in paths:
+        try:
+            path = validate_input_directory(path)
+        except (DirectoryNotFoundError, NotADirectoryError) as error:
+            info(str(error))
+            continue
+        validated_paths.append(path)
+    if len(validated_paths) == 0:
+        raise DirectoryNotFoundError(f"No directories provided in {paths} exist")
+
+    return validated_paths
+
+
+def validate_input_file(path: Union[str, Path]) -> Path:
+    """Validate input file path and make it absolute.
+
+    Arguments:
+        path: Path to input file
+    Returns:
+        Absolute path to input file
+    """
+    path = Path(expandvars(str(path))).absolute()
+    if not path.exists():
+        raise FileNotFoundError(f"Input file {path} does not exist")
+    if not path.is_file():
+        raise NotAFileError(f"Input file {path} is not a file")
+
+    return path
+
+
+def validate_input_files(
+    paths: Union[str, Path, Iterable[Union[str, Path]]]
+) -> list[Path]:
+    """Validate input file paths and make them absolute.
+
+    Arguments:
+        paths: Paths to input file or files
+    Returns:
+        List of absolute file paths
+    """
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
+    validated_paths = []
+    for path in paths:
+        try:
+            path = validate_input_file(path)
+        except (FileNotFoundError, NotAFileError) as error:
+            info(str(error))
+            continue
+        validated_paths.append(path)
+    if len(validated_paths) == 0:
+        raise FileNotFoundError(f"No files provided in {paths} exist")
+
+    return validated_paths
 
 
 def validate_int(
     value: Any,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[Tuple[int, ...]] = None,
+    options: Optional[Collection[int]] = None,
 ) -> int:
-    if min_value is not None and max_value is not None and (min_value >= max_value):
+    """Validate an int.
+
+    Arguments:
+        value: Input value to validate
+        min_value: Minimum value of int, if applicable
+        max_value: Maximum value of int, if applicable
+        options: Acceptable int values, if applicable
+    Returns:
+        value as an int
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        TypeError: If value may not be cast to an int
+        ValueError: If value is less than min_value or greater than max_value, or is not
+          one of the provided options
+    """
+    if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
-        value = int(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not int")
+        return_value = int(value)
+    except ValueError as error:
+        raise TypeError(
+            f"{value} is of type {type(value)}, cannot be cast to float"
+        ) from error
 
-    if min_value is not None and value < min_value:
-        raise ValueError(f"{value} is less than minimum value of {min_value}")
-    if max_value is not None and value > max_value:
-        raise ValueError(f"{value} is greater than maximum value of {max_value}")
-    if choices is not None and value not in choices:
-        raise ValueError(f"{value} is not one of {choices}")
+    if min_value and return_value < min_value:
+        raise ValueError(f"{return_value} is less than minimum value of {min_value}")
+    if max_value and return_value > max_value:
+        raise ValueError(f"{return_value} is greater than maximum value of {max_value}")
+    if options and return_value not in options:
+        raise ValueError(f"{return_value} is not one of {options}")
 
-    return value
+    return return_value
 
 
 def validate_ints(
@@ -195,8 +243,22 @@ def validate_ints(
     length: Optional[int] = None,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
-    choices: Optional[Tuple[int]] = None,
+    options: Optional[Collection[int]] = None,
 ):
+    """Validate a collection of int.
+
+    Arguments:
+        values: Input values to validate
+        length:  Number of values expected, if applicable
+        min_value: Minimum value of int, if applicable
+        max_value: Maximum value of int, if applicable
+        options: Acceptable int values, if applicable
+    Returns:
+        values as a list of ints
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        ValueError: If value is less than min_value or greater than max_value
+    """
     if min_value is not None and max_value is not None and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
@@ -207,7 +269,7 @@ def validate_ints(
 
     validated_values = []
     for value in values:
-        validated_values.append(validate_int(value, min_value, max_value, choices))
+        validated_values.append(validate_int(value, min_value, max_value, options))
 
     if length is not None and len(validated_values) != length:
         raise ValueError(
@@ -218,88 +280,62 @@ def validate_ints(
     return validated_values
 
 
-def validate_output_path(
-    value: Any,
-    file_ok: bool = True,
-    directory_ok: bool = False,
-    default_directory: Optional[str] = None,
-    create_directory: bool = False,
-) -> str:
-    """
-    Validates an output path and makes it absolute.
+def validate_output_file(path: Union[str, Path], exists_ok=True) -> Path:
+    """Validate output file path and make it absolute.
 
     Arguments:
-        value (Any): Provided output path
-        file_ok (bool): Whether or not file paths are permissible
-        directory_ok (bool): Whether or not directory paths are permissible
-        default_directory (Optional[str]): Default directory to prepend to *value* if
-          not absolute (default: current working directory)
-
+        path: Output file path
+        exists_ok: If True, do not raise an error if the file already exists
     Returns:
-        str: Absolute path to output file or directory
-
-    Raises:
-        ArgumentConflictError: If neither *file_ok* nor *directory_ok*
-        DirectoryNotFoundError: If *value*'s containing directory does not exist
-        NotADirectoryError: If *directory_ok* and not *file_ok* and *value* exists but
-          is not a directory, or if *value's* containing directory is not a directory
-        NotAFileError: If *file_ok* and not *directory_ok* and *value* exists but is
-          not a file
-        NotAFileOrDirectoryError: If *file_ok* and _directory_ok* and *value* exists but
-          is not a file or directory
-        PermissionError: If *value* exists and cannot be written, or if *value*'s
-          containing directory exists but is not a directory
-        TypeError: If *value* cannot be cast to a string
+        Absolute path to output file
     """
-    if not file_ok and not directory_ok:
-        raise ArgumentConflictError(
-            "Arguments 'file_ok' and 'directory_ok' are in conflict; both file and "
-            "directory paths may not be prohibited"
-        )
-    if not directory_ok and create_directory:
-        raise ArgumentConflictError(
-            "Arguments 'directory_ok' and 'create_directory' "
-            "are in conflict; may not prohibit diretory paths and enable directory "
-            "creation"
-        )
-    if default_directory is None:
-        default_directory = getcwd()
+    path = Path(expandvars(str(path))).absolute()
+    if path.exists():
+        if path.is_file():
+            if not exists_ok:
+                raise FileExistsError(f"{path} already exists")
+            info(f"{path} already exists and may be overwritten")
+            return path
+        raise NotAFileError(f"{path} already exists and is not a file")
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True)
+        info(f"Created directory {path.parent}")
 
-    try:
-        value = str(value)
-    except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+    return path
 
-    value = expandvars(value)
-    if not isabs(value):
-        value = join(default_directory, value)
-    value = normpath(value)
 
-    if exists(value):
-        if file_ok and not directory_ok and not isfile(value):
-            raise NotAFileError(f"'{value}' is not a file")
-        if not file_ok and directory_ok and not isdir(value):
-            raise NotADirectoryError(f"'{value}' is not a directory")
-        if not isfile(value) and not isdir(value):
-            raise NotAFileOrDirectoryError(f"'{value}' is not a file or directory")
-        if not access(value, W_OK):
-            raise PermissionError(f"'{value}' cannot be written")
+def validate_output_directory(path: Union[str, Path]) -> Path:
+    """Validate output directory path and make it absolute.
+
+    Arguments:
+        path: Output directory path
+    Returns:
+        Absolute to of output directory
+    """
+    path = Path(expandvars(str(path))).absolute()
+    if path.exists():
+        if not path.is_dir():
+            raise NotADirectoryError(f"{path} already exists and is not a directory")
     else:
-        if create_directory:
-            makedirs(value)
-        else:
-            directory = dirname(value)
-            if not exists(directory):
-                raise DirectoryNotFoundError(f"'{directory}' does not exist")
-            if not isdir(directory):
-                raise NotADirectoryError(f"'{directory}' is not a directory")
-            if not access(directory, W_OK):
-                raise PermissionError(f"'{directory}' cannot be written")
+        path.mkdir(parents=True)
+        info(f"Created directory {path}")
 
-    return value
+    return path
 
 
 def validate_str(value: Any, options: Iterable[str]) -> str:
+    """Validate a str.
+
+    Arguments:
+        value: Input value to validate
+        options: Acceptable string values, if applicable
+    Returns:
+        Value as a str
+    Raises:
+        ArgumentConflictError: If an option cannot be cast to a string
+        TypeError: If value may not be cast to a str
+        ValueError: If value is not one of the provided options
+    """
     case_insensitive_options = {}
     for option in options:
         try:
@@ -307,24 +343,34 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
         except ValueError:
             raise ArgumentConflictError(
                 f"Option '{option}' is of type '{type(option)}', not str"
-            )
+            ) from None
         case_insensitive_options[option.lower()] = option
 
     try:
         value = str(value)
     except ValueError:
-        raise TypeError(f"'{value}' is of type '{type(value)}', not str")
+        raise TypeError(f"'{value}' is of type '{type(value)}', not str") from None
     value = value.lower()
 
     if value not in case_insensitive_options:
         raise ValueError(
             f"'{value}' is not one of options '{case_insensitive_options.keys()}'"
-        )
+        ) from None
 
     return case_insensitive_options[value]
 
 
 def validate_type(value: Any, cls: Any) -> Any:
+    """Validate that value is of type cls.
+
+    Arguments:
+        value: Input object to validate
+        cls: Required type of object
+    Returns:
+        value
+    Raises:
+        TypeError: If value is not of type cls
+    """
     if not isinstance(value, cls):
         raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
     return value
