@@ -39,9 +39,9 @@ from .validation import (
     validate_type,
 )
 
-package_root = Path(__file__).absolute().parent.parent
+package_root = Path(__file__).resolve().parent.parent
 """absolute path of package containing this common submodule (e.g. if this file is
-'/path/to/test/common/__init__.py', value is '/path/to/test"""
+'/path/to/package/common/__init__.py', value is '/path/to/package"""
 
 __all__: list[str] = [
     "ArgumentConflictError",
