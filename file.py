@@ -37,7 +37,7 @@ def get_temp_directory_path() -> Generator[Path, None, None]:
     temp_directory = None
     try:
         temp_directory = TemporaryDirectory()
-        yield Path(temp_directory.name)
+        yield Path(temp_directory)
     finally:
         if temp_directory is not None:
             temp_directory.cleanup()
