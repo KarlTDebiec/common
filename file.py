@@ -37,7 +37,7 @@ def get_temp_directory_path() -> Generator[Path, None, None]:
     temp_directory_path = None
     try:
         temp_directory_path = mkdtemp()
-        yield Path(temp_directory_path)
+        yield Path(temp_directory_path).resolve()
     finally:
         if temp_directory_path is not None:
             rmtree(temp_directory_path)
