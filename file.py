@@ -8,8 +8,8 @@ from contextlib import contextmanager
 from logging import debug, info
 from os import remove
 from pathlib import Path
-from shutil import move
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from shutil import move, rmtree
+from tempfile import NamedTemporaryFile, mkdtemp
 from typing import Optional
 
 
@@ -34,13 +34,13 @@ def rename_preexisting_output_file_path(output_path: Path) -> None:
 @contextmanager
 def get_temp_directory_path() -> Generator[Path, None, None]:
     """Provide path to a temporary directory and remove it once no longer needed."""
-    temp_directory = None
+    temp_directory_path = None
     try:
-        temp_directory = TemporaryDirectory()
-        yield Path(temp_directory)
+        temp_directory_path = mkdtemp()
+        yield Path(temp_directory_path)
     finally:
-        if temp_directory is not None:
-            temp_directory.cleanup()
+        if temp_directory_path is not None:
+            rmtree(temp_directory_path)
 
 
 @contextmanager
