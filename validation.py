@@ -289,7 +289,7 @@ def validate_output_file(path: Union[str, Path], exists_ok=True) -> Path:
     Returns:
         Absolute path to output file
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if path.is_file():
             if not exists_ok:
@@ -310,9 +310,9 @@ def validate_output_directory(path: Union[str, Path]) -> Path:
     Arguments:
         path: Output directory path
     Returns:
-        Absolute to of output directory
+        Absolute path to output directory
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if not path.is_dir():
             raise NotADirectoryError(f"{path} already exists and is not a directory")

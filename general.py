@@ -3,7 +3,6 @@
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
-import logging
 from subprocess import PIPE, Popen
 from typing import Iterable, Optional
 
@@ -49,20 +48,3 @@ def run_command(
                 f"{stderr_str}"
             )
         return (exitcode, stdout_str, stderr_str)
-
-
-def set_logging_verbosity(verbosity: int) -> None:
-    """Set the level of verbosity of logging.
-
-    Arguments:
-        verbosity: level of verbosity
-    """
-    logging.basicConfig()
-    if verbosity <= 0:
-        logging.getLogger().setLevel(level=logging.ERROR)
-    elif verbosity == 1:
-        logging.getLogger().setLevel(level=logging.WARNING)
-    elif verbosity == 2:
-        logging.getLogger().setLevel(level=logging.INFO)
-    elif verbosity >= 3:
-        logging.getLogger().setLevel(level=logging.DEBUG)

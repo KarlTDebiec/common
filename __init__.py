@@ -5,6 +5,21 @@
 """General-purpose code not tied to a particular project."""
 from pathlib import Path
 
+from .argument_parsing import (
+    float_arg,
+    get_optional_arguments_group,
+    get_required_arguments_group,
+    get_validator,
+    input_directories_arg,
+    input_directory_arg,
+    input_file_arg,
+    input_files_arg,
+    int_arg,
+    ints_arg,
+    output_directory_arg,
+    output_file_arg,
+    str_arg,
+)
 from .command_line_interface import CommandLineInterface
 from .exception import (
     ArgumentConflictError,
@@ -22,7 +37,8 @@ from .file import (
     get_temp_file_path,
     rename_preexisting_output_file_path,
 )
-from .general import run_command, set_logging_verbosity
+from .general import run_command
+from .logging import set_logging_verbosity
 from .validation import (
     validate_enum,
     validate_executable,
@@ -54,12 +70,25 @@ __all__: list[str] = [
     "NotAFileError",
     "NotAFileOrDirectoryError",
     "UnsupportedPlatformError",
+    "float_arg",
+    "get_optional_arguments_group",
+    "get_required_arguments_group",
+    "get_temp_directory_path",
+    "get_temp_file_path",
+    "get_validator",
+    "input_directories_arg",
+    "input_directory_arg",
+    "input_file_arg",
+    "input_files_arg",
+    "int_arg",
+    "ints_arg",
+    "output_directory_arg",
+    "output_file_arg",
     "package_root",
     "rename_preexisting_output_file_path",
     "run_command",
     "set_logging_verbosity",
-    "get_temp_directory_path",
-    "get_temp_file_path",
+    "str_arg",
     "validate_enum",
     "validate_executable",
     "validate_float",
