@@ -56,6 +56,54 @@ def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
     return required
 
 
+def get_arg_groups_by_name(
+    parser: ArgumentParser,
+    *names: str,
+    optional_arguments_name: str = "optional arguments",
+) -> dict[str, _ArgumentGroup]:
+    """Get or create one or more argument groups by name.
+
+    Groups will be ordered by the order in which they are specified, with additional
+    groups whose names were not included in names appearing after the specified groups.
+
+    For example, if names = ("input arguments", "operation arguments",
+    "output arguments"), groups by these names will be created, yielding the final order
+    of ("input arguments", "operation arguments", "output arguments",
+    "optional arguments").
+
+    The default "optional arguments" group may be renamed by providing
+    optional_arguments_name.
+
+    Arguments:
+        parser: Argparser to get groups from
+        *names: Names of groups to get or create
+        optional_arguments_name: Name of optional arguments group
+    Returns:
+        Dictionary of names to argument groups
+    """
+    specified_groups = {}
+    for name in names:
+        for i, ag in enumerate(parser._action_groups):  # noqa
+            if ag.title == name:
+                specified_groups[name] = parser._action_groups.pop(i)  # noqa
+                break
+        else:
+            parser.add_argument_group(name)
+            specified_groups[name] = parser._action_groups.pop()  # noqa
+
+    additional_groups = {}
+    while len(parser._action_groups) > 0:  # noqa
+        ag = parser._action_groups.pop()  # noqa
+        if ag.title == "optional arguments":  # noqa
+            ag.title = optional_arguments_name
+        additional_groups[ag.title] = ag  # noqa
+
+    parser._action_groups.extend(specified_groups.values())  # noqa
+    parser._action_groups.extend(additional_groups.values())  # noqa
+
+    return {**specified_groups, **additional_groups}
+
+
 def get_validator(function: Callable, **kwargs: Any) -> Callable:
     """Get a function that can be called with the same signature as function.
 
