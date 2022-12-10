@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .argument_parsing import (
     float_arg,
+    get_arg_groups_by_name,
     get_optional_arguments_group,
     get_required_arguments_group,
     get_validator,
@@ -71,6 +72,7 @@ __all__: list[str] = [
     "NotAFileOrDirectoryError",
     "UnsupportedPlatformError",
     "float_arg",
+    "get_arg_groups_by_name",
     "get_optional_arguments_group",
     "get_required_arguments_group",
     "get_temp_directory_path",
