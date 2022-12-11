@@ -154,19 +154,21 @@ def validate_input_directories(
     return validated_paths
 
 
-def validate_input_file(path: Union[str, Path]) -> Path:
+def validate_input_file(path: Union[str, Path], must_exist=True) -> Path:
     """Validate input file path and make it absolute.
 
     Arguments:
         path: Path to input file
+        must_exist: If True, do not raise an error if the file does not exist
     Returns:
         Absolute path to input file
     """
-    path = Path(expandvars(str(path))).resolve()
-    if not path.exists():
+    path = Path(expandvars(str(path))).absolute().resolve()
+    if path.exists():
+        if not path.is_file():
+            raise NotAFileError(f"Input file {path} is not a file")
+    elif must_exist:
         raise FileNotFoundError(f"Input file {path} does not exist")
-    if not path.is_file():
-        raise NotAFileError(f"Input file {path} is not a file")
 
     return path
 
@@ -280,19 +282,19 @@ def validate_ints(
     return validated_values
 
 
-def validate_output_file(path: Union[str, Path], exists_ok=True) -> Path:
+def validate_output_file(path: Union[str, Path], may_exist=True) -> Path:
     """Validate output file path and make it absolute.
 
     Arguments:
         path: Output file path
-        exists_ok: If True, do not raise an error if the file already exists
+        may_exist: If True, do not raise an error if the file already exists
     Returns:
         Absolute path to output file
     """
     path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if path.is_file():
-            if not exists_ok:
+            if not may_exist:
                 raise FileExistsError(f"{path} already exists")
             info(f"{path} already exists and may be overwritten")
             return path
