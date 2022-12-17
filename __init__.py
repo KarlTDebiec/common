@@ -3,6 +3,8 @@
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
+from __future__ import annotations
+
 from pathlib import Path
 
 from .command_line_interface import CommandLineInterface
@@ -23,6 +25,7 @@ from .file import (
     rename_preexisting_output_file_path,
 )
 from .general import run_command, set_logging_verbosity
+from .typing import PathLike
 from .validation import (
     validate_enum,
     validate_executable,
@@ -53,6 +56,7 @@ __all__: list[str] = [
     "IsAFileError",
     "NotAFileError",
     "NotAFileOrDirectoryError",
+    "PathLike",
     "UnsupportedPlatformError",
     "package_root",
     "rename_preexisting_output_file_path",

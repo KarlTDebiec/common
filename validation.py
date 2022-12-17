@@ -3,6 +3,8 @@
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
+from __future__ import annotations
+
 from enum import Enum
 from logging import info
 from os.path import defpath, expandvars
@@ -18,6 +20,7 @@ from .exception import (
     NotAFileError,
     UnsupportedPlatformError,
 )
+from .typing import PathLike
 
 
 def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
@@ -111,7 +114,7 @@ def validate_float(
     return return_value
 
 
-def validate_input_directory(path: Union[str, Path]) -> Path:
+def validate_input_directory(path: PathLike) -> Path:
     """Validate input directory path and make it absolute.
 
     Arguments:
@@ -129,7 +132,7 @@ def validate_input_directory(path: Union[str, Path]) -> Path:
 
 
 def validate_input_directories(
-    paths: Union[str, Path, Iterable[Union[str, Path]]]
+    paths: Union[str, Path, Iterable[PathLike]]
 ) -> list[Path]:
     """Validate input directory paths and make them absolute.
 
@@ -154,7 +157,7 @@ def validate_input_directories(
     return validated_paths
 
 
-def validate_input_file(path: Union[str, Path]) -> Path:
+def validate_input_file(path: PathLike) -> Path:
     """Validate input file path and make it absolute.
 
     Arguments:
@@ -171,9 +174,7 @@ def validate_input_file(path: Union[str, Path]) -> Path:
     return path
 
 
-def validate_input_files(
-    paths: Union[str, Path, Iterable[Union[str, Path]]]
-) -> list[Path]:
+def validate_input_files(paths: Union[str, Path, Iterable[PathLike]]) -> list[Path]:
     """Validate input file paths and make them absolute.
 
     Arguments:
@@ -280,7 +281,7 @@ def validate_ints(
     return validated_values
 
 
-def validate_output_file(path: Union[str, Path], exists_ok=True) -> Path:
+def validate_output_file(path: PathLike, exists_ok=True) -> Path:
     """Validate output file path and make it absolute.
 
     Arguments:
@@ -304,7 +305,7 @@ def validate_output_file(path: Union[str, Path], exists_ok=True) -> Path:
     return path
 
 
-def validate_output_directory(path: Union[str, Path]) -> Path:
+def validate_output_directory(path: PathLike) -> Path:
     """Validate output directory path and make it absolute.
 
     Arguments:
