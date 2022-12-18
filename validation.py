@@ -132,7 +132,7 @@ def validate_input_directory(path: PathLike) -> Path:
 
 
 def validate_input_directories(
-    paths: Union[str, Path, Iterable[PathLike]]
+    paths: Union[PathLike, Iterable[PathLike]]
 ) -> list[Path]:
     """Validate input directory paths and make them absolute.
 
@@ -174,7 +174,7 @@ def validate_input_file(path: PathLike) -> Path:
     return path
 
 
-def validate_input_files(paths: Union[str, Path, Iterable[PathLike]]) -> list[Path]:
+def validate_input_files(paths: Union[PathLike, Iterable[PathLike]]) -> list[Path]:
     """Validate input file paths and make them absolute.
 
     Arguments:
