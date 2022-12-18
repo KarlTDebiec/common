@@ -3,6 +3,8 @@
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
+from __future__ import annotations
+
 from pathlib import Path
 
 from .argument_parsing import (
@@ -40,6 +42,7 @@ from .file import (
 )
 from .general import run_command
 from .logging import set_logging_verbosity
+from .typing import PathLike
 from .validation import (
     validate_enum,
     validate_executable,
@@ -70,6 +73,7 @@ __all__ = [
     "IsAFileError",
     "NotAFileError",
     "NotAFileOrDirectoryError",
+    "PathLike",
     "UnsupportedPlatformError",
     "float_arg",
     "get_arg_groups_by_name",

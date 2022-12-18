@@ -3,6 +3,8 @@
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
+from __future__ import annotations
+
 from enum import Enum
 from logging import info
 from os.path import defpath, expandvars
@@ -11,8 +13,6 @@ from platform import system
 from shutil import which
 from typing import Any, Collection, Iterable, Optional, Type, Union
 
-from pipescaler.common import PathLike
-
 from .exception import (
     ArgumentConflictError,
     DirectoryNotFoundError,
@@ -20,6 +20,7 @@ from .exception import (
     NotAFileError,
     UnsupportedPlatformError,
 )
+from .typing import PathLike
 
 
 def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
