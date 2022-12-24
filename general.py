@@ -53,6 +53,20 @@ def run_command(
         return (exitcode, stdout_str, stderr_str)
 
 
+def run_command_long(command: str) -> tuple[int, Optional[str], Optional[str]]:
+    """Run a provided command.
+
+    Arguments:
+        command: command to run
+    Returns:
+        exitcode, standard output, and standard error
+    """
+    with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
+        stdout, stderr = child.communicate()
+        exitcode = child.wait()
+        return (exitcode, stdout, stderr)
+
+
 def set_logging_verbosity(verbosity: int) -> None:
     """Set the level of verbosity of logging.
 

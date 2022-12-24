@@ -24,7 +24,7 @@ from .file import (
     get_temp_file_path,
     rename_preexisting_output_file_path,
 )
-from .general import run_command, set_logging_verbosity
+from .general import run_command, run_command_long, set_logging_verbosity
 from .typing import PathLike
 from .validation import (
     validate_enum,
@@ -61,6 +61,7 @@ __all__: list[str] = [
     "package_root",
     "rename_preexisting_output_file_path",
     "run_command",
+    "run_command_long",
     "set_logging_verbosity",
     "get_temp_directory_path",
     "get_temp_file_path",
