@@ -14,7 +14,7 @@ def run_command(
     command: str,
     timeout: int = 600,
     acceptable_exitcodes: Optional[Iterable[int]] = None,
-) -> tuple[int, Optional[str], Optional[str]]:
+) -> tuple[int, str, str]:
     """Run a provided command.
 
     Arguments:
@@ -50,10 +50,10 @@ def run_command(
                 f"STDERR:\n"
                 f"{stderr_str}"
             )
-        return (exitcode, stdout_str, stderr_str)
+        return exitcode, stdout_str, stderr_str
 
 
-def run_command_long(command: str) -> tuple[int, Optional[str], Optional[str]]:
+def run_command_long(command: str) -> tuple[int, str, str]:
     """Run a provided command.
 
     Arguments:
@@ -64,7 +64,15 @@ def run_command_long(command: str) -> tuple[int, Optional[str], Optional[str]]:
     with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
         stdout, stderr = child.communicate()
         exitcode = child.wait()
-        return (exitcode, stdout, stderr)
+        try:
+            stdout_str = stdout.decode("utf8")
+        except UnicodeDecodeError:
+            stdout_str = stdout.decode("ISO-8859-1")
+        try:
+            stderr_str = stderr.decode("utf8")
+        except UnicodeDecodeError:
+            stderr_str = stderr.decode("ISO-8859-1")
+        return exitcode, stdout_str, stderr_str
 
 
 def set_logging_verbosity(verbosity: int) -> None:
