@@ -22,7 +22,7 @@ from .exception import (
 from .file import (
     get_temp_directory_path,
     get_temp_file_path,
-    rename_preexisting_output_file_path,
+    rename_preexisting_output_path,
 )
 from .general import run_command, run_command_long, set_logging_verbosity
 from .typing import PathLike
@@ -42,7 +42,7 @@ from .validation import (
     validate_type,
 )
 
-package_root = Path(__file__).resolve().parent.parent
+package_root = Path(__file__).absolute().resolve().parent.parent
 """absolute path of package containing this common submodule (e.g. if this file is
 '/path/to/package/common/__init__.py', value is '/path/to/package"""
 
@@ -59,7 +59,7 @@ __all__: list[str] = [
     "PathLike",
     "UnsupportedPlatformError",
     "package_root",
-    "rename_preexisting_output_file_path",
+    "rename_preexisting_output_path",
     "run_command",
     "run_command_long",
     "set_logging_verbosity",

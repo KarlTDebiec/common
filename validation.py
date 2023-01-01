@@ -122,7 +122,7 @@ def validate_input_directory(path: PathLike) -> Path:
     Returns:
         Absolute path to input directory
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if not path.exists():
         raise DirectoryNotFoundError(f"Input directory {path} does not exist")
     if not path.is_dir():
@@ -165,7 +165,7 @@ def validate_input_file(path: PathLike) -> Path:
     Returns:
         Absolute path to input file
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if not path.exists():
         raise FileNotFoundError(f"Input file {path} does not exist")
     if not path.is_file():
@@ -313,7 +313,7 @@ def validate_output_directory(path: PathLike) -> Path:
     Returns:
         Absolute to of output directory
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if not path.is_dir():
             raise NotADirectoryError(f"{path} already exists and is not a directory")
