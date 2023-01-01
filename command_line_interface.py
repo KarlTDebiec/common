@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-#  Copyright 2017-2022 Karl T Debiec
+#  Copyright 2017-2023 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
-"""General-purpose command line interface base class."""
+"""Abstract base class for command-line interfaces."""
+from __future__ import annotations
+
 import re
 from abc import ABC, abstractmethod
 from argparse import (
@@ -31,7 +33,7 @@ from .validation import (
 
 
 class CommandLineInterface(ABC):
-    """General-purpose command line interface base class."""
+    """Abstract base class for command-line interfaces."""
 
     @classmethod
     def add_arguments_to_argparser(cls, parser: ArgumentParser) -> None:

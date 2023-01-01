@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-#  Copyright 2017-2022 Karl T Debiec
+#  Copyright 2017-2023 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions not tied to a particular project."""
+from __future__ import annotations
+
 import logging
 from subprocess import PIPE, Popen
 from typing import Iterable, Optional
@@ -12,7 +14,7 @@ def run_command(
     command: str,
     timeout: int = 600,
     acceptable_exitcodes: Optional[Iterable[int]] = None,
-) -> tuple[int, Optional[str], Optional[str]]:
+) -> tuple[int, str, str]:
     """Run a provided command.
 
     Arguments:
@@ -48,7 +50,29 @@ def run_command(
                 f"STDERR:\n"
                 f"{stderr_str}"
             )
-        return (exitcode, stdout_str, stderr_str)
+        return exitcode, stdout_str, stderr_str
+
+
+def run_command_long(command: str) -> tuple[int, str, str]:
+    """Run a provided command.
+
+    Arguments:
+        command: command to run
+    Returns:
+        exitcode, standard output, and standard error
+    """
+    with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
+        stdout, stderr = child.communicate()
+        exitcode = child.wait()
+        try:
+            stdout_str = stdout.decode("utf8")
+        except UnicodeDecodeError:
+            stdout_str = stdout.decode("ISO-8859-1")
+        try:
+            stderr_str = stderr.decode("utf8")
+        except UnicodeDecodeError:
+            stderr_str = stderr.decode("ISO-8859-1")
+        return exitcode, stdout_str, stderr_str
 
 
 def set_logging_verbosity(verbosity: int) -> None:

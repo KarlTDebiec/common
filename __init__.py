@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-#  Copyright 2017-2022 Karl T Debiec
+#  Copyright 2017-2023 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
+from __future__ import annotations
+
 from pathlib import Path
 
 from .command_line_interface import CommandLineInterface
@@ -20,9 +22,10 @@ from .exception import (
 from .file import (
     get_temp_directory_path,
     get_temp_file_path,
-    rename_preexisting_output_file_path,
+    rename_preexisting_output_path,
 )
-from .general import run_command, set_logging_verbosity
+from .general import run_command, run_command_long, set_logging_verbosity
+from .typing import PathLike
 from .validation import (
     validate_enum,
     validate_executable,
@@ -39,9 +42,9 @@ from .validation import (
     validate_type,
 )
 
-package_root = Path(__file__).absolute().parent.parent
+package_root = Path(__file__).absolute().resolve().parent.parent
 """absolute path of package containing this common submodule (e.g. if this file is
-'/path/to/test/common/__init__.py', value is '/path/to/test"""
+'/path/to/package/common/__init__.py', value is '/path/to/package"""
 
 __all__: list[str] = [
     "ArgumentConflictError",
@@ -53,10 +56,12 @@ __all__: list[str] = [
     "IsAFileError",
     "NotAFileError",
     "NotAFileOrDirectoryError",
+    "PathLike",
     "UnsupportedPlatformError",
     "package_root",
-    "rename_preexisting_output_file_path",
+    "rename_preexisting_output_path",
     "run_command",
+    "run_command_long",
     "set_logging_verbosity",
     "get_temp_directory_path",
     "get_temp_file_path",
