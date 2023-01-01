@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  Copyright 2017-2022 Karl T Debiec
+#  Copyright 2017-2023 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
@@ -122,7 +122,7 @@ def validate_input_directory(path: PathLike) -> Path:
     Returns:
         Absolute path to input directory
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if not path.exists():
         raise DirectoryNotFoundError(f"Input directory {path} does not exist")
     if not path.is_dir():

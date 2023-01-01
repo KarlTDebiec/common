@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#  Copyright 2017-2022 Karl T Debiec
+#  Copyright 2017-2023 Karl T Debiec
 #  All rights reserved. This software may be modified and distributed under
 #  the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
@@ -38,9 +38,9 @@ from .exception import (
 from .file import (
     get_temp_directory_path,
     get_temp_file_path,
-    rename_preexisting_output_file_path,
+    rename_preexisting_output_path,
 )
-from .general import run_command
+from .general import run_command, run_command_long
 from .logging import set_logging_verbosity
 from .typing import PathLike
 from .validation import (
@@ -59,7 +59,7 @@ from .validation import (
     validate_type,
 )
 
-package_root = Path(__file__).resolve().parent.parent
+package_root = Path(__file__).absolute().resolve().parent.parent
 """absolute path of package containing this common submodule (e.g. if this file is
 '/path/to/package/common/__init__.py', value is '/path/to/package"""
 
@@ -91,8 +91,9 @@ __all__ = [
     "output_directory_arg",
     "output_file_arg",
     "package_root",
-    "rename_preexisting_output_file_path",
+    "rename_preexisting_output_path",
     "run_command",
+    "run_command_long",
     "set_logging_verbosity",
     "str_arg",
     "validate_enum",
