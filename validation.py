@@ -262,7 +262,7 @@ def validate_ints(
         ArgumentConflictError: If min_value is greater than max_value
         ValueError: If value is less than min_value or greater than max_value
     """
-    if min_value is not None and max_value is not None and (min_value >= max_value):
+    if min_value and max_value and (min_value >= max_value):
         raise ArgumentConflictError("min_value must be greater than max_value")
 
     try:
@@ -274,7 +274,7 @@ def validate_ints(
     for value in values:
         validated_values.append(validate_int(value, min_value, max_value, options))
 
-    if length is not None and len(validated_values) != length:
+    if length and len(validated_values) != length:
         raise ValueError(
             f"'{validated_values}' is of length {len(validated_values)}, not "
             f"'{min_value}'"

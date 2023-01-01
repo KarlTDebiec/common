@@ -41,7 +41,7 @@ def get_temp_directory_path() -> Generator[Path, None, None]:
         temp_directory_path = mkdtemp()
         yield Path(temp_directory_path).resolve()
     finally:
-        if temp_directory_path is not None:
+        if temp_directory_path:
             rmtree(temp_directory_path)
 
 
@@ -60,7 +60,7 @@ def get_temp_file_path(suffix: Optional[str] = None) -> Generator[Path, None, No
         remove(temp_file_path)
         yield temp_file_path
     finally:
-        if temp_file_path is not None and temp_file_path.exists():
+        if temp_file_path and temp_file_path.exists():
             try:
                 remove(temp_file_path)
             except PermissionError as error:
