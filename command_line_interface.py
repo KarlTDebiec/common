@@ -95,4 +95,4 @@ class CommandLineInterface(ABC):
     @classmethod
     def name(cls) -> str:
         """Name of this tool used to define it when it is a subparser."""
-        return cls.__name__
+        return cls.__name__.lower()
