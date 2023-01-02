@@ -31,9 +31,8 @@ def get_optional_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
     Returns:
         Optional arguments group
     """
-    return next(
-        ag for ag in parser._action_groups if ag.title == "optional arguments"  # noqa
-    )
+    action_groups = parser._action_groups  # noqa pylint: disable=protected-access
+    return next(ag for ag in action_groups if ag.title == "optional arguments")
 
 
 def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
@@ -51,9 +50,10 @@ def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
         return required  # noqa
 
     # Move "optional arguments" group below "required arguments" group
-    optional = parser._action_groups.pop()  # noqa
+    action_groups = parser._action_groups  # noqa pylint: disable=protected-access
+    optional = action_groups.pop()
     required = parser.add_argument_group("required arguments")
-    parser._action_groups.append(optional)  # noqa
+    action_groups.append(optional)
 
     return required
 
@@ -85,23 +85,25 @@ def get_arg_groups_by_name(
     """
     specified_groups = {}
     for name in names:
-        for i, ag in enumerate(parser._action_groups):  # noqa
+        action_groups = parser._action_groups  # noqa pylint: disable=protected-access
+        for i, ag in enumerate(action_groups):
             if ag.title == name:
-                specified_groups[name] = parser._action_groups.pop(i)  # noqa
+                specified_groups[name] = action_groups.pop(i)
                 break
         else:
             parser.add_argument_group(name)
-            specified_groups[name] = parser._action_groups.pop()  # noqa
+            specified_groups[name] = action_groups.pop()
 
+    action_groups = parser._action_groups  # noqa pylint: disable=protected-access
     additional_groups = {}
-    while len(parser._action_groups) > 0:  # noqa
-        ag = parser._action_groups.pop()  # noqa
-        if ag.title == "optional arguments":  # noqa
+    while len(action_groups) > 0:
+        ag = action_groups.pop()
+        if ag.title == "optional arguments":
             ag.title = optional_arguments_name
-        additional_groups[ag.title] = ag  # noqa
+        additional_groups[ag.title] = ag
 
-    parser._action_groups.extend(specified_groups.values())  # noqa
-    parser._action_groups.extend(additional_groups.values())  # noqa
+    action_groups.extend(specified_groups.values())
+    action_groups.extend(additional_groups.values())
 
     return {**specified_groups, **additional_groups}
 
