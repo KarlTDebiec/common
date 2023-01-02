@@ -83,7 +83,6 @@ class CommandLineInterface(ABC):
         return text[0].lower() + text[1:]
 
     @classmethod
-    @abstractmethod
     def main(cls) -> None:
         """Execute from command line."""
         parser = cls.argparser()
