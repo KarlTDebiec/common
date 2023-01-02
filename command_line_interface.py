@@ -9,7 +9,7 @@ import re
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, _SubParsersAction
 from inspect import cleandoc
-from typing import Optional
+from typing import Any, Optional
 
 from .logging import set_logging_verbosity
 
@@ -79,7 +79,8 @@ class CommandLineInterface(ABC):
     @classmethod
     def help(cls) -> str:
         """Short description of this tool used when it is a subparser."""
-        return re.split(r"\.\s+", str(cls.description()))[0].rstrip(".")
+        text = re.split(r"\.\s+", str(cls.description()))[0].rstrip(".")
+        return text[0].lower() + text[1:]
 
     @classmethod
     @abstractmethod
@@ -90,6 +91,12 @@ class CommandLineInterface(ABC):
         verbosity = kwargs.pop("verbosity", 1)
         set_logging_verbosity(verbosity)
 
+        cls.main_internal(**kwargs)
+
+    @classmethod
+    @abstractmethod
+    def main_internal(cls, **kwargs: Any) -> None:
+        """Execute with provided keyword arguments."""
         raise NotImplementedError()
 
     @classmethod
