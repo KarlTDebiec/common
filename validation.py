@@ -5,13 +5,12 @@
 """General-purpose validation functions not tied to a particular project."""
 from __future__ import annotations
 
-from enum import Enum
 from logging import info
 from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Collection, Iterable, Optional, Type, Union
+from typing import Any, Collection, Iterable, Optional, Union
 
 from .exception import (
     ArgumentConflictError,
@@ -21,33 +20,6 @@ from .exception import (
     UnsupportedPlatformError,
 )
 from .typing import PathLike
-
-
-def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
-    """Validate an enum member, if necessary converted from a string.
-
-    Arguments:
-        value: Member name
-        enum: Enum
-    Returns:
-        validated enum member
-    Raises:
-        TypeError: If enum is not an Enum, or value is not a member of enum
-    """
-    if not isinstance(enum, type(Enum)):
-        raise TypeError(f"'{enum}' is of type '{type(enum)}', not Enum")
-    if isinstance(value, enum):
-        return value
-    value = str(value)
-    if value.startswith(Enum.__name__):
-        value = value[len(Enum.__name__) :].lstrip(".")
-    if hasattr(enum, value):
-        return enum[value]
-
-    raise TypeError(
-        f"{value} is not a member of {enum.__name__}, must be one of "
-        f"{list(enum.__members__.keys())}"
-    )
 
 
 def validate_executable(

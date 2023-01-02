@@ -44,7 +44,6 @@ from .general import run_command, run_command_long
 from .logging import set_logging_verbosity
 from .typing import PathLike
 from .validation import (
-    validate_enum,
     validate_executable,
     validate_float,
     validate_input_directories,
@@ -96,7 +95,6 @@ __all__ = [
     "run_command_long",
     "set_logging_verbosity",
     "str_arg",
-    "validate_enum",
     "validate_executable",
     "validate_float",
     "validate_input_directory",
