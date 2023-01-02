@@ -43,14 +43,11 @@ def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
     Returns:
         Required arguments group
     """
-    if any(
-        (required := ag).title == "required arguments"
-        for ag in parser._action_groups  # noqa
-    ):
-        return required  # noqa
+    action_groups = parser._action_groups  # noqa pylint: disable=protected-access
+    if any((required := ag).title == "required arguments" for ag in action_groups):
+        return required
 
     # Move "optional arguments" group below "required arguments" group
-    action_groups = parser._action_groups  # noqa pylint: disable=protected-access
     optional = action_groups.pop()
     required = parser.add_argument_group("required arguments")
     action_groups.append(optional)
@@ -100,7 +97,8 @@ def get_arg_groups_by_name(
         ag = action_groups.pop()
         if ag.title == "optional arguments":
             ag.title = optional_arguments_name
-        additional_groups[ag.title] = ag
+        if ag.title:
+            additional_groups[ag.title] = ag
 
     action_groups.extend(specified_groups.values())
     action_groups.extend(additional_groups.values())
