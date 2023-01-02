@@ -89,7 +89,7 @@ class CommandLineInterface(ABC):
         kwargs = vars(parser.parse_args())
         verbosity = kwargs.pop("verbosity", 1)
         set_logging_verbosity(verbosity)
-        # cls.main_internal(**kwargs)
+
         raise NotImplementedError()
 
     @classmethod
