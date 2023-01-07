@@ -5,7 +5,6 @@
 """General-purpose functions not tied to a particular project."""
 from __future__ import annotations
 
-import logging
 from subprocess import PIPE, Popen
 from typing import Iterable, Optional
 
@@ -50,7 +49,8 @@ def run_command(
                 f"STDERR:\n"
                 f"{stderr_str}"
             )
-        return exitcode, stdout_str, stderr_str
+
+    return exitcode, stdout_str, stderr_str
 
 
 def run_command_long(command: str) -> tuple[int, str, str]:
@@ -72,21 +72,5 @@ def run_command_long(command: str) -> tuple[int, str, str]:
             stderr_str = stderr.decode("utf8")
         except UnicodeDecodeError:
             stderr_str = stderr.decode("ISO-8859-1")
-        return exitcode, stdout_str, stderr_str
 
-
-def set_logging_verbosity(verbosity: int) -> None:
-    """Set the level of verbosity of logging.
-
-    Arguments:
-        verbosity: level of verbosity
-    """
-    logging.basicConfig()
-    if verbosity <= 0:
-        logging.getLogger().setLevel(level=logging.ERROR)
-    elif verbosity == 1:
-        logging.getLogger().setLevel(level=logging.WARNING)
-    elif verbosity == 2:
-        logging.getLogger().setLevel(level=logging.INFO)
-    elif verbosity >= 3:
-        logging.getLogger().setLevel(level=logging.DEBUG)
+    return exitcode, stdout_str, stderr_str

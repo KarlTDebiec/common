@@ -7,29 +7,11 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from argparse import (
-    ArgumentParser,
-    ArgumentTypeError,
-    RawDescriptionHelpFormatter,
-    _ArgumentGroup,
-    _SubParsersAction,
-)
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, _SubParsersAction
 from inspect import cleandoc
-from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
-from .validation import (
-    validate_float,
-    validate_input_directories,
-    validate_input_directory,
-    validate_input_file,
-    validate_input_files,
-    validate_int,
-    validate_ints,
-    validate_output_directory,
-    validate_output_file,
-    validate_str,
-)
+from .logging import set_logging_verbosity
 
 
 class CommandLineInterface(ABC):
@@ -95,193 +77,28 @@ class CommandLineInterface(ABC):
         return cleandoc(cls.__doc__) if cls.__doc__ else ""
 
     @classmethod
-    def float_arg(cls, **kwargs: Any) -> Callable[[Any], float]:
-        """Validate a float argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_float
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_float, **kwargs)
-
-    @classmethod
-    @abstractmethod
-    def execute(cls, **kwargs: Any) -> None:
-        """Execute with provided keyword arguments.
-
-        Arguments:
-            **kwargs: Command-line arguments
-        """
-        raise NotImplementedError()
-
-    @classmethod
     def help(cls) -> str:
         """Short description of this tool used when it is a subparser."""
-        return re.split(r"\.\s+", str(cls.description()))[0].rstrip(".")
-
-    @classmethod
-    def input_directories_arg(cls, **kwargs: Any) -> Callable[[Any], list[Path]]:
-        """Validate an input directory paths argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_input_directory_paths
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_input_directories, **kwargs)
-
-    @classmethod
-    def input_directory_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
-        """Validate an input directory path argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_input_directory_path
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_input_directory, **kwargs)
-
-    @classmethod
-    def input_file_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
-        """Validate an input file path argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_input_file_path
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_input_file, **kwargs)
-
-    @classmethod
-    def input_files_arg(cls, **kwargs: Any) -> Callable[[Any], list[Path]]:
-        """Validate an input file paths argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_input_file_paths
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_input_files, **kwargs)
-
-    @classmethod
-    def int_arg(cls, **kwargs: Any) -> Callable[[Any], int]:
-        """Validate an int argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_int
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_int, **kwargs)
-
-    @classmethod
-    def ints_arg(cls, **kwargs: Any) -> Callable[[Any], int]:
-        """Validate a tuple of ints argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_ints
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_ints, **kwargs)
+        text = re.split(r"\.\s+", str(cls.description()))[0].rstrip(".")
+        return text[0].lower() + text[1:]
 
     @classmethod
     def main(cls) -> None:
         """Execute from command line."""
         parser = cls.argparser()
         kwargs = vars(parser.parse_args())
-        cls.execute(**kwargs)
+        verbosity = kwargs.pop("verbosity", 1)
+        set_logging_verbosity(verbosity)
+
+        cls.main_internal(**kwargs)
+
+    @classmethod
+    @abstractmethod
+    def main_internal(cls, **kwargs: Any) -> None:
+        """Execute with provided keyword arguments."""
+        raise NotImplementedError()
 
     @classmethod
     def name(cls) -> str:
         """Name of this tool used to define it when it is a subparser."""
-        return cls.__name__
-
-    @classmethod
-    def output_directory_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
-        """Validate an output directory path argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_output_directory_path
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_output_directory, **kwargs)
-
-    @classmethod
-    def output_file_arg(cls, **kwargs: Any) -> Callable[[Any], Path]:
-        """Validate an output file path argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_output_file_path
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_output_file, **kwargs)
-
-    @classmethod
-    def str_arg(cls, **kwargs: Any) -> Callable[[Any], str]:
-        """Validate a string argument.
-
-        Arguments:
-            **kwargs: Keyword arguments to pass to validate_str
-        Returns:
-            Value validator function
-        """
-        return cls.get_validator(validate_str, **kwargs)
-
-    @staticmethod
-    def get_optional_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
-        """Get the 'optional arguments' group from an argparser.
-
-        Arguments:
-            parser: Argparser to get group from
-        Returns:
-            Optional arguments group
-        """
-        return next(
-            ag
-            for ag in parser._action_groups  # noqa
-            if ag.title == "optional arguments"
-        )
-
-    @staticmethod
-    def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
-        """Get or create a 'required arguments' group from an argparser.
-
-        Arguments:
-            parser: Argparser to get group from
-        Returns:
-            Required arguments group
-        """
-        if any(
-            (required := ag).title == "required arguments"
-            for ag in parser._action_groups  # noqa
-        ):
-            return required  # noqa
-
-        # Move "optional arguments" group below "required arguments" group
-        optional = parser._action_groups.pop()  # noqa
-        required = parser.add_argument_group("required arguments")
-        parser._action_groups.append(optional)  # noqa
-
-        return required
-
-    @staticmethod
-    def get_validator(function: Callable, **kwargs: Any) -> Callable:
-        """Get a function that can be called with the same signature as function.
-
-        Arguments:
-            function: Function to be wrapped
-        Returns:
-            Wrapped function
-        """
-
-        def wrapped(value: Any) -> Any:
-            try:
-                return function(value, **kwargs)
-            except TypeError as error:
-                raise ArgumentTypeError from error
-
-        return wrapped
+        return cls.__name__.lower()

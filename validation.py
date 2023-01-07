@@ -5,13 +5,12 @@
 """General-purpose validation functions not tied to a particular project."""
 from __future__ import annotations
 
-from enum import Enum
 from logging import info
 from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Collection, Iterable, Optional, Type, Union
+from typing import Any, Collection, Iterable, Optional, Union
 
 from .exception import (
     ArgumentConflictError,
@@ -21,33 +20,6 @@ from .exception import (
     UnsupportedPlatformError,
 )
 from .typing import PathLike
-
-
-def validate_enum(value: Any, enum: Type[Enum]) -> Enum:
-    """Validate an enum member, if necessary converted from a string.
-
-    Arguments:
-        value: Member name
-        enum: Enum
-    Returns:
-        validated enum member
-    Raises:
-        TypeError: If enum is not an Enum, or value is not a member of enum
-    """
-    if not isinstance(enum, type(Enum)):
-        raise TypeError(f"'{enum}' is of type '{type(enum)}', not Enum")
-    if isinstance(value, enum):
-        return value
-    value = str(value)
-    if value.startswith(Enum.__name__):
-        value = value[len(Enum.__name__) :].lstrip(".")
-    if hasattr(enum, value):
-        return enum[value]
-
-    raise TypeError(
-        f"{value} is not a member of {enum.__name__}, must be one of "
-        f"{list(enum.__members__.keys())}"
-    )
 
 
 def validate_executable(
@@ -157,19 +129,21 @@ def validate_input_directories(
     return validated_paths
 
 
-def validate_input_file(path: PathLike) -> Path:
+def validate_input_file(path: PathLike, must_exist: bool = True) -> Path:
     """Validate input file path and make it absolute.
 
     Arguments:
         path: Path to input file
+        must_exist: If True, do not raise an error if the file does not exist
     Returns:
         Absolute path to input file
     """
     path = Path(expandvars(str(path))).absolute().resolve()
-    if not path.exists():
+    if path.exists():
+        if not path.is_file():
+            raise NotAFileError(f"Input file {path} is not a file")
+    elif must_exist:
         raise FileNotFoundError(f"Input file {path} does not exist")
-    if not path.is_file():
-        raise NotAFileError(f"Input file {path} is not a file")
 
     return path
 
@@ -281,19 +255,19 @@ def validate_ints(
     return validated_values
 
 
-def validate_output_file(path: PathLike, exists_ok=True) -> Path:
+def validate_output_file(path: PathLike, may_exist: bool = True) -> Path:
     """Validate output file path and make it absolute.
 
     Arguments:
         path: Output file path
-        exists_ok: If True, do not raise an error if the file already exists
+        may_exist: If True, do not raise an error if the file already exists
     Returns:
         Absolute path to output file
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if path.is_file():
-            if not exists_ok:
+            if not may_exist:
                 raise FileExistsError(f"{path} already exists")
             info(f"{path} already exists and may be overwritten")
             return path
@@ -311,7 +285,7 @@ def validate_output_directory(path: PathLike) -> Path:
     Arguments:
         path: Output directory path
     Returns:
-        Absolute to of output directory
+        Absolute path to output directory
     """
     path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
