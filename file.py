@@ -12,7 +12,6 @@ from os import remove
 from pathlib import Path
 from shutil import move, rmtree
 from tempfile import NamedTemporaryFile, mkdtemp
-from typing import Optional
 
 
 @contextmanager
@@ -28,7 +27,7 @@ def get_temp_directory_path() -> Generator[Path, None, None]:
 
 
 @contextmanager
-def get_temp_file_path(suffix: Optional[str] = None) -> Generator[Path, None, None]:
+def get_temp_file_path(suffix: str | None = None) -> Generator[Path, None, None]:
     """Provide path to a temporary file and remove it once no longer needed.
 
     Arguments:

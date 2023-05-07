@@ -10,7 +10,7 @@ from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Collection, Iterable, Optional
+from typing import Any, Collection, Iterable
 
 from .exception import (
     ArgumentConflictError,
@@ -23,7 +23,7 @@ from .typing import PathLike
 
 
 def validate_executable(
-    name: str, supported_platforms: Optional[Collection[str]] = None
+    name: str, supported_platforms: Collection[str] | None = None
 ) -> Path:
     """Validates that executable name and returns its absolute path.
 
@@ -54,7 +54,7 @@ def validate_executable(
 
 
 def validate_float(
-    value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
+    value: Any, min_value: float | None = None, max_value: float | None = None
 ) -> float:
     """Validate a float.
 
@@ -172,9 +172,9 @@ def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
 
 def validate_int(
     value: Any,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None,
-    options: Optional[Collection[int]] = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    options: Collection[int] | None = None,
 ) -> int:
     """Validate an int.
 
@@ -213,10 +213,10 @@ def validate_int(
 
 def validate_ints(
     values: Any,
-    length: Optional[int] = None,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None,
-    options: Optional[Collection[int]] = None,
+    length: int | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    options: Collection[int] | None = None,
 ):
     """Validate a collection of int.
 

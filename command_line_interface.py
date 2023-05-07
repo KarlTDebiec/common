@@ -9,7 +9,7 @@ import re
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, _SubParsersAction
 from inspect import cleandoc
-from typing import Any, Optional
+from typing import Any
 
 from .logging import set_logging_verbosity
 
@@ -44,7 +44,7 @@ class CommandLineInterface(ABC):
 
     @classmethod
     def argparser(
-        cls, *, subparsers: Optional[_SubParsersAction] = None
+        cls, *, subparsers: _SubParsersAction | None = None
     ) -> ArgumentParser:
         """Construct argument parser.
 
