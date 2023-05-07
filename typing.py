@@ -6,6 +6,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Union
+from typing import TypeAlias
 
-PathLike = Union[Path, str]
+PathLike: TypeAlias = Path | str

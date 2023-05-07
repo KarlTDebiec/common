@@ -6,13 +6,13 @@
 from __future__ import annotations
 
 from subprocess import PIPE, Popen
-from typing import Iterable, Optional
+from typing import Iterable
 
 
 def run_command(
     command: str,
     timeout: int = 600,
-    acceptable_exitcodes: Optional[Iterable[int]] = None,
+    acceptable_exitcodes: Iterable[int] | None = None,
 ) -> tuple[int, str, str]:
     """Run a provided command.
 

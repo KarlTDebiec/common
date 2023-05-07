@@ -95,7 +95,7 @@ def get_arg_groups_by_name(
     additional_groups = {}
     while len(action_groups) > 0:
         ag = action_groups.pop()
-        if ag.title == "optional arguments":
+        if ag.title in ["options", "optional arguments"]:
             ag.title = optional_arguments_name
         if ag.title:
             additional_groups[ag.title] = ag
