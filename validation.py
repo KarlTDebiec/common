@@ -10,7 +10,7 @@ from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Collection, Iterable, Optional, Union
+from typing import Any, Collection, Iterable, Optional
 
 from .exception import (
     ArgumentConflictError,
@@ -103,9 +103,7 @@ def validate_input_directory(path: PathLike) -> Path:
     return path
 
 
-def validate_input_directories(
-    paths: Union[PathLike, Iterable[PathLike]]
-) -> list[Path]:
+def validate_input_directories(paths: PathLike | Iterable[PathLike]) -> list[Path]:
     """Validate input directory paths and make them absolute.
 
     Arguments:
@@ -148,7 +146,7 @@ def validate_input_file(path: PathLike, must_exist: bool = True) -> Path:
     return path
 
 
-def validate_input_files(paths: Union[PathLike, Iterable[PathLike]]) -> list[Path]:
+def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
     """Validate input file paths and make them absolute.
 
     Arguments:

@@ -6,6 +6,5 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Union
 
-PathLike = Union[Path, str]
+PathLike = Path | str
