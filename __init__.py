@@ -1,4 +1,4 @@
-#  Copyright 2017-2023 Karl T Debiec. All rights reserved. This software may be modified
+#  Copyright 2020-2023 Karl T Debiec. All rights reserved. This software may be modified
 #  and distributed under the terms of the BSD license. See the LICENSE file for details.
 """General-purpose code not tied to a particular project."""
 from __future__ import annotations
@@ -40,6 +40,7 @@ from .file import (
 )
 from .general import run_command, run_command_long
 from .logging import set_logging_verbosity
+from .testing import run_cli_with_args
 from .typing import PathLike
 from .validation import (
     validate_executable,
@@ -89,6 +90,7 @@ __all__ = [
     "output_file_arg",
     "package_root",
     "rename_preexisting_output_path",
+    "run_cli_with_args",
     "run_command",
     "run_command_long",
     "set_logging_verbosity",
