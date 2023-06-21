@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-#  Copyright 2017-2023 Karl T Debiec
-#  All rights reserved. This software may be modified and distributed under
-#  the terms of the BSD license. See the LICENSE file for details.
+#  Copyright 2017-2023 Karl T Debiec. All rights reserved. This software may be modified
+#  and distributed under the terms of the BSD license. See the LICENSE file for details.
 """Typing."""
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Union
+from typing import TypeAlias
 
-PathLike = Union[Path, str]
+PathLike: TypeAlias = Path | str

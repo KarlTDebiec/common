@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-#  Copyright 2017-2023 Karl T Debiec
-#  All rights reserved. This software may be modified and distributed under
-#  the terms of the BSD license. See the LICENSE file for details.
+#  Copyright 2017-2023 Karl T Debiec. All rights reserved. This software may be modified
+#  and distributed under the terms of the BSD license. See the LICENSE file for details.
 """General-purpose functions related to argument parsing."""
 from __future__ import annotations
 
@@ -95,7 +93,7 @@ def get_arg_groups_by_name(
     additional_groups = {}
     while len(action_groups) > 0:
         ag = action_groups.pop()
-        if ag.title == "optional arguments":
+        if ag.title in ["options", "optional arguments"]:
             ag.title = optional_arguments_name
         if ag.title:
             additional_groups[ag.title] = ag

@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-#  Copyright 2017-2023 Karl T Debiec
-#  All rights reserved. This software may be modified and distributed under
-#  the terms of the BSD license. See the LICENSE file for details.
+#  Copyright 2017-2023 Karl T Debiec. All rights reserved. This software may be modified
+#  and distributed under the terms of the BSD license. See the LICENSE file for details.
 """General-purpose validation functions not tied to a particular project."""
 from __future__ import annotations
 
@@ -10,7 +8,7 @@ from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Collection, Iterable, Optional, Union
+from typing import Any, Collection, Iterable
 
 from .exception import (
     ArgumentConflictError,
@@ -23,7 +21,7 @@ from .typing import PathLike
 
 
 def validate_executable(
-    name: str, supported_platforms: Optional[Collection[str]] = None
+    name: str, supported_platforms: Collection[str] | None = None
 ) -> Path:
     """Validates that executable name and returns its absolute path.
 
@@ -54,7 +52,7 @@ def validate_executable(
 
 
 def validate_float(
-    value: Any, min_value: Optional[float] = None, max_value: Optional[float] = None
+    value: Any, min_value: float | None = None, max_value: float | None = None
 ) -> float:
     """Validate a float.
 
@@ -103,9 +101,7 @@ def validate_input_directory(path: PathLike) -> Path:
     return path
 
 
-def validate_input_directories(
-    paths: Union[PathLike, Iterable[PathLike]]
-) -> list[Path]:
+def validate_input_directories(paths: PathLike | Iterable[PathLike]) -> list[Path]:
     """Validate input directory paths and make them absolute.
 
     Arguments:
@@ -148,7 +144,7 @@ def validate_input_file(path: PathLike, must_exist: bool = True) -> Path:
     return path
 
 
-def validate_input_files(paths: Union[PathLike, Iterable[PathLike]]) -> list[Path]:
+def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
     """Validate input file paths and make them absolute.
 
     Arguments:
@@ -174,9 +170,9 @@ def validate_input_files(paths: Union[PathLike, Iterable[PathLike]]) -> list[Pat
 
 def validate_int(
     value: Any,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None,
-    options: Optional[Collection[int]] = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    options: Collection[int] | None = None,
 ) -> int:
     """Validate an int.
 
@@ -215,10 +211,10 @@ def validate_int(
 
 def validate_ints(
     values: Any,
-    length: Optional[int] = None,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None,
-    options: Optional[Collection[int]] = None,
+    length: int | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    options: Collection[int] | None = None,
 ):
     """Validate a collection of int.
 
