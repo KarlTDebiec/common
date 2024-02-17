@@ -3,20 +3,24 @@
 """General-purpose functions related to argument parsing."""
 from __future__ import annotations
 
-from argparse import ArgumentParser, ArgumentTypeError, _ArgumentGroup
+from argparse import (
+    ArgumentParser,
+    ArgumentTypeError,
+    _ArgumentGroup,  # noqa pylint: disable=unused-import
+)
 from pathlib import Path
 from typing import Any, Callable
 
 from .validation import (
     validate_float,
-    validate_input_directories,
-    validate_input_directory,
-    validate_input_file,
-    validate_input_files,
+    validate_input_directory_path,
+    validate_input_directory_paths,
+    validate_input_file_path,
+    validate_input_file_paths,
     validate_int,
     validate_ints,
-    validate_output_directory,
-    validate_output_file,
+    validate_output_directory_path,
+    validate_output_file_path,
     validate_str,
 )
 
@@ -25,9 +29,9 @@ def get_optional_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
     """Get the 'optional arguments' group from an argparser.
 
     Arguments:
-        parser: Argparser to get group from
+        parser: argparser from which to get group
     Returns:
-        Optional arguments group
+        optional arguments group
     """
     action_groups = parser._action_groups  # noqa pylint: disable=protected-access
     return next(ag for ag in action_groups if ag.title == "optional arguments")
@@ -37,9 +41,9 @@ def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
     """Get or create a 'required arguments' group from an argparser.
 
     Arguments:
-        parser: Argparser to get group from
+        parser: argparser from which to get group
     Returns:
-        Required arguments group
+        required arguments group
     """
     action_groups = parser._action_groups  # noqa pylint: disable=protected-access
     if any((required := ag).title == "required arguments" for ag in action_groups):
@@ -72,11 +76,11 @@ def get_arg_groups_by_name(
     optional_arguments_name.
 
     Arguments:
-        parser: Argparser to get groups from
-        *names: Names of groups to get or create
-        optional_arguments_name: Name of optional arguments group
+        parser: argparser for which to get arg groups
+        *names: names of groups to get or create
+        optional_arguments_name: name of optional arguments group
     Returns:
-        Dictionary of names to argument groups
+        dict of names to argument groups
     """
     specified_groups = {}
     for name in names:
@@ -105,12 +109,12 @@ def get_arg_groups_by_name(
 
 
 def get_validator(function: Callable, **kwargs: Any) -> Callable:
-    """Get a function that can be called with the same signature as function.
+    """Wrap a function to catch and re-raise TypeErrors as ArgumentTypeErrors.
 
     Arguments:
-        function: Function to be wrapped
+        function: function to wrap
     Returns:
-        Wrapped function
+        wrapped function
     """
 
     def wrapped(value: Any) -> Any:
@@ -126,64 +130,64 @@ def float_arg(**kwargs: Any) -> Callable[[Any], float]:
     """Validate a float argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_float
+        **kwargs: keyword arguments to pass to validate_float
     Returns:
-        Value validator function
+        value validator function
     """
     return get_validator(validate_float, **kwargs)
 
 
-def input_directories_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
+def input_directory_paths_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
     """Validate an input directory paths argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_directory_paths
+        **kwargs: keyword arguments to pass to validate_input_directory_paths
     Returns:
-        Value validator function
+        value validator function
     """
-    return get_validator(validate_input_directories, **kwargs)
+    return get_validator(validate_input_directory_paths, **kwargs)
 
 
-def input_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
+def input_directory_path_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input directory path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_directory_path
+        **kwargs: keyword arguments to pass to validate_input_directory_path
     Returns:
-        Value validator function
+        value validator function
     """
-    return get_validator(validate_input_directory, **kwargs)
+    return get_validator(validate_input_directory_path, **kwargs)
 
 
-def input_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
+def input_file_path_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input file path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_file_path
+        **kwargs: keyword arguments to pass to validate_input_file_path
     Returns:
-        Value validator function
+        value validator function
     """
-    return get_validator(validate_input_file, **kwargs)
+    return get_validator(validate_input_file_path, **kwargs)
 
 
-def input_files_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
+def input_file_paths_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
     """Validate an input file paths argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_file_paths
+        **kwargs: keyword arguments to pass to validate_input_file_paths
     Returns:
-        Value validator function
+        value validator function
     """
-    return get_validator(validate_input_files, **kwargs)
+    return get_validator(validate_input_file_paths, **kwargs)
 
 
 def int_arg(**kwargs: Any) -> Callable[[Any], int]:
     """Validate an int argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_int
+        **kwargs: keyword arguments to pass to validate_int
     Returns:
-        Value validator function
+        value validator function
     """
     return get_validator(validate_int, **kwargs)
 
@@ -192,41 +196,41 @@ def ints_arg(**kwargs: Any) -> Callable[[Any], int]:
     """Validate a tuple of ints argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_ints
+        **kwargs: keyword arguments to pass to validate_ints
     Returns:
-        Value validator function
+        value validator function
     """
     return get_validator(validate_ints, **kwargs)
 
 
-def output_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
+def output_directory_path_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output directory path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_output_directory_path
+        **kwargs: keyword arguments to pass to validate_output_directory_path
     Returns:
-        Value validator function
+        value validator function
     """
-    return get_validator(validate_output_directory, **kwargs)
+    return get_validator(validate_output_directory_path, **kwargs)
 
 
-def output_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
+def output_file_path_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output file path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_output_file_path
+        **kwargs: keyword arguments to pass to validate_output_file_path
     Returns:
-        Value validator function
+        value validator function
     """
-    return get_validator(validate_output_file, **kwargs)
+    return get_validator(validate_output_file_path, **kwargs)
 
 
 def str_arg(**kwargs: Any) -> Callable[[Any], str]:
     """Validate a string argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_str
+        **kwargs: keyword arguments to pass to validate_str
     Returns:
-        Value validator function
+        value validator function
     """
     return get_validator(validate_str, **kwargs)
