@@ -3,7 +3,11 @@
 """General-purpose functions related to argument parsing."""
 from __future__ import annotations
 
-from argparse import ArgumentParser, ArgumentTypeError, _ArgumentGroup
+from argparse import (
+    ArgumentParser,
+    ArgumentTypeError,
+    _ArgumentGroup,  # noqa pylint
+)
 from pathlib import Path
 from typing import Any, Callable
 
@@ -114,6 +118,15 @@ def get_validator(function: Callable, **kwargs: Any) -> Callable:
     """
 
     def wrapped(value: Any) -> Any:
+        """Wrapped function.
+
+        Arguments:
+            value: Value to be validated
+        Returns:
+            Validated value
+        Raises:
+            ArgumentTypeError: If TypeError is raised by wrapped function
+        """
         try:
             return function(value, **kwargs)
         except TypeError as error:

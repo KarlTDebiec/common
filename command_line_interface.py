@@ -5,7 +5,11 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from argparse import ArgumentParser, RawDescriptionHelpFormatter, _SubParsersAction
+from argparse import (
+    ArgumentParser,
+    RawDescriptionHelpFormatter,
+    _SubParsersAction,  # noqa pylint
+)
 from inspect import cleandoc
 from typing import Any
 
