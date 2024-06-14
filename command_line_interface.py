@@ -5,7 +5,11 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from argparse import ArgumentParser, RawDescriptionHelpFormatter, _SubParsersAction
+from argparse import (
+    ArgumentParser,
+    RawDescriptionHelpFormatter,
+    _SubParsersAction,  # noqa pylint
+)
 from datetime import datetime
 from inspect import cleandoc
 from logging import FileHandler, basicConfig, getLogger, info
@@ -16,7 +20,7 @@ from typing import Any
 from .logging import set_logging_verbosity
 
 
-class Cli(ABC):
+class CommandLineInterface(ABC):
     """Abstract base class for command-line interfaces."""
 
     @classmethod
