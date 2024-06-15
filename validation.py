@@ -84,94 +84,86 @@ def validate_float(
     return return_value
 
 
-def validate_input_directory_path(path: PathLike, strict: bool = True) -> Path:
-    """Resolve and validate input directory path.
+def validate_input_directory(path: PathLike) -> Path:
+    """Validate input directory path and make it absolute.
 
     Arguments:
-        path: path to directory of input files
-        strict: raise error if directory does not exist
+        path: Path to directory of input files
     Returns:
-        resolved input directory path, with environment variables expanded
-    Raises:
-        DirectoryNotFoundError: input directory does not exist
-        NotADirectoryError: input directory exists but is not a directory
+        Absolute path to input directory
     """
-    path = Path(expandvars(str(path))).resolve()
-
-    if path.exists():
-        if not path.is_dir():
-            raise NotADirectoryError(f"Input directory {path} is not a directory")
-    elif strict:
+    path = Path(expandvars(str(path))).absolute().resolve()
+    if not path.exists():
         raise DirectoryNotFoundError(f"Input directory {path} does not exist")
+    if not path.is_dir():
+        raise NotADirectoryError(f"Input directory {path} is not a directory")
 
     return path
 
 
-def validate_input_directory_paths(
-    paths: PathLike | Iterable[PathLike], strict: bool = True
-) -> list[Path]:
-    """Resolve and validate input directory paths.
+def validate_input_directories(paths: PathLike | Iterable[PathLike]) -> list[Path]:
+    """Validate input directory paths and make them absolute.
 
     Arguments:
-        paths: path to directory or directories of input files
-        strict: raise error if any directory does not exist
+        paths: Path to directory or directories of input files
     Returns:
-        resolved input directory paths, with environment variables expanded
-    Raises:
-        DirectoryNotFoundError: an input directory does not exist
-        NotADirectoryError: an input directory exists but is not a directory
+        List of absolute directory paths
     """
     if isinstance(paths, (str, Path)):
         paths = [paths]
-
-    validated_paths = [
-        validate_input_directory_path(path, strict=strict) for path in paths
-    ]
+    validated_paths = []
+    for path in paths:
+        try:
+            path = validate_input_directory(path)
+        except (DirectoryNotFoundError, NotADirectoryError) as error:
+            info(str(error))
+            continue
+        validated_paths.append(path)
+    if len(validated_paths) == 0:
+        raise DirectoryNotFoundError(f"No directories provided in {paths} exist")
 
     return validated_paths
 
 
-def validate_input_file_path(path: PathLike, strict: bool = True) -> Path:
-    """Resolve and validate input file path.
+def validate_input_file(path: PathLike, must_exist: bool = True) -> Path:
+    """Validate input file path and make it absolute.
 
     Arguments:
-        path: path to input file
-        strict: raise error if file does not exist
+        path: Path to input file
+        must_exist: If True, do not raise an error if the file does not exist
     Returns:
-        resolved input file path, with environment variables expanded
-    Raises:
-        FileNotFoundError: input file does not exist
-        NotAFileError: input file exists but is not a file
+        Absolute path to input file
     """
-    path = Path(expandvars(str(path))).resolve()
-
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if not path.is_file():
             raise NotAFileError(f"Input file {path} is not a file")
-    elif strict:
+    elif must_exist:
         raise FileNotFoundError(f"Input file {path} does not exist")
 
     return path
 
 
-def validate_input_file_paths(
-    paths: PathLike | Iterable[PathLike], strict: bool = True
-) -> list[Path]:
-    """Resolve and validate input file paths.
+def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
+    """Validate input file paths and make them absolute.
 
     Arguments:
-        paths: paths to input file or files
-        strict: raise error if any file does not exist
+        paths: Paths to input file or files
     Returns:
-        resolved input file paths, with environment variables expanded
-    Raises:
-        FileNotFoundError: an input file does not exist
-        NotAFileError: an input file exists but is not a file
+        List of absolute file paths
     """
     if isinstance(paths, (str, Path)):
         paths = [paths]
-
-    validated_paths = [validate_input_file_path(path, strict=strict) for path in paths]
+    validated_paths = []
+    for path in paths:
+        try:
+            path = validate_input_file(path)
+        except (FileNotFoundError, NotAFileError) as error:
+            info(str(error))
+            continue
+        validated_paths.append(path)
+    if len(validated_paths) == 0:
+        raise FileNotFoundError(f"No files provided in {paths} exist")
 
     return validated_paths
 
@@ -259,58 +251,42 @@ def validate_ints(
     return validated_values
 
 
-def validate_output_file_path(
-    path: PathLike, strict: bool = True, parents: bool = True
-) -> Path:
+def validate_output_file(path: PathLike, may_exist: bool = True) -> Path:
     """Validate output file path and make it absolute.
 
     Arguments:
-        path: output file path
-        strict: raise error if file already exists
-        parents: create parent directories if they do not exist
+        path: Output file path
+        may_exist: If True, do not raise an error if the file already exists
     Returns:
-        resolved path to output file, with environment variables expanded
-    Raises:
-        DirectoryNotFoundError: parent directory does not exist
-        FileExistsError: output file already exists
-        NotAFileError: output file already exists but is not a file
+        Absolute path to output file
     """
-    path = Path(expandvars(str(path))).resolve()
-
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
-        if strict:
-            raise FileExistsError(f"Output file {path} already exists")
-        if not path.is_file():
-            raise NotAFileError(f"Output file {path} already exists but is not a file")
+        if path.is_file():
+            if not may_exist:
+                raise FileExistsError(f"{path} already exists")
+            info(f"{path} already exists and may be overwritten")
+            return path
+        raise NotAFileError(f"{path} already exists and is not a file")
     if not path.parent.exists():
-        if not parents:
-            raise DirectoryNotFoundError(
-                f"Output file {path} parent {path.parent} does not exist"
-            )
         path.parent.mkdir(parents=True)
         info(f"Created directory {path.parent}")
 
     return path
 
 
-def validate_output_directory_path(
-    path: PathLike,
-) -> Path:
+def validate_output_directory(path: PathLike) -> Path:
     """Validate output directory path and make it absolute.
 
     Arguments:
-        path: output directory path
+        path: Output directory path
     Returns:
-        Absolute path to output directory, with environment variables expanded
-    Raises:
-        NotADirectoryError: output directory already exists but is not a directory
+        Absolute path to output directory
     """
-    path = Path(expandvars(str(path))).resolve()
+    path = Path(expandvars(str(path))).absolute().resolve()
     if path.exists():
         if not path.is_dir():
-            raise NotADirectoryError(
-                f"Output directory {path} already exists but is not a directory"
-            )
+            raise NotADirectoryError(f"{path} already exists and is not a directory")
     else:
         path.mkdir(parents=True)
         info(f"Created directory {path}")
