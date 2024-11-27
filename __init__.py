@@ -19,8 +19,10 @@ from .exception import (
 )
 
 package_root = Path(__file__).absolute().resolve().parent.parent
-"""absolute path of package containing this common submodule (e.g. if this file is
-'/path/to/package/common/__init__.py', value is '/path/to/package"""
+"""absolute path of package containing this common submodule.
+
+If this file is '/path/to/package/common/__init__.py', value is '/path/to/package.
+"""
 
 __all__ = [
     "ArgumentConflictError",
