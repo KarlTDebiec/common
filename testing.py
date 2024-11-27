@@ -8,7 +8,7 @@ from inspect import getfile
 from typing import Type
 from unittest.mock import patch
 
-from .command_line_interface import CommandLineInterface
+from scinoephile.common import CommandLineInterface
 
 
 def run_cli_with_args(cli: Type[CommandLineInterface], args: str = "") -> None:

@@ -10,7 +10,11 @@ from argparse import (
     RawDescriptionHelpFormatter,
     _SubParsersAction,  # noqa pylint
 )
+from datetime import datetime
 from inspect import cleandoc
+from logging import FileHandler, basicConfig, getLogger, info
+from pathlib import Path
+from sys import argv
 from typing import Any
 
 from .logging import set_logging_verbosity
@@ -42,6 +46,17 @@ class CommandLineInterface(ABC):
             const=0,
             dest="verbosity",
             help="disable verbose output",
+        )
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        parser.add_argument(
+            "-l",
+            "--log-file",
+            nargs="?",
+            const=f"{cls.name()}.{timestamp}.log",
+            required=False,
+            type=str,
+            help="log to file (default: 'YYYY-MM-DD_hh-mm-ss.log')",
         )
 
     @classmethod
@@ -89,8 +104,21 @@ class CommandLineInterface(ABC):
         """Execute from command line."""
         parser = cls.argparser()
         kwargs = vars(parser.parse_args())
+
+        # Stdout logging
+        logger = getLogger()
+        logger.handlers.clear()
+        basicConfig()
         verbosity = kwargs.pop("verbosity", 1)
         set_logging_verbosity(verbosity)
+
+        # File logging
+        log_file = kwargs.pop("log_file")
+        if log_file:
+            log_file_path = Path(log_file).resolve()
+            file_logger = FileHandler(log_file_path)
+            logger.addHandler(file_logger)
+            info(f"Logging to {log_file_path} at level {logger.level}")
 
         cls.main_internal(**kwargs)
 
@@ -103,4 +131,14 @@ class CommandLineInterface(ABC):
     @classmethod
     def name(cls) -> str:
         """Name of this tool used to define it when it is a subparser."""
-        return cls.__name__.lower()
+        name = cls.__name__
+        if name.endswith("Cli"):
+            name = name[:-3]
+        return name.lower()
+
+    @staticmethod
+    def log_command_line() -> None:
+        """Log the command line with which the script was run."""
+        args = argv[:]
+        command_line = " ".join(args)
+        info(f"Run with command line: {command_line}")
