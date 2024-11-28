@@ -120,13 +120,7 @@ class CommandLineInterface(ABC):
             logger.addHandler(file_logger)
             info(f"Logging to {log_file_path} at level {logger.level}")
 
-        cls.main_internal(**kwargs)
-
-    @classmethod
-    @abstractmethod
-    def main_internal(cls, **kwargs: Any) -> None:
-        """Execute with provided keyword arguments."""
-        raise NotImplementedError()
+        cls._main(**kwargs)
 
     @classmethod
     def name(cls) -> str:
@@ -142,3 +136,9 @@ class CommandLineInterface(ABC):
         args = argv[:]
         command_line = " ".join(args)
         info(f"Run with command line: {command_line}")
+
+    @classmethod
+    @abstractmethod
+    def _main(cls, **kwargs: Any) -> None:
+        """Execute with provided keyword arguments."""
+        raise NotImplementedError()
