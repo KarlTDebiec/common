@@ -3,6 +3,7 @@
 """General-purpose functions not tied to a particular project."""
 from __future__ import annotations
 
+import threading
 from typing import Iterable
 
 
@@ -76,28 +77,35 @@ def run_command_live(
     stdout_lines = []
     stderr_lines = []
 
+    def read_stream(stream, lines):
+        for line in iter(stream.readline, ""):
+            print(line, end="")
+            lines.append(line)
+        stream.close()
+
     with Popen(
         command,
         shell=True,
         stdout=PIPE,
         stderr=PIPE,
         text=True,
-        bufsize=1,
+        bufsize=0,
         encoding="utf-8",
     ) as child:
-        try:
-            for line in child.stdout:
-                print(line, end="")
-                stdout_lines.append(line)
+        stdout_thread = threading.Thread(
+            target=read_stream, args=(child.stdout, stdout_lines)
+        )
+        stderr_thread = threading.Thread(
+            target=read_stream, args=(child.stderr, stderr_lines)
+        )
 
-            for line in child.stderr:
-                print(line, end="")
-                stderr_lines.append(line)
+        stdout_thread.start()
+        stderr_thread.start()
 
-            exitcode = child.wait(timeout)
-        except Exception as e:
-            child.kill()
-            raise RuntimeError(f"Command execution failed: {e}")
+        stdout_thread.join(timeout)
+        stderr_thread.join(timeout)
+
+        exitcode = child.wait(timeout)
 
         stdout_str = "".join(stdout_lines)
         stderr_str = "".join(stderr_lines)
