@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import threading
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def run_command(
@@ -51,15 +51,14 @@ def run_command(
     return exitcode, stdout_str, stderr_str
 
 
-from subprocess import Popen, PIPE
-from typing import Iterable, Tuple
+from subprocess import PIPE, Popen
 
 
 def run_command_live(
     command: str,
     timeout: int | None = 600,
     acceptable_exitcodes: Iterable[int] | None = None,
-) -> Tuple[int, str, str]:
+) -> tuple[int, str, str]:
     """Run a provided command and stream output live.
 
     Arguments:

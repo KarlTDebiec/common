@@ -8,8 +8,9 @@ from argparse import (
     ArgumentTypeError,
     _ArgumentGroup,  # noqa pylint
 )
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from .validation import (
     validate_float,

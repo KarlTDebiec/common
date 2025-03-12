@@ -3,12 +3,13 @@
 """General-purpose validation functions not tied to a particular project."""
 from __future__ import annotations
 
+from collections.abc import Collection, Iterable
 from logging import info
 from os.path import defpath, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any, Collection, Iterable
+from typing import Any
 
 from .exception import (
     ArgumentConflictError,
