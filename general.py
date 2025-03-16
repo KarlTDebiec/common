@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Iterable
+from subprocess import PIPE, Popen
 
 
 def run_command(
@@ -49,9 +50,6 @@ def run_command(
             )
 
     return exitcode, stdout_str, stderr_str
-
-
-from subprocess import PIPE, Popen
 
 
 def run_command_live(

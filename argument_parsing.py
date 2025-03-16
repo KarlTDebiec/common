@@ -114,6 +114,7 @@ def get_validator(function: Callable, **kwargs: Any) -> Callable:
 
     Arguments:
         function: Function to be wrapped
+        **kwargs: Keyword arguments to pass to wrapped function
     Returns:
         Wrapped function
     """

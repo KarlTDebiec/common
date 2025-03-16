@@ -110,7 +110,7 @@ def validate_input_directories(paths: PathLike | Iterable[PathLike]) -> list[Pat
     Returns:
         List of absolute directory paths
     """
-    if isinstance(paths, (str, Path)):
+    if isinstance(paths, (str | Path)):
         paths = [paths]
     validated_paths = []
     for path in paths:
@@ -153,7 +153,7 @@ def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
     Returns:
         List of absolute file paths
     """
-    if isinstance(paths, (str, Path)):
+    if isinstance(paths, (str | Path)):
         paths = [paths]
     validated_paths = []
     for path in paths:
