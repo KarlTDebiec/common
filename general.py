@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Iterable
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, TimeoutExpired
 
 
 def run_command(
@@ -28,16 +28,24 @@ def run_command(
         acceptable_exitcodes = [0]
 
     with Popen(command, shell=True, stdout=PIPE, stderr=PIPE) as child:
-        exitcode = child.wait(timeout)
-        stdout, stderr = child.communicate()
         try:
-            stdout_str = stdout.decode("utf8")
+            stdout, stderr = child.communicate(timeout=timeout)
+        except TimeoutExpired:
+            child.kill()
+            stdout, stderr = child.communicate()
+
+        try:
+            stdout_str = stdout.decode("utf-8")
         except UnicodeDecodeError:
             stdout_str = stdout.decode("ISO-8859-1")
+
         try:
-            stderr_str = stderr.decode("utf8")
+            stderr_str = stderr.decode("utf-8")
         except UnicodeDecodeError:
             stderr_str = stderr.decode("ISO-8859-1")
+
+        exitcode = child.returncode
+
         if exitcode not in acceptable_exitcodes:
             raise ValueError(
                 f"subprocess for command:\n"
