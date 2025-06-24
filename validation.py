@@ -115,11 +115,11 @@ def validate_input_directories(paths: PathLike | Iterable[PathLike]) -> list[Pat
     validated_paths = []
     for path in paths:
         try:
-            path = validate_input_directory(path)
+            validated_path = validate_input_directory(path)
         except (DirectoryNotFoundError, NotADirectoryError) as error:
             info(str(error))
             continue
-        validated_paths.append(path)
+        validated_paths.append(validated_path)
     if len(validated_paths) == 0:
         raise DirectoryNotFoundError(f"No directories provided in {paths} exist")
 
@@ -158,11 +158,11 @@ def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
     validated_paths = []
     for path in paths:
         try:
-            path = validate_input_file(path)
+            validated_path = validate_input_file(path)
         except (FileNotFoundError, NotAFileError) as error:
             info(str(error))
             continue
-        validated_paths.append(path)
+        validated_paths.append(validated_path)
     if len(validated_paths) == 0:
         raise FileNotFoundError(f"No files provided in {paths} exist")
 
@@ -239,9 +239,9 @@ def validate_ints(
     except TypeError:
         values = [values]
 
-    validated_values = []
-    for value in values:
-        validated_values.append(validate_int(value, min_value, max_value, options))
+    validated_values = [
+        validate_int(value, min_value, max_value, options) for value in values
+    ]
 
     if length and len(validated_values) != length:
         raise ValueError(
@@ -311,12 +311,12 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
     case_insensitive_options = {}
     for option in options:
         try:
-            option = str(option)
+            validated_option = str(option)
         except ValueError:
             raise ArgumentConflictError(
                 f"Option '{option}' is of type '{type(option)}', not str"
             ) from None
-        case_insensitive_options[option.lower()] = option
+        case_insensitive_options[validated_option.lower()] = validated_option
 
     try:
         value = str(value)
