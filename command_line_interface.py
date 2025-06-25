@@ -17,7 +17,7 @@ from pathlib import Path
 from sys import argv
 from typing import Any
 
-from .logging import set_logging_verbosity
+from .logs import set_logging_verbosity
 
 
 class CommandLineInterface(ABC):
