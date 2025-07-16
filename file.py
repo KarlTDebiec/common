@@ -15,7 +15,11 @@ from tempfile import NamedTemporaryFile, mkdtemp
 
 @contextmanager
 def get_temp_directory_path() -> Generator[Path]:
-    """Provide path to a temporary directory and remove it once no longer needed."""
+    """Provide path to a temporary directory and remove it once no longer needed.
+
+    Returns:
+        Path to temporary directory
+    """
     temp_directory_path = None
     try:
         temp_directory_path = Path(mkdtemp()).resolve()
@@ -31,6 +35,8 @@ def get_temp_file_path(suffix: str | None = None) -> Generator[Path]:
 
     Arguments:
         suffix: Suffix of named temporary file
+    Returns:
+        Path to temporary file
     """
     temp_file_path = None
     try:
