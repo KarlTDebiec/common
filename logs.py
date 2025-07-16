@@ -22,3 +22,8 @@ def set_logging_verbosity(verbosity: int) -> None:
         getLogger().setLevel(level=INFO)
     elif verbosity >= 3:
         getLogger().setLevel(level=DEBUG)
+
+
+__all__ = [
+    "set_logging_verbosity",
+]
