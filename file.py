@@ -66,3 +66,10 @@ def rename_preexisting_output_path(output_path: Path) -> None:
                 move(output_path, backup_path)
                 break
             backup_i += 1
+
+
+__all__ = [
+    "get_temp_directory_path",
+    "get_temp_file_path",
+    "rename_preexisting_output_path",
+]
