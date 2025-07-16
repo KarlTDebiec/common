@@ -132,7 +132,7 @@ def validate_input_file(path: PathLike, must_exist: bool = True) -> Path:
 
     Arguments:
         path: Path to input file
-        must_exist: If True, do not raise an error if the file does not exist
+        must_exist: Whether to raise an error if the file does not exist
     Returns:
         Absolute path to input file
     """
