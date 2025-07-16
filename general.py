@@ -128,3 +128,9 @@ def run_command_live(
             )
 
     return exitcode, stdout_str, stderr_str
+
+
+__all__ = [
+    "run_command",
+    "run_command_live",
+]
