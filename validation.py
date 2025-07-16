@@ -247,7 +247,7 @@ def validate_ints(
     if length and len(validated_values) != length:
         raise ValueError(
             f"'{validated_values}' is of length {len(validated_values)}, not "
-            f"'{min_value}'"
+            f"'{length}'"
         )
 
     return validated_values
