@@ -20,9 +20,10 @@ from .exception import (
 )
 
 package_root = Path(__file__).absolute().resolve().parent.parent
-"""absolute path of package containing this common submodule.
+"""Absolute path of the package containing this submodule.
 
-If this file is '/path/to/package/common/__init__.py', value is '/path/to/package.
+If this file is '/path/to/package/common/__init__.py', the value is
+'/path/to/package'.
 """
 
 __all__ = [
