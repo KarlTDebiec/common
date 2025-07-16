@@ -153,7 +153,7 @@ def input_directories_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
     """Validate an input directory paths argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_directory_paths
+        **kwargs: Keyword arguments to pass to validate_input_directories
     Returns:
         Value validator function
     """
@@ -164,7 +164,7 @@ def input_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input directory path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_directory_path
+        **kwargs: Keyword arguments to pass to validate_input_directory
     Returns:
         Value validator function
     """
@@ -175,7 +175,7 @@ def input_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input file path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_file_path
+        **kwargs: Keyword arguments to pass to validate_input_file
     Returns:
         Value validator function
     """
@@ -186,7 +186,7 @@ def input_files_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
     """Validate an input file paths argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_file_paths
+        **kwargs: Keyword arguments to pass to validate_input_files
     Returns:
         Value validator function
     """
@@ -219,7 +219,7 @@ def output_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output directory path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_output_directory_path
+        **kwargs: Keyword arguments to pass to validate_output_directory
     Returns:
         Value validator function
     """
@@ -230,7 +230,7 @@ def output_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output file path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_output_file_path
+        **kwargs: Keyword arguments to pass to validate_output_file
     Returns:
         Value validator function
     """
