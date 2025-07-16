@@ -75,7 +75,7 @@ def validate_float(
         return_value = float(value)
     except ValueError as error:
         raise TypeError(
-            f"{value} is of type {type(value)}, cannot be cast to int"
+            f"{value} is of type {type(value)}, cannot be cast to float"
         ) from error
 
     if min_value and return_value < min_value:
@@ -198,7 +198,7 @@ def validate_int(
         return_value = int(value)
     except ValueError as error:
         raise TypeError(
-            f"{value} is of type {type(value)}, cannot be cast to float"
+            f"{value} is of type {type(value)}, cannot be cast to int"
         ) from error
 
     if min_value and return_value < min_value:
