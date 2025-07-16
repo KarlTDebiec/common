@@ -217,7 +217,7 @@ def validate_ints(
     min_value: int | None = None,
     max_value: int | None = None,
     options: Collection[int] | None = None,
-):
+) -> list[int]:
     """Validate a collection of int.
 
     Arguments:
