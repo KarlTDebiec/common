@@ -110,7 +110,7 @@ def get_arg_groups_by_name(
     return {**specified_groups, **additional_groups}
 
 
-def get_validator(function: Callable, **kwargs: Any) -> Callable:
+def get_validator[T](function: Callable[..., T], **kwargs: Any) -> Callable[[Any], T]:
     """Get a function that can be called with the same signature as function.
 
     Arguments:
@@ -120,7 +120,7 @@ def get_validator(function: Callable, **kwargs: Any) -> Callable:
         Wrapped function
     """
 
-    def wrapped(value: Any) -> Any:
+    def wrapped(value: Any) -> T:
         """Wrapped function.
 
         Arguments:
@@ -204,7 +204,7 @@ def int_arg(**kwargs: Any) -> Callable[[Any], int]:
     return get_validator(validate_int, **kwargs)
 
 
-def ints_arg(**kwargs: Any) -> Callable[[Any], int]:
+def ints_arg(**kwargs: Any) -> Callable[[Any], list[int]]:
     """Validate a tuple of ints argument.
 
     Arguments:

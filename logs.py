@@ -14,14 +14,15 @@ def set_logging_verbosity(verbosity: int) -> None:
         verbosity: level of verbosity
     """
     basicConfig()
-    if verbosity <= 0:
-        getLogger().setLevel(level=ERROR)
-    elif verbosity == 1:
-        getLogger().setLevel(level=WARNING)
-    elif verbosity == 2:
-        getLogger().setLevel(level=INFO)
-    elif verbosity >= 3:
-        getLogger().setLevel(level=DEBUG)
+    match verbosity:
+        case 0:
+            getLogger().setLevel(level=ERROR)
+        case 1:
+            getLogger().setLevel(level=WARNING)
+        case 2:
+            getLogger().setLevel(level=INFO)
+        case _:
+            getLogger().setLevel(level=DEBUG)
 
 
 __all__ = [
