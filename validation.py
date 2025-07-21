@@ -116,7 +116,7 @@ def val_float(
 
     # Handle iterables
     validated_values = [_val_float(value_to_validate) for value_to_validate in value]
-    if n_values and len(validated_values) != n_values:
+    if n_values is not None and len(validated_values) != n_values:
         raise ValueError(
             f"'{validated_values}' is of length {len(validated_values)}, "
             f"not '{n_values}'"
@@ -299,7 +299,7 @@ def val_int(
             raise ValueError(
                 f"{validated_value} is greater than maximum value of {max_value}"
             )
-        if acceptable_values and validated_value not in acceptable_values:
+        if acceptable_values is not None and validated_value not in acceptable_values:
             raise ValueError(f"{validated_value} is not one of {acceptable_values}")
         return validated_value
 
@@ -309,7 +309,7 @@ def val_int(
 
     # Handle iterables
     validated_values = [_val_int(value_to_validate) for value_to_validate in value]
-    if n_values and len(validated_values) != n_values:
+    if n_values is not None and len(validated_values) != n_values:
         raise ValueError(
             f"'{validated_values}' is of length {len(validated_values)}, "
             f"not '{n_values}'"
