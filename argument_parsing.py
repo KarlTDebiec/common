@@ -139,7 +139,7 @@ def float_arg(**kwargs: Any) -> Callable[[Any], float]:
     """Validate a float argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_float
+        **kwargs: Keyword arguments to pass to val_float
     Returns:
         Value validator function
     """
@@ -150,7 +150,7 @@ def input_dir_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input directory path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_directory
+        **kwargs: Keyword arguments to pass to val_input_dir_path
     Returns:
         Value validator function
     """
@@ -161,7 +161,7 @@ def input_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input file path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_file
+        **kwargs: Keyword arguments to pass to val_input_path
     Returns:
         Value validator function
     """
@@ -172,7 +172,7 @@ def int_arg(**kwargs: Any) -> Callable[[Any], int]:
     """Validate an int argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_int
+        **kwargs: Keyword arguments to pass to val_int
     Returns:
         Value validator function
     """
@@ -183,7 +183,7 @@ def output_dir_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output directory path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_output_directory
+        **kwargs: Keyword arguments to pass to val_output_dir_path
     Returns:
         Value validator function
     """
@@ -194,7 +194,7 @@ def output_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output file path argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_output_file
+        **kwargs: Keyword arguments to pass to val_output_path
     Returns:
         Value validator function
     """
@@ -205,7 +205,7 @@ def str_arg(**kwargs: Any) -> Callable[[Any], str]:
     """Validate a string argument.
 
     Arguments:
-        **kwargs: Keyword arguments to pass to validate_str
+        **kwargs: Keyword arguments to pass to val_str
     Returns:
         Value validator function
     """
