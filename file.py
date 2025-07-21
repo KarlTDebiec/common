@@ -49,9 +49,9 @@ def get_temp_file_path(suffix: str | None = None) -> Generator[Path]:
         if temp_file_path and temp_file_path.exists():
             try:
                 remove(temp_file_path)
-            except PermissionError as error:
+            except PermissionError as exc:
                 debug(
-                    f"temp_file_path encountered PermissionException '{error}'; "
+                    f"temp_file_path encountered PermissionException '{exc}'; "
                     f"temporary file {temp_file_path}, will not be removed."
                 )
 

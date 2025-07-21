@@ -14,20 +14,17 @@ from pathlib import Path
 from typing import Any
 
 from .validation import (
-    validate_float,
-    validate_input_directories,
-    validate_input_directory,
-    validate_input_file,
-    validate_input_files,
-    validate_int,
-    validate_ints,
-    validate_output_directory,
-    validate_output_file,
-    validate_str,
+    val_float,
+    val_input_dir_path,
+    val_input_path,
+    val_int,
+    val_output_dir_path,
+    val_output_path,
+    val_str,
 )
 
 
-def get_optional_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
+def get_optional_args_group(parser: ArgumentParser) -> _ArgumentGroup:
     """Get the 'optional arguments' group from an argparser.
 
     Arguments:
@@ -39,7 +36,7 @@ def get_optional_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
     return next(ag for ag in action_groups if ag.title == "optional arguments")
 
 
-def get_required_arguments_group(parser: ArgumentParser) -> _ArgumentGroup:
+def get_required_args_group(parser: ArgumentParser) -> _ArgumentGroup:
     """Get or create a 'required arguments' group from an argparser.
 
     Arguments:
@@ -132,8 +129,8 @@ def get_validator[T](function: Callable[..., T], **kwargs: Any) -> Callable[[Any
         """
         try:
             return function(value, **kwargs)
-        except TypeError as error:
-            raise ArgumentTypeError from error
+        except TypeError as exc:
+            raise ArgumentTypeError from exc
 
     return wrapped
 
@@ -146,21 +143,10 @@ def float_arg(**kwargs: Any) -> Callable[[Any], float]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_float, **kwargs)
+    return get_validator(val_float, **kwargs)
 
 
-def input_directories_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
-    """Validate an input directory paths argument.
-
-    Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_directories
-    Returns:
-        Value validator function
-    """
-    return get_validator(validate_input_directories, **kwargs)
-
-
-def input_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
+def input_dir_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an input directory path argument.
 
     Arguments:
@@ -168,7 +154,7 @@ def input_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_input_directory, **kwargs)
+    return get_validator(val_input_dir_path, **kwargs)
 
 
 def input_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
@@ -179,18 +165,7 @@ def input_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_input_file, **kwargs)
-
-
-def input_files_arg(**kwargs: Any) -> Callable[[Any], list[Path]]:
-    """Validate an input file paths argument.
-
-    Arguments:
-        **kwargs: Keyword arguments to pass to validate_input_files
-    Returns:
-        Value validator function
-    """
-    return get_validator(validate_input_files, **kwargs)
+    return get_validator(val_input_path, **kwargs)
 
 
 def int_arg(**kwargs: Any) -> Callable[[Any], int]:
@@ -201,21 +176,10 @@ def int_arg(**kwargs: Any) -> Callable[[Any], int]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_int, **kwargs)
+    return get_validator(val_int, **kwargs)
 
 
-def ints_arg(**kwargs: Any) -> Callable[[Any], list[int]]:
-    """Validate a tuple of ints argument.
-
-    Arguments:
-        **kwargs: Keyword arguments to pass to validate_ints
-    Returns:
-        Value validator function
-    """
-    return get_validator(validate_ints, **kwargs)
-
-
-def output_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
+def output_dir_arg(**kwargs: Any) -> Callable[[Any], Path]:
     """Validate an output directory path argument.
 
     Arguments:
@@ -223,7 +187,7 @@ def output_directory_arg(**kwargs: Any) -> Callable[[Any], Path]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_output_directory, **kwargs)
+    return get_validator(val_output_dir_path, **kwargs)
 
 
 def output_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
@@ -234,7 +198,7 @@ def output_file_arg(**kwargs: Any) -> Callable[[Any], Path]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_output_file, **kwargs)
+    return get_validator(val_output_path, **kwargs)
 
 
 def str_arg(**kwargs: Any) -> Callable[[Any], str]:
@@ -245,22 +209,19 @@ def str_arg(**kwargs: Any) -> Callable[[Any], str]:
     Returns:
         Value validator function
     """
-    return get_validator(validate_str, **kwargs)
+    return get_validator(val_str, **kwargs)
 
 
 __all__ = [
     "float_arg",
     "get_arg_groups_by_name",
-    "get_optional_arguments_group",
-    "get_required_arguments_group",
+    "get_optional_args_group",
+    "get_required_args_group",
     "get_validator",
-    "input_directories_arg",
-    "input_directory_arg",
+    "input_dir_arg",
     "input_file_arg",
-    "input_files_arg",
     "int_arg",
-    "ints_arg",
-    "output_directory_arg",
+    "output_dir_arg",
     "output_file_arg",
     "str_arg",
 ]

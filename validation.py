@@ -10,7 +10,7 @@ from os.path import defpath, expanduser, expandvars
 from pathlib import Path
 from platform import system
 from shutil import which
-from typing import Any
+from typing import Any, overload
 
 from .exception import (
     ArgumentConflictError,
@@ -19,13 +19,12 @@ from .exception import (
     NotAFileError,
     UnsupportedPlatformError,
 )
-from .typing import PathLike
 
 
-def validate_executable(
+def val_executable(
     name: str, supported_platforms: Collection[str] | None = None
 ) -> Path:
-    """Validates that executable name and returns its absolute path.
+    """Validates executable and returns its absolute path.
 
     Arguments:
         name: executable name
@@ -53,249 +52,377 @@ def validate_executable(
     return executable_path
 
 
-def validate_float(
-    value: Any, min_value: float | None = None, max_value: float | None = None
-) -> float:
-    """Validate a float.
+@overload
+def val_float(
+    value: float,
+    *,
+    n_values: int | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
+) -> float: ...
+@overload
+def val_float(
+    value: Iterable[Any],
+    *,
+    n_values: int | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
+) -> list[float]: ...
+def val_float(
+    value: float | Iterable[Any],
+    *,
+    n_values: int | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
+) -> float | list[float]:
+    """Validate one or more floats.
 
     Arguments:
-        value: Input value to validate
+        value: Single value or iterable of values to validate
+        n_values: Number of values expected, if applicable
         min_value: Minimum value of float, if applicable
         max_value: Maximum value of float, if applicable
     Returns:
-        value as a float
+        Single float or list of floats depending on input
     Raises:
         ArgumentConflictError: If min_value is greater than max_value
-        ValueError: If value is less than min_value or greater than max_value
+        TypeError: If a value may not be cast to a float
+        ValueError: If a value is invalid or the list is the wrong length
     """
-    if min_value and max_value and (min_value >= max_value):
-        raise ArgumentConflictError("min_value must be greater than max_value")
+    if min_value is not None and max_value is not None and (min_value >= max_value):
+        raise ArgumentConflictError("min_value must be less than max_value")
 
-    try:
-        return_value = float(value)
-    except ValueError as error:
-        raise TypeError(
-            f"{value} is of type {type(value)}, cannot be cast to float"
-        ) from error
-
-    if min_value and return_value < min_value:
-        raise ValueError(f"{return_value} is less than minimum value of {min_value}")
-    if max_value and return_value > max_value:
-        raise ValueError(f"{return_value} is greater than maximum value of {max_value}")
-
-    return return_value
-
-
-def validate_input_directory(path: PathLike) -> Path:
-    """Validate input directory path, expand '~' and env vars, and make it absolute.
-
-    Arguments:
-        path: Path to directory of input files
-    Returns:
-        Absolute path to input directory
-    """
-    path = Path(expandvars(expanduser(str(path)))).absolute().resolve()
-    if not path.exists():
-        raise DirectoryNotFoundError(f"Input directory {path} does not exist")
-    if not path.is_dir():
-        raise NotADirectoryError(f"Input directory {path} is not a directory")
-
-    return path
-
-
-def validate_input_directories(paths: PathLike | Iterable[PathLike]) -> list[Path]:
-    """Validate input directory paths and make them absolute.
-
-    Arguments:
-        paths: Path to directory or directories of input files
-    Returns:
-        List of absolute directory paths
-    """
-    if isinstance(paths, (str | Path)):
-        paths = [paths]
-    validated_paths = []
-    for path in paths:
+    def _val_float(value_to_validate: Any) -> float:
         try:
-            validated_path = validate_input_directory(path)
-        except (DirectoryNotFoundError, NotADirectoryError) as error:
-            info(str(error))
-            continue
-        validated_paths.append(validated_path)
-    if len(validated_paths) == 0:
-        raise DirectoryNotFoundError(f"No directories provided in {paths} exist")
+            validated_value = float(value_to_validate)
+        except ValueError as exc:
+            raise TypeError(
+                f"{value_to_validate} is of type "
+                f"{type(value_to_validate)}, cannot be cast to float"
+            ) from exc
+        if min_value is not None and validated_value < min_value:
+            raise ValueError(
+                f"{validated_value} is less than minimum value of {min_value}"
+            )
+        if max_value is not None and validated_value > max_value:
+            raise ValueError(
+                f"{validated_value} is greater than maximum value of {max_value}"
+            )
+        return validated_value
 
-    return validated_paths
+    # Handle non-iterables and iterables we don't want to iterate over
+    if isinstance(value, str | bytes) or not isinstance(value, Iterable):
+        return _val_float(value)
 
-
-def validate_input_file(path: PathLike, must_exist: bool = True) -> Path:
-    """Validate input file path, expand '~' and env vars, and make it absolute.
-
-    Arguments:
-        path: Path to input file
-        must_exist: Whether to raise an error if the file does not exist
-    Returns:
-        Absolute path to input file
-    """
-    path = Path(expandvars(expanduser(str(path)))).absolute().resolve()
-    if path.exists():
-        if not path.is_file():
-            raise NotAFileError(f"Input file {path} is not a file")
-    elif must_exist:
-        raise FileNotFoundError(f"Input file {path} does not exist")
-
-    return path
-
-
-def validate_input_files(paths: PathLike | Iterable[PathLike]) -> list[Path]:
-    """Validate input file paths and make them absolute.
-
-    Arguments:
-        paths: Paths to input file or files
-    Returns:
-        List of absolute file paths
-    """
-    if isinstance(paths, (str | Path)):
-        paths = [paths]
-    validated_paths = []
-    for path in paths:
-        try:
-            validated_path = validate_input_file(path)
-        except (FileNotFoundError, NotAFileError) as error:
-            info(str(error))
-            continue
-        validated_paths.append(validated_path)
-    if len(validated_paths) == 0:
-        raise FileNotFoundError(f"No files provided in {paths} exist")
-
-    return validated_paths
-
-
-def validate_int(
-    value: Any,
-    min_value: int | None = None,
-    max_value: int | None = None,
-    options: Collection[int] | None = None,
-) -> int:
-    """Validate an int.
-
-    Arguments:
-        value: Input value to validate
-        min_value: Minimum value of int, if applicable
-        max_value: Maximum value of int, if applicable
-        options: Acceptable int values, if applicable
-    Returns:
-        value as an int
-    Raises:
-        ArgumentConflictError: If min_value is greater than max_value
-        TypeError: If value may not be cast to an int
-        ValueError: If value is less than min_value or greater than max_value, or is not
-          one of the provided options
-    """
-    if min_value and max_value and (min_value >= max_value):
-        raise ArgumentConflictError("min_value must be greater than max_value")
-
-    try:
-        return_value = int(value)
-    except ValueError as error:
-        raise TypeError(
-            f"{value} is of type {type(value)}, cannot be cast to int"
-        ) from error
-
-    if min_value and return_value < min_value:
-        raise ValueError(f"{return_value} is less than minimum value of {min_value}")
-    if max_value and return_value > max_value:
-        raise ValueError(f"{return_value} is greater than maximum value of {max_value}")
-    if options and return_value not in options:
-        raise ValueError(f"{return_value} is not one of {options}")
-
-    return return_value
-
-
-def validate_ints(
-    values: Any,
-    length: int | None = None,
-    min_value: int | None = None,
-    max_value: int | None = None,
-    options: Collection[int] | None = None,
-) -> list[int]:
-    """Validate a collection of int.
-
-    Arguments:
-        values: Input values to validate
-        length:  Number of values expected, if applicable
-        min_value: Minimum value of int, if applicable
-        max_value: Maximum value of int, if applicable
-        options: Acceptable int values, if applicable
-    Returns:
-        values as a list of ints
-    Raises:
-        ArgumentConflictError: If min_value is greater than max_value
-        ValueError: If value is less than min_value or greater than max_value
-    """
-    if min_value and max_value and (min_value >= max_value):
-        raise ArgumentConflictError("min_value must be greater than max_value")
-
-    try:
-        len(values)
-    except TypeError:
-        values = [values]
-
-    validated_values = [
-        validate_int(value, min_value, max_value, options) for value in values
-    ]
-
-    if length and len(validated_values) != length:
+    # Handle iterables
+    validated_values = [_val_float(value_to_validate) for value_to_validate in value]
+    if n_values and len(validated_values) != n_values:
         raise ValueError(
-            f"'{validated_values}' is of length {len(validated_values)}, not '{length}'"
+            f"'{validated_values}' is of length {len(validated_values)}, "
+            f"not '{n_values}'"
         )
-
     return validated_values
 
 
-def validate_output_file(path: PathLike, may_exist: bool = True) -> Path:
-    """Validate output file path, expand '~' and env vars, and make it absolute.
+@overload
+def val_input_dir_path(value: Path | str) -> Path: ...
+@overload
+def val_input_dir_path(value: Iterable[Path | str]) -> list[Path]: ...
+def val_input_dir_path(value: Path | str | Iterable[Path | str]) -> Path | list[Path]:
+    """Validate input directory path(s) and make them absolute.
 
     Arguments:
-        path: Output file path
-        may_exist: If True, do not raise an error if the file already exists
+        value: Path or paths to input directories
     Returns:
-        Absolute path to output file
+        Validated path or paths
+    Raises:
+        DirectoryNotFoundError: If any path does not exist
+        NotADirectoryError: If any path is not a directory
+        TypeError: If any value cannot be cast to Path
     """
-    path = Path(expandvars(expanduser(str(path)))).absolute().resolve()
-    if path.exists():
-        if path.is_file():
-            if not may_exist:
-                raise FileExistsError(f"{path} already exists")
-            info(f"{path} already exists and may be overwritten")
-            return path
-        raise NotAFileError(f"{path} already exists and is not a file")
-    if not path.parent.exists():
-        path.parent.mkdir(parents=True)
-        info(f"Created directory {path.parent}")
 
-    return path
+    def _val_input_dir(value_to_validate: Path | str) -> Path:
+        """Validate a path.
+
+        Arguments:
+            value_to_validate: Path to validate
+        Returns:
+            Validated path
+        Raises:
+            DirectoryNotFoundError: If path does not exist
+            NotADirectoryError: If path is not a directory
+            TypeError: If value cannot be cast to Path
+        """
+        try:
+            validated_value = Path(
+                expandvars(expanduser(str(value_to_validate)))
+            ).resolve()
+        except ValueError as exc:
+            raise TypeError(
+                f"{value_to_validate} is of type "
+                f"{type(value_to_validate)}, cannot be cast to Path"
+            ) from exc
+        if not validated_value.exists():
+            raise DirectoryNotFoundError(
+                f"Input directory {validated_value} does not exist"
+            )
+        if not validated_value.is_dir():
+            raise NotADirectoryError(
+                f"Input directory {validated_value} is not a directory"
+            )
+        return validated_value
+
+    # Handle non-iterables and iterables we don't want to iterate over
+    if isinstance(value, Path | str | bytes) or not isinstance(value, Iterable):
+        return _val_input_dir(value)
+
+    # Handle iterables
+    return [_val_input_dir(value_to_validate) for value_to_validate in value]
 
 
-def validate_output_directory(path: PathLike) -> Path:
-    """Validate output directory path, expand '~' and env vars, and make it absolute.
+@overload
+def val_input_path(value: Path | str) -> Path: ...
+@overload
+def val_input_path(value: Iterable[Path | str]) -> list[Path]: ...
+def val_input_path(value: Path | str | Iterable[Path | str]) -> Path | list[Path]:
+    """Validate input file path(s) and make them absolute.
 
     Arguments:
-        path: Output directory path
+        value: Path or paths to input files
     Returns:
-        Absolute path to output directory
+        Validated path or paths
+    Raises:
+        FileNotFoundError: If any file does not exist
+        NotAFileError: If any path is not a file
+        TypeError: If any value cannot be cast to Path
     """
-    path = Path(expandvars(expanduser(str(path)))).absolute().resolve()
-    if path.exists():
-        if not path.is_dir():
-            raise NotADirectoryError(f"{path} already exists and is not a directory")
-    else:
-        path.mkdir(parents=True)
-        info(f"Created directory {path}")
 
-    return path
+    def _val_input_path(value_to_validate: Path | str) -> Path:
+        """Validate a path.
+
+        Arguments:
+            value_to_validate: Path to validate
+        Returns:
+            Validated path
+        Raises:
+            FileNotFoundError: If path does not exist
+            NotAFileError: If path is not a file
+            TypeError: If value cannot be cast to Path
+        """
+        try:
+            validated_value = Path(
+                expandvars(expanduser(str(value_to_validate)))
+            ).resolve()
+        except ValueError as exc:
+            raise TypeError(
+                f"{value_to_validate} is of type "
+                f"{type(value_to_validate)}, cannot be cast to Path"
+            ) from exc
+        if not validated_value.exists():
+            raise FileNotFoundError(f"Input file {validated_value} does not exist")
+        if not validated_value.is_file():
+            raise NotAFileError(f"Input file {validated_value} is not a file")
+        return validated_value
+
+    # Handle non-iterables and iterables we don't want to iterate over
+    if isinstance(value, Path | str | bytes) or not isinstance(value, Iterable):
+        return _val_input_path(value)
+
+    # Handle iterables
+    return [_val_input_path(value_to_validate) for value_to_validate in value]
 
 
-def validate_str(value: Any, options: Iterable[str]) -> str:
+@overload
+def val_int(
+    value: int,
+    *,
+    n_values: int | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    acceptable_values: Collection[int] | None = None,
+) -> int: ...
+@overload
+def val_int(
+    value: Iterable[Any],
+    *,
+    n_values: int | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    acceptable_values: Collection[int] | None = None,
+) -> list[int]: ...
+def val_int(
+    value: int | Iterable[Any],
+    *,
+    n_values: int | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    acceptable_values: Collection[int] | None = None,
+) -> int | list[int]:
+    """Validate one or more ints.
+
+    Arguments:
+        value: Single value or iterable of values to validate
+        n_values: Number of values expected, if applicable
+        min_value: Minimum value of int, if applicable
+        max_value: Maximum value of int, if applicable
+        acceptable_values: Acceptable int values, if applicable
+    Returns:
+        Single int or list of ints depending on input
+    Raises:
+        ArgumentConflictError: If min_value is greater than max_value
+        TypeError: If a value may not be cast to an int
+        ValueError: If a value is invalid or the list is the wrong length
+    """
+    if min_value is not None and max_value is not None and (min_value >= max_value):
+        raise ArgumentConflictError("min_value must be less than max_value")
+
+    def _val_int(value_to_validate: Any) -> int:
+        """Validate a single value as an int.
+
+        Arguments:
+            value_to_validate: Value to validate
+        Returns:
+            Value as an int
+        """
+        try:
+            validated_value = int(value_to_validate)
+        except ValueError as exc:
+            raise TypeError(
+                f"{value_to_validate} is of type "
+                f"{type(value_to_validate)}, cannot be cast to int"
+            ) from exc
+        if min_value is not None and validated_value < min_value:
+            raise ValueError(
+                f"{validated_value} is less than minimum value of {min_value}"
+            )
+        if max_value is not None and validated_value > max_value:
+            raise ValueError(
+                f"{validated_value} is greater than maximum value of {max_value}"
+            )
+        if acceptable_values and validated_value not in acceptable_values:
+            raise ValueError(f"{validated_value} is not one of {acceptable_values}")
+        return validated_value
+
+    # Handle non-iterables and iterables we don't want to iterate over
+    if isinstance(value, str | bytes) or not isinstance(value, Iterable):
+        return _val_int(value)
+
+    # Handle iterables
+    validated_values = [_val_int(value_to_validate) for value_to_validate in value]
+    if n_values and len(validated_values) != n_values:
+        raise ValueError(
+            f"'{validated_values}' is of length {len(validated_values)}, "
+            f"not '{n_values}'"
+        )
+    return validated_values
+
+
+@overload
+def val_output_dir_path(value: Path | str) -> Path: ...
+@overload
+def val_output_dir_path(value: Iterable[Path | str]) -> list[Path]: ...
+def val_output_dir_path(value: Path | str | Iterable[Path | str]) -> Path | list[Path]:
+    """Validate output directory path(s), make them absolute, and create them if needed.
+
+    Arguments:
+        value: Path or paths to output directories
+    Returns:
+        Validated path or paths
+    Raises:
+        NotADirectoryError: If any path is not a directory
+        TypeError: If any value cannot be cast to Path
+    """
+
+    def _val_output_dir_path(value_to_validate: Path | str) -> Path:
+        """Validate a path.
+
+        Arguments:
+            value_to_validate: Path to validate
+        Returns:
+            Validated path
+        Raises:
+            FileExistsError: If path already exists
+            NotADirectoryError: If path is not a directory
+            TypeError: If value cannot be cast to Path
+        """
+        try:
+            validated_value = Path(
+                expandvars(expanduser(str(value_to_validate)))
+            ).resolve()
+        except ValueError as exc:
+            raise TypeError(
+                f"{value_to_validate} is of type "
+                f"{type(value_to_validate)}, cannot be cast to Path"
+            ) from exc
+        if not validated_value.exists():
+            validated_value.mkdir(parents=True)
+            info(f"Created directory {validated_value}")
+            return validated_value
+        if not validated_value.is_dir():
+            raise NotADirectoryError(f"{validated_value} is not a directory")
+        return validated_value
+
+    # Handle non-iterables and iterables we don't want to iterate over
+    if isinstance(value, Path | str | bytes) or not isinstance(value, Iterable):
+        return _val_output_dir_path(value)
+
+    # Handle iterables
+    return [_val_output_dir_path(v) for v in value]
+
+
+@overload
+def val_output_path(value: Path | str) -> Path: ...
+@overload
+def val_output_path(value: Iterable[Path | str]) -> list[Path]: ...
+def val_output_path(value: Path | str | Iterable[Path | str]) -> Path | list[Path]:
+    """Validate output file path(s) and make them absolute.
+
+    Arguments:
+        value: Path or paths to output files
+    Returns:
+        Validated path or paths
+    Raises:
+        FileExistsError: If the file exists and must_exist is True
+        NotAFileError: If a path exists and is not a file
+        TypeError: If any value cannot be cast to a Path
+    """
+
+    def _val_output_path(value_to_validate: Path | str) -> Path:
+        """Validate a path.
+
+        Arguments:
+            value_to_validate: Path to validate
+        Returns:
+            Validated path
+        Raises:
+            FileExistsError: If file exists and may_exist is False
+            TypeError: If value cannot be cast to a Path
+        """
+        try:
+            validated_value = Path(
+                expandvars(expanduser(str(value_to_validate)))
+            ).resolve()
+        except ValueError as exc:
+            raise TypeError(
+                f"{value_to_validate} is of type "
+                f"{type(value_to_validate)}, cannot be cast to Path"
+            ) from exc
+        if validated_value.exists():
+            raise FileExistsError(f"Output file {validated_value} already exists")
+        if not validated_value.parent.exists():
+            validated_value.parent.mkdir(parents=True)
+            info(f"Created directory {validated_value.parent}")
+        return validated_value
+
+    # Handle non-iterables and iterables we don't want to iterate over
+    if isinstance(value, Path | str | bytes) or not isinstance(value, Iterable):
+        return _val_output_path(value)
+
+    # Handle iterables
+    return [_val_output_path(value_to_validate) for value_to_validate in value]
+
+
+def val_str(value: Any, options: Iterable[str]) -> str:
     """Validate a str.
 
     Arguments:
@@ -332,33 +459,13 @@ def validate_str(value: Any, options: Iterable[str]) -> str:
     return case_insensitive_options[value]
 
 
-def validate_type(value: Any, cls: Any) -> Any:
-    """Validate that value is of type cls.
-
-    Arguments:
-        value: Input object to validate
-        cls: Required type of object
-    Returns:
-        value
-    Raises:
-        TypeError: If value is not of type cls
-    """
-    if not isinstance(value, cls):
-        raise TypeError(f"'{value}' is of type '{type(value)}', not {cls.__name__}")
-    return value
-
-
 __all__ = [
-    "validate_executable",
-    "validate_float",
-    "validate_input_directories",
-    "validate_input_directory",
-    "validate_input_file",
-    "validate_input_files",
-    "validate_int",
-    "validate_ints",
-    "validate_output_directory",
-    "validate_output_file",
-    "validate_str",
-    "validate_type",
+    "val_executable",
+    "val_float",
+    "val_input_dir_path",
+    "val_input_path",
+    "val_int",
+    "val_output_dir_path",
+    "val_output_path",
+    "val_str",
 ]
