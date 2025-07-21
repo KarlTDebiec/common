@@ -309,7 +309,7 @@ def val_int(
 
     # Handle iterables
     validated_values = [_val_int(value_to_validate) for value_to_validate in value]
-    if n_values and len(validated_values) != n_values:
+    if n_values is not None and len(validated_values) != n_values:
         raise ValueError(
             f"'{validated_values}' is of length {len(validated_values)}, "
             f"not '{n_values}'"
