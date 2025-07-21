@@ -111,7 +111,7 @@ def val_float(
         return validated_value
 
     # Handle non-iterables and iterables we don't want to iterate over
-    if isinstance(value, str | bytes) or not isinstance(value, Iterable):
+    if isinstance(value, str) or not isinstance(value, Iterable):
         return _val_float(value)
 
     # Handle iterables
@@ -173,7 +173,7 @@ def val_input_dir_path(value: Path | str | Iterable[Path | str]) -> Path | list[
         return validated_value
 
     # Handle non-iterables and iterables we don't want to iterate over
-    if isinstance(value, Path | str | bytes) or not isinstance(value, Iterable):
+    if isinstance(value, Path | str) or not isinstance(value, Iterable):
         return _val_input_dir(value)
 
     # Handle iterables
@@ -225,7 +225,7 @@ def val_input_path(value: Path | str | Iterable[Path | str]) -> Path | list[Path
         return validated_value
 
     # Handle non-iterables and iterables we don't want to iterate over
-    if isinstance(value, Path | str | bytes) or not isinstance(value, Iterable):
+    if isinstance(value, Path | str) or not isinstance(value, Iterable):
         return _val_input_path(value)
 
     # Handle iterables
