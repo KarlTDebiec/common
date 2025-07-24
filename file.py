@@ -56,7 +56,7 @@ def get_temp_file_path(suffix: str | None = None) -> Generator[Path]:
                 )
 
 
-def rename_preexisting_output_path(output_path: Path) -> None:
+def rename_preexisting_output_path(output_path: Path):
     """Check if a proposed output file exists, and if so rename the existing file.
 
     Arguments:

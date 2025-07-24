@@ -11,7 +11,7 @@ from unittest.mock import patch
 from .command_line_interface import CommandLineInterface
 
 
-def run_cli_with_args(cli: type[CommandLineInterface], args: str = "") -> None:
+def run_cli_with_args(cli: type[CommandLineInterface], args: str = ""):
     """Run CommandLineInterface as if from shell with provided args.
 
     Arguments:

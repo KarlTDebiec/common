@@ -7,7 +7,7 @@ from __future__ import annotations
 from logging import DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger
 
 
-def set_logging_verbosity(verbosity: int) -> None:
+def set_logging_verbosity(verbosity: int):
     """Set the level of verbosity of logging.
 
     Arguments:

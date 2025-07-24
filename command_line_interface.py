@@ -25,7 +25,7 @@ class CommandLineInterface(ABC):
     """Abstract base class for command-line interfaces."""
 
     @classmethod
-    def add_arguments_to_argparser(cls, parser: ArgumentParser) -> None:
+    def add_arguments_to_argparser(cls, parser: ArgumentParser):
         """Add arguments to a nascent argument parser.
 
         Arguments:
@@ -101,7 +101,7 @@ class CommandLineInterface(ABC):
         return text[0].lower() + text[1:]
 
     @classmethod
-    def main(cls) -> None:
+    def main(cls):
         """Execute from command line."""
         parser = cls.argparser()
         kwargs = vars(parser.parse_args())
@@ -132,7 +132,7 @@ class CommandLineInterface(ABC):
         return name.lower()
 
     @staticmethod
-    def log_command_line() -> None:
+    def log_command_line():
         """Log the command line with which the script was run."""
         args = argv[:]
         command_line = " ".join(args)
@@ -140,6 +140,6 @@ class CommandLineInterface(ABC):
 
     @classmethod
     @abstractmethod
-    def _main(cls, **kwargs: Any) -> None:
+    def _main(cls, **kwargs: Any):
         """Execute with provided keyword arguments."""
         raise NotImplementedError()
