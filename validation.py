@@ -371,18 +371,23 @@ def val_output_dir_path(value: Path | str | Iterable[Path | str]) -> Path | list
 
 
 @overload
-def val_output_path(value: Path | str) -> Path: ...
+def val_output_path(value: Path | str, exist_ok: bool = False) -> Path: ...
 @overload
-def val_output_path(value: Iterable[Path | str]) -> list[Path]: ...
-def val_output_path(value: Path | str | Iterable[Path | str]) -> Path | list[Path]:
+def val_output_path(
+    value: Iterable[Path | str], exist_ok: bool = False
+) -> list[Path]: ...
+def val_output_path(
+    value: Path | str | Iterable[Path | str], exist_ok: bool = False
+) -> Path | list[Path]:
     """Validate output file path(s) and make them absolute.
 
     Arguments:
         value: Path or paths to output files
+        exist_ok: Whether to allow output files to already exist
     Returns:
         Validated path or paths
     Raises:
-        FileExistsError: If the file exists and must_exist is True
+        FileExistsError: If the file exists and exist_ok is False
         NotAFileError: If a path exists and is not a file
         TypeError: If any value cannot be cast to a Path
     """
@@ -395,7 +400,7 @@ def val_output_path(value: Path | str | Iterable[Path | str]) -> Path | list[Pat
         Returns:
             Validated path
         Raises:
-            FileExistsError: If file exists and may_exist is False
+            FileExistsError: If file exists and exist_ok is False
             TypeError: If value cannot be cast to a Path
         """
         try:
@@ -407,7 +412,7 @@ def val_output_path(value: Path | str | Iterable[Path | str]) -> Path | list[Pat
                 f"{value_to_validate} is of type "
                 f"{type(value_to_validate)}, cannot be cast to Path"
             ) from exc
-        if validated_value.exists():
+        if validated_value.exists() and not exist_ok:
             raise FileExistsError(f"Output file {validated_value} already exists")
         if not validated_value.parent.exists():
             validated_value.parent.mkdir(parents=True)
